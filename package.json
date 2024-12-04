@@ -1,0 +1,26 @@
+{
+  "name": "mental-health-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "chart.js": "^4.4.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "esbuild": "^0.24.0",
+    "express": "^4.21.2"
+  },
+  "scripts": {
+    "serve": "npm run build && ts-node server/host.ts",
+    "build": "esbuild --bundle src/index.ts --outfile=web/out.js && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js",
+    "test": "tsc --noEmit && npx playwright test"
+  },
+  "engines": {
+    "node": "21.x"
+  },
+  "author": "",
+  "license": "AGPL-3.0-only"
+}

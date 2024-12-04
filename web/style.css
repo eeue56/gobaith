@@ -1,0 +1,441 @@
+:root {
+  --mood-unfilled: gray;
+  --mood-1: #c2fbc8;
+  --mood-2: #52ec73;
+  --mood-3: #42ac64;
+  --mood-4: #336b34;
+  --pico-color-sand-50: #f2f0ec;
+  --pico-color-zinc-150: #d1d5db;
+  --pico-color-zinc-300: #a4acba;
+  --pico-color-fuchsia-400: #f748b7;
+  --pico-color-orange-450: #e74b1a;
+  --pico-color-yellow-150: #e8d600;
+  --pico-color-green-150: #77ef3d;
+  --pico-color-red-500: #d93526;
+}
+
+body {
+  margin-top: 5vh;
+}
+
+textarea {
+  field-sizing: content;
+  max-height: 500px;
+  padding: 5px;
+}
+
+canvas {
+  background-color: white;
+}
+
+.pure-g {
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+}
+
+.pure-button {
+  background-color: var(--pico-color-zinc-300);
+  color: black;
+  font-size: 2vh;
+  text-wrap: auto;
+}
+
+.pure-button-active {
+  box-shadow: none;
+  font-weight: bold;
+}
+
+.pure-button:hover,
+.pure-button:active {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5) inset;
+  background-image: none;
+  border-color: white;
+}
+
+.current-day {
+  text-align: center;
+}
+
+.mood-color-indicator-0 {
+  border-right: 5px solid var(--mood-unfilled);
+  height: 100%;
+}
+
+.mood-color-indicator-1 {
+  border-right: 5px solid var(--mood-1);
+  height: 100%;
+}
+
+.mood-color-indicator-2 {
+  border-right: 5px solid var(--mood-2);
+  height: 100%;
+}
+
+.mood-color-indicator-3 {
+  border-right: 5px solid var(--mood-3);
+  height: 100%;
+}
+
+.mood-color-indicator-4 {
+  border-right: 5px solid var(--mood-4);
+  height: 100%;
+}
+
+.mood-color-button-0 {
+  background-color: var(--mood-unfilled);
+}
+
+.mood-color-button-1 {
+  background-color: var(--mood-1);
+}
+
+.mood-color-button-2 {
+  background-color: var(--mood-2);
+}
+
+.mood-color-button-3 {
+  background-color: var(--mood-3);
+  color: white;
+}
+
+.mood-color-button-4 {
+  background-color: var(--mood-4);
+  color: white;
+}
+
+.tabs {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  margin-bottom: 0vh;
+}
+
+.tabs > .pure-g > .pure-button {
+  font-weight: bold;
+}
+
+.active-tab {
+  border-color: var(--pico-color-sand-50);
+  background-color: var(--pico-color-zinc-150);
+  border-width: 2px;
+  border-style: solid;
+}
+
+.slider {
+  height: 15px;
+  border-radius: 5px;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  width: 33.33% !important;
+}
+
+.thick {
+  font-size: 1.5em;
+  font-weight: bolder;
+}
+
+.daily-bar {
+  height: 100px;
+  width: 10px;
+  display: inline-block;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.daily-bar-0 {
+  background-color: var(--mood-unfilled);
+  height: 20px;
+  margin-bottom: 40px;
+}
+
+.daily-bar-1 {
+  background-color: var(--mood-1);
+  height: 30px;
+  margin-bottom: 35px;
+}
+
+.daily-bar-2 {
+  background-color: var(--mood-2);
+  height: 40px;
+  margin-bottom: 30px;
+}
+
+.daily-bar-3 {
+  background-color: var(--mood-3);
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.daily-bar-4 {
+  background-color: var(--mood-4);
+  height: 100px;
+  margin-bottom: 0px;
+}
+
+.daily-bar-sleep {
+  background-color: var(--mood-3);
+  width: 10px;
+  display: inline-block;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.daily-bar-row {
+  height: 100px;
+  padding-top: 30px;
+}
+
+.daily-bar-row.daily-bar-journal {
+  height: 50px;
+}
+
+.daily-bar-colors {
+  display: inline-block;
+}
+
+.daily-bar-prompt {
+  padding-left: 30px;
+  width: 200px;
+  display: inline-block;
+  overflow: auto;
+  margin: 0;
+  padding-bottom: 40px;
+}
+
+.daily-bar-detailed {
+  height: 100px;
+  width: 5px;
+  display: inline-block;
+  border-radius: 25px;
+}
+
+.daily-bar-detailed-prompt {
+  padding-left: 30px;
+  width: 100px;
+  display: inline-block;
+  overflow: auto;
+  margin: 0;
+  padding-bottom: 40px;
+}
+
+.daily-bar-detailed-sleep {
+  background-color: var(--mood-3);
+  width: 5px;
+  display: inline-block;
+  border-radius: 25px;
+}
+
+.daily-bar-detailed-0 {
+  background-color: var(--mood-unfilled);
+  height: 20px;
+  margin-bottom: 40px;
+}
+
+.daily-bar-detailed-1 {
+  background-color: var(--mood-1);
+  height: 30px;
+  margin-bottom: 35px;
+}
+
+.daily-bar-detailed-2 {
+  background-color: var(--mood-2);
+  height: 40px;
+  margin-bottom: 30px;
+}
+
+.daily-bar-detailed-3 {
+  background-color: var(--mood-3);
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.daily-bar-detailed-4 {
+  background-color: var(--mood-4);
+  height: 100px;
+  margin-bottom: 0px;
+}
+
+.daily-bar-totaled-0 {
+  background-color: var(--mood-unfilled);
+}
+
+.daily-bar-totaled-1 {
+  background-color: var(--mood-1);
+}
+
+.daily-bar-totaled-2 {
+  background-color: var(--mood-2);
+}
+
+.daily-bar-totaled-3 {
+  background-color: var(--mood-3);
+}
+
+.daily-bar-totaled-4 {
+  background-color: var(--mood-4);
+}
+
+.daily-bar-total-prompt {
+  font-size: 20px;
+  padding-left: 30px;
+  display: inline-block;
+  overflow: auto;
+  margin: 0;
+  padding-bottom: 40px;
+}
+
+.daily-bar-total-colors {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  transform: rotate(-90deg) translate(-100%) translateY(50%);
+}
+
+.daily-bar-total {
+  width: 5px;
+}
+
+.daily-bar-total-Depression {
+  background-color: var(--pico-color-fuchsia-400);
+}
+
+.daily-bar-total-Elevation {
+  background-color: var(--pico-color-orange-450);
+}
+
+.daily-bar-total-Anxiety {
+  background-color: var(--pico-color-yellow-150);
+}
+
+.daily-bar-total-Irrability {
+  background-color: var(--pico-color-green-150);
+}
+
+.daily-bar-total-Psychotic {
+  background-color: var(--pico-color-red-500);
+}
+
+.bipolar-periods {
+  text-align: center;
+  padding-bottom: 100px;
+}
+
+.journal-entries {
+  overflow-y: scroll;
+  max-height: 15vh;
+}
+
+.pill-amount-taken {
+  text-align: center;
+}
+
+.slider-label {
+  display: grid;
+  align-items: center;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#spiderweb {
+  aspect-ratio: 1 / 2;
+}
+
+#line-overview {
+  aspect-ratio: 1;
+}
+
+.spacer {
+  height: 59.4923px;
+}
+
+.export-data {
+  height: fit-content;
+}
+
+.import-field {
+  height: fit-content;
+}
+
+.tab-title {
+  text-align: center;
+}
+
+.tab-content {
+  padding-bottom: 10vh;
+  min-height: 100vh;
+}
+
+.tabs > .pure-g {
+  margin-bottom: 0px;
+}
+
+.prompt > h4 {
+  text-align: center;
+}
+
+.daily-bar-graph-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 70vh;
+}
+
+.save-log-entry-button {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#download-settings,
+#download-state {
+  margin-top: 10px;
+}
+
+#update-import-from-text {
+  padding: 2px;
+}
+
+@media (min-width: 1000px) {
+  body {
+    padding-left: 15vw;
+    padding-right: 15vw;
+  }
+
+  .tabs {
+    width: 70vw;
+  }
+}
+
+@media (max-width: 400px) {
+  body {
+    padding-bottom: 3vh;
+  }
+
+  .prompt-side {
+    display: none;
+  }
+
+  .tabs {
+    margin-bottom: 0;
+  }
+
+  .daily-bar-sleep,
+  .daily-bar {
+    width: 20px;
+  }
+
+  #previous-day,
+  #next-day,
+  .active-tab {
+    padding-left: 1px;
+    padding-right: 1px;
+  }
+
+  .daily-bar-prompt {
+    padding-left: 10px;
+    width: 120px;
+  }
+}
