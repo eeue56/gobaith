@@ -48,7 +48,7 @@ Many apps provide notifications specifically for a tracker app. I instead built 
 
 ### Avoid dependencies
 
-A core tool that you use every day should not need constant maintence to keep running. Therefore this app uses minimal dependencies. The frontend itself only uses Chart.js, and two CSS frameworks (Pico and Pure.css). The backend only uses Express.
+A core tool that you use every day should not need constant maintenance to keep running. Therefore this app uses minimal dependencies. The frontend itself only uses Chart.js, and two CSS frameworks (Pico and Pure.css). The backend only uses Express.
 
 ## Install
 
