@@ -131,6 +131,7 @@ canvas {
   margin-top: 1vh;
   margin-bottom: 1vh;
   width: 33.33% !important;
+  cursor: pointer;
 }
 
 .slider::-webkit-slider-runnable-track {
