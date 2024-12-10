@@ -4,9 +4,19 @@ A flexible mental health tracker for developers.
 
 Many other trackers exist. This is mine. I have used it for a long time (multiple years) and have open sourced it for others to use and adapt as they need.
 
-*Non-developers probably should look at other existing tracker apps, rather than using this one. There's lots on the app stores* This tracker comes with flexiblity at a cost in terms of how easy it is to use.
+*Non-developers probably should look at other existing tracker apps, rather than using this one. There's lots on the app stores.* This tracker comes with flexiblity at a cost in terms of how easy it is to use.
 
 You are expected to modify the tracking to adapt to your needs. The default tracking is suitable for those with mood disorders, or psychotic disorders.
+
+## Screenshots
+
+Some screenshots based on generated data (no real human's tracking, see the [generator](./src/utils/data.ts)). There is more functionality and visualizations within the app, so the best way to understand is to try it out yourself.
+
+<img src="https://github.com/user-attachments/assets/bff698f3-cb23-4091-8b3e-f3f8cd275d99" width="15%"/>
+<img src="https://github.com/user-attachments/assets/b2aec6b5-ac0b-4255-accc-f1deb5d49a56" width="15%"/>
+<img src="https://github.com/user-attachments/assets/a0b2d477-2546-460b-b0c2-1fd6d3e304a7" width="15%"/>
+<img src="https://github.com/user-attachments/assets/313e2fe4-9d17-43f8-99fc-418a7f70ca99" width="15%"/>
+<img src="https://github.com/user-attachments/assets/48284e6f-661b-441f-b3e6-e11fdbec7c11" width="15%"/>
 
 ## Design principles
 
@@ -38,7 +48,7 @@ Many apps provide notifications specifically for a tracker app. I instead built 
 
 ### Avoid dependencies
 
-A core tool that you use every day should not need constant maintence to keep running. Therefore this app uses minimal dependencies. The frontend itself only uses Chart.js, and two CSS frameworks (Pico and Pure.css). The backend only uses Express.
+A core tool that you use every day should not need constant maintenance to keep running. Therefore this app uses minimal dependencies. The frontend itself only uses Chart.js, and two CSS frameworks (Pico and Pure.css). The backend only uses Express.
 
 ## Install
 
