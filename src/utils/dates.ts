@@ -48,8 +48,15 @@ export function dateToDay(date: Date): Day {
   };
 }
 
+function padDateNumber(number: number): string {
+  if (number < 10) {
+    return `0${number}`;
+  }
+  return `${number}`;
+}
+
 export function dayToString(day: Day): string {
-  return `${day.year}-${day.month}-${day.day}`;
+  return `${day.year}-${padDateNumber(day.month)}-${padDateNumber(day.day)}`;
 }
 
 export function stringToDay(string: string): Day | null {
