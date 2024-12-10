@@ -10,7 +10,7 @@ You are expected to modify the tracking to adapt to your needs. The default trac
 
 ## Screenshots
 
-Some screenshots based on generated data (no real human's tracking, see the [generator](./src/utils/data.ts). There is more functionality and visualizations within the app, so the best way to understand is to try it out yourself.
+Some screenshots based on generated data (no real human's tracking, see the [generator](./src/utils/data.ts)). There is more functionality and visualizations within the app, so the best way to understand is to try it out yourself.
 
 <img src="https://github.com/user-attachments/assets/bff698f3-cb23-4091-8b3e-f3f8cd275d99" width="15%"/>
 <img src="https://github.com/user-attachments/assets/b2aec6b5-ac0b-4255-accc-f1deb5d49a56" width="15%"/>
