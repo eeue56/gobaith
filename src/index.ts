@@ -152,7 +152,7 @@ renderChannel.channel.addEventListener(
  * app currently requires a service-worker.
  */
 function attachServiceWorker(): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (navigator.storage && navigator.storage.persist) {
       navigator.storage.persist().then((persistent) => {
         if (persistent) {
@@ -168,7 +168,7 @@ function attachServiceWorker(): Promise<void> {
     }
 
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
+      await navigator.serviceWorker
         .register("service-worker.js", {
           scope: "./",
         })
@@ -185,7 +185,6 @@ function attachServiceWorker(): Promise<void> {
             serviceWorker.addEventListener("statechange", (event) => {
               console.log((event.target as any).state);
             });
-            serviceWorker.postMessage("wakeup");
             resolve();
             return;
           }

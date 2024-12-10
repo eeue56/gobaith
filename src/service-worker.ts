@@ -31,6 +31,8 @@ import { dateToDay } from "./utils/dates";
 
 const renderChannel = TypedBroadcastChannel<RenderBroadcast>("render");
 
+let hasBackend = false;
+
 let appState: AppState = {
   kind: "AppState",
   currentTab: "JOURNAL",
@@ -66,8 +68,10 @@ function syncToDatabase(state: AppState, settings: Settings): void {
 
   // we send to the database, but don't block on response
   try {
-    saveSettingsToServer(settings);
-    saveAppStateToServer(state);
+    if (hasBackend) {
+      saveSettingsToServer(settings);
+      saveAppStateToServer(state);
+    }
   } catch (error) {}
 }
 
@@ -393,27 +397,38 @@ async function initDatabase(shouldLoadFromBackend: boolean) {
   }
 }
 
-self.addEventListener("install", async function (e) {
-  console.info("Install event:", e);
-  let shouldLoadFromBackend = true;
-
+async function hasHeartbeat(): Promise<boolean> {
   try {
     const healthcheck = await fetch("/healthcheck", {
       signal: AbortSignal.timeout(50),
     });
 
     if (healthcheck.status !== 200) {
-      shouldLoadFromBackend = false;
+      return false;
     }
   } catch (error) {
     // no backend
-    shouldLoadFromBackend = false;
+    return false;
   }
+
+  return true;
+}
+
+self.addEventListener("install", async function (e) {
+  console.info("Install event:", e);
+  const shouldLoadFromBackend = await hasHeartbeat();
+  hasBackend = shouldLoadFromBackend;
 
   await initDatabase(shouldLoadFromBackend);
 });
 
 self.addEventListener("activate", async function (e) {
+  const shouldLoadFromBackend = await hasHeartbeat();
+  hasBackend = shouldLoadFromBackend;
   console.info("Activate event:", e);
+  await initDatabase(false);
+});
+
+self.addEventListener("fetch", async (event) => {
   await initDatabase(false);
 });
