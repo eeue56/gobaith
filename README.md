@@ -62,6 +62,8 @@ npm install
 You can run it either:
 - Without a backend (which then uses IndexedDB for storage)
 - With a backend (that stores json on-device, and uses IndexedDB in the client for caching)
+- In Electron without a backend (using IndexedDB for storage)
+- In Electron with a backend
 
 ### Without a backend
 
@@ -76,6 +78,15 @@ python3 -m http.server
 ```
 npm run serve
 ```
+
+### Electron without a backend
+
+```
+cd electron
+npm start
+```
+
+The big benefit of using Electron is that IndexedDB has persistant storage through Electron. It does not when self hosting outside of Electron on localhost without a certification.
 
 ## Tests
 
@@ -127,7 +138,6 @@ To begin with changes, I suggest checking out the [types](./src/types.ts) file, 
 ## Future plans
 
 - Add more Playwright tests
-- Release electron wrapper
 - A way to sync between mobile/desktop
 
 ## Support

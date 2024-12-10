@@ -140,3 +140,4 @@ generated_state.json
 settings.json
 state.json
 backend-state
+electron/main.js
