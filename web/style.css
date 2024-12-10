@@ -133,6 +133,10 @@ canvas {
   width: 33.33% !important;
 }
 
+.slider::-webkit-slider-runnable-track {
+  background: none;
+}
+
 .thick {
   font-size: 1.5em;
   font-weight: bolder;
