@@ -1,0 +1,19 @@
+{
+    "short_name": "Gobaith",
+    "name": "Gobaith | Tracker",
+    "icons": [
+      {
+        "src": "/icon_192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/icon_512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/",
+    "display": "browser",
+    "prefer_related_applications": false
+  }

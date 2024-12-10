@@ -18,6 +18,7 @@ export function idHash(str: string): string {
     }
     hashCache[str] = unique;
   }
+
   return hashCache[str];
 }
 
