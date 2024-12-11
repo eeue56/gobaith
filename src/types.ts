@@ -18,6 +18,10 @@ export function moodStateFromValue(value: MoodValue): MoodState {
   }
 }
 
+export function generateRandomMoodValue(): MoodValue {
+  return MOOD_VALUES[Math.floor(Math.random() * MOOD_VALUES.length)];
+}
+
 /**
  * These are the prompts you'll want to answer each day.
  *
@@ -33,6 +37,10 @@ export const PROMPTS = [
 ] as const;
 
 export type Prompt = (typeof PROMPTS)[number];
+
+export function isPrompt(str: string): str is Prompt {
+  return PROMPTS.includes(str as Prompt);
+}
 
 export type PromptResponses = {
   [prompt in Prompt]: MoodValue;

@@ -12,11 +12,20 @@ You are expected to modify the tracking to adapt to your needs. The default trac
 
 Some screenshots based on generated data (no real human's tracking, see the [generator](./src/utils/data.ts)). There is more functionality and visualizations within the app, so the best way to understand is to try it out yourself.
 
-<img src="https://github.com/user-attachments/assets/bff698f3-cb23-4091-8b3e-f3f8cd275d99" width="15%"/>
-<img src="https://github.com/user-attachments/assets/b2aec6b5-ac0b-4255-accc-f1deb5d49a56" width="15%"/>
-<img src="https://github.com/user-attachments/assets/a0b2d477-2546-460b-b0c2-1fd6d3e304a7" width="15%"/>
-<img src="https://github.com/user-attachments/assets/313e2fe4-9d17-43f8-99fc-418a7f70ca99" width="15%"/>
-<img src="https://github.com/user-attachments/assets/48284e6f-661b-441f-b3e6-e11fdbec7c11" width="15%"/>
+<details open>
+
+| Page | Screenshot |
+|------|------------|
+| The daily tracker | ![](./screenshots/images/daily_tracker.png) |
+| A summary of mood periods | ![](./screenshots/images/graph_bipolar_periods.png) |
+| Daily bar overview, with clickable indicators | ![](./screenshots/images/graph_daily_bar.png) |
+| An interactive line chart of moods | ![](./screenshots/images/graph_line_overview.png) |
+| Spiderweb graph to compare moods | ![](./screenshots/images/graph_spiderweb.png) |
+| A combined representation of the extremes of all moods | ![](./screenshots/images/graph_totaled_bar.png) |
+| Importer | ![](./screenshots/images/importer.png) |
+| Settings | ![](./screenshots/images/settings.png) |
+
+</details>
 
 ## Design principles
 

@@ -1,17 +1,13 @@
 import {
   AppState,
   Day,
+  generateRandomMoodValue,
   JournalEntry,
   LogEntry,
-  MoodValue,
   PromptResponses,
 } from "../types";
 import { previousDay } from "../updaters";
 import { dateToDay } from "./dates";
-
-function randomMoodValue(): MoodValue {
-  return Math.ceil(Math.random() * 4) as MoodValue;
-}
 
 /**
  * Generates data for one day for use in examples
@@ -21,11 +17,11 @@ function generateDataForADay(day: Day): JournalEntry {
   const hoursSlept = Math.floor(Math.random() * 48) / 2;
   const logs: LogEntry[] = [];
   const promptResponses: PromptResponses = PromptResponses(
-    randomMoodValue(),
-    randomMoodValue(),
-    randomMoodValue(),
-    randomMoodValue(),
-    randomMoodValue()
+    generateRandomMoodValue(),
+    generateRandomMoodValue(),
+    generateRandomMoodValue(),
+    generateRandomMoodValue(),
+    generateRandomMoodValue()
   );
 
   return {
@@ -68,4 +64,12 @@ async function main() {
   console.log("Wrote to generated_state.json");
 }
 
-main();
+if (process.versions.bun) {
+  if (require.main === process.mainModule) {
+    main();
+  }
+} else {
+  if (require.main === module) {
+    main();
+  }
+}
