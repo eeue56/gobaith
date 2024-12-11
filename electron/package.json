@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "dependencies": {
-  },
   "devDependencies": {
     "@types/node": "^22.10.1",
     "electron": "^33.2.1",
@@ -12,7 +10,8 @@
   },
   "scripts": {
     "build": "esbuild main.ts --outfile=main.js --format=cjs && cd ../ && npm run build",
-    "start": "npm run build && electron ./"
+    "start": "npm run build && electron ./",
+    "test": "cd ../ && npx playwright test-electron"
   },
   "engines": {
     "node": "21.x"

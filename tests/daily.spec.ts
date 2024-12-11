@@ -1,30 +1,24 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { PROMPTS } from "../src/types";
-import { awaitForServiceWorker } from "./helpers";
+import { test } from "./fixtures";
+import { getActiveTab } from "./helpers";
+
+const url = "http://localhost:3003";
 
 test("renders", async ({ context, page }) => {
-  const url = "http://localhost:3003";
-  await page.goto(url.toString());
-  await awaitForServiceWorker(context);
-
   await expect(page).toHaveTitle("Mood tracker");
 });
 
 test("it starts on daily page", async ({ context, page }) => {
-  const url = "http://localhost:3003";
-  await page.goto(url.toString());
-  await awaitForServiceWorker(context);
-
   await expect(
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");
+
+  await expect(await getActiveTab(page)).toBe("Journal");
 });
 
 test("the user can choose answers to prompts", async ({ context, page }) => {
-  const url = "http://localhost:3003";
-  await page.goto(url.toString());
-  await awaitForServiceWorker(context);
-
+  await expect(page).toHaveTitle("Mood tracker");
   const promptGroups = await page.locator(".prompt-group").all();
 
   const numberOfPrompts = Object.keys(PROMPTS).length;
@@ -53,7 +47,9 @@ test("the user can choose answers to prompts", async ({ context, page }) => {
     await page.locator(".pure-button-active.prompt-answer").all()
   ).toHaveLength(numberOfPrompts);
 
-  await page.goto(url.toString());
+  if (!process.env.IS_ELECTRON) {
+    await page.goto(url.toString());
+  }
 
   await expect(page).toHaveTitle("Mood tracker");
 
@@ -71,10 +67,6 @@ test("the user can choose answers to prompts", async ({ context, page }) => {
 });
 
 test("the user can move between dates", async ({ context, page }) => {
-  const url = "http://localhost:3003";
-  await page.goto(url.toString());
-  await awaitForServiceWorker(context);
-
   await expect(
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");

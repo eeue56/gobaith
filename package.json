@@ -10,13 +10,18 @@
     "@playwright/test": "^1.49.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
+    "electron": "^33.2.1",
     "esbuild": "^0.24.0",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "typescript": "^5.7.2"
   },
   "scripts": {
     "serve": "npm run build && ts-node server/host.ts",
     "build": "esbuild --bundle src/index.ts --outfile=web/out.js && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js",
-    "test": "tsc --noEmit && npx playwright test"
+    "build-electron": "cd electron && npm run build",
+    "test": "tsc --noEmit && npx playwright test",
+    "test-electron": "IS_ELECTRON=true npx playwright test",
+    "test-all": "npm run test && npm run test-electron"
   },
   "engines": {
     "node": "21.x"

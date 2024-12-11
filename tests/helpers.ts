@@ -1,4 +1,4 @@
-import { BrowserContext, expect } from "@playwright/test";
+import { BrowserContext, expect, Page } from "@playwright/test";
 
 export async function awaitForServiceWorker(context: BrowserContext) {
   await expect
@@ -10,4 +10,9 @@ export async function awaitForServiceWorker(context: BrowserContext) {
       { timeout: 10000 }
     )
     .toBe(true);
+}
+
+export async function getActiveTab(page: Page): Promise<string> {
+  const tabName = await page.locator(".active-tab").first().innerText();
+  return tabName;
 }
