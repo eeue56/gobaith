@@ -50,7 +50,7 @@ async function loadFromDatabase<
       const transaction = db.transaction(storeName, "readonly");
       const store = transaction.objectStore(storeName);
 
-      const obj = store.get(APP_STATE_OBJECT_STORE_NAME);
+      const obj = store.get(storeName);
 
       transaction.oncomplete = (event) => {
         resolve(obj.result as returnObject);

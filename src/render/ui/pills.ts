@@ -51,7 +51,7 @@ export function renderPill(entry: JournalEntry, pill: string): Renderer {
 
   return {
     body: `
-<div id="${uniquePillGroupId}" class="prompt-group">
+<div id="${uniquePillGroupId}" class="prompt-group journal-pill">
     <div class="pure-g">
         <div class="pure-u-1-6"></div>
         <div class="pure-u-1-2 prompt">${pill}:</div>
