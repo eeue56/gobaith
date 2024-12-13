@@ -13,7 +13,7 @@ function renderJournalEntry(log: LogEntry): string {
   return `
 <div class="pure-g"/>
   <div class="pure-u-1-5"></div>
-  <p class="pure-u-3-5">${log.time} - ${log.text}</p>
+  <p class="pure-u-3-5 journal-entry">${log.time} - ${log.text}</p>
   <div class="pure-u-1-5"></div>
 </div>
 `;

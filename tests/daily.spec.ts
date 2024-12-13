@@ -96,5 +96,28 @@ test("the user can move between dates", async ({ context, page }) => {
     await expect(
       await page.locator(".current-day").first().innerHTML()
     ).toContain("1 day ahead");
+
+    await page.locator("#reset-day").click();
   }
+});
+
+test("the user can enter log entries", async ({ context, page }) => {
+  await expect(
+    await page.locator(".current-day").first().innerHTML()
+  ).toContain("Today");
+
+  await expect((await page.locator(".journal-entry").all()).length).toEqual(0);
+
+  const logEntryToFill = "Today was a good day";
+  await page.locator("#new-journal-entry").fill(logEntryToFill);
+  await page.locator(".save-log-entry-button").first().click();
+
+  await expect(await page.locator("#new-journal-entry").innerText()).toEqual(
+    ""
+  );
+  await expect(
+    await page
+      .locator(".journal-entries")
+      .evaluate((div) => div.children.length)
+  ).toEqual(1);
 });
