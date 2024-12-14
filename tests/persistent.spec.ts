@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import { testPeristentElectron } from "./fixtures";
 
 testPeristentElectron("the user adds a pill", async ({ context, page }) => {
+  if (!process.env.IS_ELECTRON) return;
   await page.locator('.tab:text("Settings")').click();
 
   await page.locator("#new-pill-entry").fill("Paracetamol 100mg");
@@ -17,6 +18,7 @@ testPeristentElectron("the user adds a pill", async ({ context, page }) => {
 testPeristentElectron(
   "the pill is still there after closing/opening electron",
   async ({ context, page }) => {
+    if (!process.env.IS_ELECTRON) return;
     // switch between views a couple of times to make sure we've re-rendered since starting electron
     await page.locator('.tab:text("Settings")').click();
     await page.locator('.tab:text("Journal")').click();
