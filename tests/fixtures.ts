@@ -33,7 +33,7 @@ export const test = base.extend<Page, BrowserContext>({
   },
 });
 
-const persistentElectronPath = `/tmp/gobaith-electron-persist-${new Date().getTime()}`;
+const persistentElectronPath = `/tmp/gobaith-electron-persist`;
 const tempUserDir = mkdtempSync(persistentElectronPath);
 
 export const testPeristentElectron = base.extend<Page, BrowserContext>({
