@@ -21,9 +21,9 @@ jobs:
         run: npm run build
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      - name: Run Playwright tests
-        run: npx playwright test
       - name: Build Electron code
         run: npm run build-electron
+      - name: Run Playwright tests
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npx playwright test
       - name: Run Playwright Electron tests
         run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test-electron
