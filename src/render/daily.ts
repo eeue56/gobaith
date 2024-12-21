@@ -32,39 +32,32 @@ export function renderJournal(state: AppState, settings: Settings): Renderer {
   }
 
   const bodies: string[] = [];
-  const eventHandlers: EventHandler[] = [];
+  let eventHandlers: EventHandler[] = [];
 
-  const date = renderDate(state.day);
-  bodies.push(date.body);
-  eventHandlers.push(...date.eventListeners);
+  /**
+   * Just a helper to handle body/eventListeners from the rendered content
+   */
+  function pushBodiesAndEventHandlers(renderer: Renderer): void {
+    bodies.push(renderer.body);
+    // concat is faster than push(...)
+    eventHandlers = eventHandlers.concat(renderer.eventListeners);
+  }
 
-  const enterTime = renderEnterTimestampMessage(state.day);
-  bodies.push(enterTime.body);
-  eventHandlers.push(...enterTime.eventListeners);
+  pushBodiesAndEventHandlers(renderDate(state.day));
+  pushBodiesAndEventHandlers(renderEnterTimestampMessage(state.day));
+  pushBodiesAndEventHandlers(renderLogs(todaysEntry));
+  pushBodiesAndEventHandlers(renderSleepSlider(todaysEntry));
 
-  const logs = renderLogs(todaysEntry);
-  bodies.push(logs.body);
-  eventHandlers.push(...logs.eventListeners);
+  for (const prompt of PROMPTS) {
+    pushBodiesAndEventHandlers(renderButtonSet(todaysEntry, prompt));
+  }
 
-  const sleep = renderSleepSlider(todaysEntry);
-  bodies.push(sleep.body);
-  eventHandlers.push(...sleep.eventListeners);
+  for (const pill of settings.currentPills) {
+    pushBodiesAndEventHandlers(renderPill(todaysEntry, pill));
+  }
 
-  PROMPTS.forEach((prompt) => {
-    const row = renderButtonSet(todaysEntry, prompt);
-    bodies.push(row.body);
-    eventHandlers.push(...row.eventListeners);
-  });
-
-  settings.currentPills.forEach((pill) => {
-    const row = renderPill(todaysEntry, pill);
-    bodies.push(row.body);
-    eventHandlers.push(...row.eventListeners);
-  });
-
-  const tab = renderTabNavigation(state.currentTab);
-
-  eventHandlers.push(...tab.eventListeners);
+  const tabs = renderTabNavigation(state.currentTab);
+  eventHandlers.push(...tabs.eventListeners);
 
   return {
     body: `
@@ -73,7 +66,7 @@ export function renderJournal(state: AppState, settings: Settings): Renderer {
       ${bodies.join("\n")}
   </div>
 </div>
-${tab.body}
+${tabs.body}
 `,
     eventListeners: eventHandlers,
   };

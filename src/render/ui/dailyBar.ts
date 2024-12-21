@@ -51,7 +51,7 @@ function renderSleepRow(entries: JournalEntry[]): Renderer {
   };
 }
 
-function renderRow(prompt: Prompt, entries: JournalEntry[]): Renderer {
+function renderRowBars(prompt: Prompt, entries: JournalEntry[]): Renderer {
   const bodies: string[] = [];
   const callbacks: EventHandler[] = [];
 
@@ -72,11 +72,10 @@ function renderRow(prompt: Prompt, entries: JournalEntry[]): Renderer {
     });
 
     const dayValue = entry.promptResponses[prompt];
+    const title = dayToString(entry.day);
 
     bodies.push(
-      `<div title="${dayToString(
-        entry.day
-      )}" class="daily-bar daily-bar-${dayValue}" id="${id}"></div>`
+      `<div title="${title}" class="daily-bar daily-bar-${dayValue}" id="${id}"></div>`
     );
   }
 
@@ -89,7 +88,7 @@ function renderRow(prompt: Prompt, entries: JournalEntry[]): Renderer {
   };
 }
 
-function renderPromptPart(prompt: Prompt): string {
+function renderPromptShortName(prompt: Prompt): string {
   return `<span class="daily-bar-prompt">${SHORT_PROMPTS[prompt]}</span>`;
 }
 
@@ -100,28 +99,31 @@ export function renderDailyBar(
   let entries = entriesBeforeToday(today, journalEntries);
 
   entries.sort(sortEntriesByDate);
-
   entries = entries.slice(Math.max(entries.length - 60, 0));
 
   const promptBodies: string[] = [];
-  const promptEvents: EventHandler[] = [];
+  let eventListeners: EventHandler[] = [];
 
   for (const prompt of PROMPTS) {
-    const row = renderer`<div class="daily-bar-row">${renderPromptPart(
-      prompt
-    )}${renderRow(prompt, entries)}</div>`;
+    const renderedShortName = renderPromptShortName(prompt);
+    const rowBars = renderRowBars(prompt, entries);
+    const row = renderer`<div class="daily-bar-row">${renderedShortName}${rowBars}</div>`;
     promptBodies.push(row.body);
-    promptEvents.push(...row.eventListeners);
+    eventListeners = eventListeners.concat(row.eventListeners);
   }
 
-  const sleepParts = renderer`<div class="daily-bar-row"><span class="daily-bar-prompt">Sleep</span>${renderSleepRow(
-    entries
-  )}</div>`;
+  const sleepRow = renderSleepRow(entries);
+  const sleepParts = renderer`<div class="daily-bar-row">
+    <span class="daily-bar-prompt">Sleep</span>
+    ${sleepRow}
+</div>`;
+
+  eventListeners = eventListeners.concat(sleepParts.eventListeners);
 
   return {
     body: `<div class="daily-bar-graph-container">${sleepParts.body}
   ${promptBodies.join("\n")}</div>`,
-    eventListeners: [...promptEvents, ...sleepParts.eventListeners],
+    eventListeners: eventListeners,
   };
 }
 
@@ -134,21 +136,22 @@ export function renderTotaledDailyBar(
 
   const dailyBars: string[] = [];
   for (const entry of entries) {
-    const inner = PROMPTS.map((prompt) => {
+    const innerPromptRendered = [];
+    for (const prompt of PROMPTS) {
       const dayValue = entry.promptResponses[prompt];
       const promptClass = `daily-bar-total-${SHORT_PROMPTS[prompt]}`;
 
-      return `
-<div style="height: ${
-        ((dayValue - 1) / 4) * 70
-      }px;" class="daily-bar-total ${promptClass}"></div>
-              `;
-    }).join("");
+      const height = ((dayValue - 1) / 4) * 70;
 
+      innerPromptRendered.push(`
+<div style="height: ${height}px;" class="daily-bar-total ${promptClass}"></div>
+`);
+    }
+
+    const title = dayToString(entry.day);
+    const content = innerPromptRendered.join("");
     dailyBars.push(
-      `<div title="${dayToString(
-        entry.day
-      )}" class="daily-bar-total-bar">${inner}</div>`
+      `<div title="${title}" class="daily-bar-total-bar">${content}</div>`
     );
   }
 
