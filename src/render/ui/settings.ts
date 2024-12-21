@@ -1,6 +1,6 @@
-import { Renderer, sendUpdate, Sent } from "../../types";
+import { RenderedWithEvents, sendUpdate, Sent } from "../../types";
 
-export function renderRemoveSettings(): Renderer {
+export function renderRemoveSettings(): RenderedWithEvents {
   return {
     body: `
 <div class="pure-g">
@@ -25,7 +25,7 @@ function updateRemoveSettings(): Sent {
   });
 }
 
-export function renderRemoveAppState(): Renderer {
+export function renderRemoveAppState(): RenderedWithEvents {
   return {
     body: `
 <div class="pure-g">

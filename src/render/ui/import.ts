@@ -3,13 +3,13 @@ import {
   AppState,
   dontSend,
   EventHandler,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
   Settings,
 } from "../../types";
 
-export function renderEnterTextToImport(): Renderer {
+export function renderEnterTextToImport(): RenderedWithEvents {
   const ids: string[] = ["update-import-from-text", "import-from-file"];
   const eventHandlers: EventHandler[] = [
     {
@@ -104,7 +104,7 @@ async function updateImportFile(event: Event): Promise<Sent> {
   return dontSend();
 }
 
-export function renderExportedSettings(settings: Settings): Renderer {
+export function renderExportedSettings(settings: Settings): RenderedWithEvents {
   const id = "download-settings";
   const stringSettings = JSON.stringify(settings);
   return {
@@ -129,7 +129,7 @@ export function renderExportedSettings(settings: Settings): Renderer {
   };
 }
 
-export function renderExportedState(state: AppState): Renderer {
+export function renderExportedState(state: AppState): RenderedWithEvents {
   const id = "download-state";
   const stringState = JSON.stringify(state);
   return {

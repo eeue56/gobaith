@@ -3,7 +3,7 @@ import {
   EventHandler,
   JournalEntry,
   PROMPTS,
-  Renderer,
+  RenderedWithEvents,
   Settings,
 } from "../types";
 import { isSameDay } from "../utils/dates";
@@ -14,7 +14,10 @@ import { renderPill } from "./ui/pills";
 import { renderSleepSlider } from "./ui/sleep";
 import { renderTabNavigation } from "./ui/tabs";
 
-export function renderJournal(state: AppState, settings: Settings): Renderer {
+export function renderJournal(
+  state: AppState,
+  settings: Settings
+): RenderedWithEvents {
   let todaysEntry: JournalEntry | null = null;
   // the last entry is usually the one you're looking at (i.e the current day)
   // so start at the back, then loop downwards to the find the right one
@@ -37,7 +40,7 @@ export function renderJournal(state: AppState, settings: Settings): Renderer {
   /**
    * Just a helper to handle body/eventListeners from the rendered content
    */
-  function pushBodiesAndEventHandlers(renderer: Renderer): void {
+  function pushBodiesAndEventHandlers(renderer: RenderedWithEvents): void {
     bodies.push(renderer.body);
     // concat is faster than push(...)
     eventHandlers = eventHandlers.concat(renderer.eventListeners);

@@ -3,7 +3,7 @@ import { showLineOverview } from "./render/graphs/lineOverview";
 import {
   AppState,
   RenderBroadcast,
-  Renderer,
+  RenderedWithEvents,
   RenderError,
   sendUpdate,
   Settings,
@@ -19,7 +19,7 @@ let lastRenderTime = 0;
 /**
  * Call the individual render functions
  */
-function renderBody(state: AppState, settings: Settings): Renderer {
+function renderBody(state: AppState, settings: Settings): RenderedWithEvents {
   switch (state.currentTab) {
     case "JOURNAL": {
       return renderJournal(state, settings);

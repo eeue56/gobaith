@@ -1,4 +1,4 @@
-import { Renderer } from "../types";
+import { RenderedWithEvents } from "../types";
 
 let unique = "a";
 
@@ -38,8 +38,8 @@ export function idHash(str: string): string {
  */
 export function renderer(
   strings: TemplateStringsArray,
-  ...vars: (string | Renderer)[]
-): Renderer {
+  ...vars: (string | RenderedWithEvents)[]
+): RenderedWithEvents {
   const body = [];
   const eventListeners = [];
   for (var i = 0; i < strings.length; i++) {

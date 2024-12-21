@@ -1,6 +1,6 @@
 import { Chart } from "chart.js/auto";
 import { getDataOnlyForToday } from "../../logic/journal";
-import { Day, JournalEntry, PROMPTS, Renderer } from "../../types";
+import { Day, JournalEntry, PROMPTS, RenderedWithEvents } from "../../types";
 import { dayToString } from "../../utils/dates";
 import { renderer } from "../../utils/render";
 import { renderDate } from "../date";
@@ -67,7 +67,7 @@ export function showSpiderweb(today: Day, entries: JournalEntry[]): void {
   });
 }
 
-export function renderSpiderweb(today: Day): Renderer {
+export function renderSpiderweb(today: Day): RenderedWithEvents {
   return renderer`
 ${renderDate(today)}
 <div class="pure-g">

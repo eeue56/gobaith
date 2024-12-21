@@ -4,7 +4,7 @@ import {
   EventHandler,
   JournalEntry,
   PillOrderDirection,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
   Settings,
@@ -15,7 +15,10 @@ import { idHash } from "../../utils/render";
 // todo: pick this up dynamically
 const IS_MOBILE = false;
 
-export function renderPill(entry: JournalEntry, pill: string): Renderer {
+export function renderPill(
+  entry: JournalEntry,
+  pill: string
+): RenderedWithEvents {
   const uniquePillGroupId = "pill-" + dayToString(entry.day) + idHash(pill);
   const amountTaken = entry.pills[pill];
   const size = IS_MOBILE ? 4 : 6;
@@ -70,7 +73,7 @@ export function renderPill(entry: JournalEntry, pill: string): Renderer {
   };
 }
 
-export function renderAddPill(): Renderer {
+export function renderAddPill(): RenderedWithEvents {
   return {
     body: `
 <div class="pure-g">
@@ -107,7 +110,7 @@ function updateAddPill(): Sent {
   });
 }
 
-export function renderPillOrder(settings: Settings): Renderer {
+export function renderPillOrder(settings: Settings): RenderedWithEvents {
   const handlers: EventHandler[] = [];
   const pills = settings.currentPills
     .map((pillName) => {

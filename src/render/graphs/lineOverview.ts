@@ -1,10 +1,10 @@
 import { Chart } from "chart.js";
 import { getDataPerPrompt } from ".";
-import { JournalEntry, Renderer } from "../../types";
+import { JournalEntry, RenderedWithEvents } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
 import { renderer } from "../../utils/render";
 
-export function renderLineOverview(): Renderer {
+export function renderLineOverview(): RenderedWithEvents {
   return renderer`
 <div class="pure-g">
     <div class="pure-u-1-24"></div>

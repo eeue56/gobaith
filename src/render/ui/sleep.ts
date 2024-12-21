@@ -1,7 +1,7 @@
 import {
   dontSend,
   JournalEntry,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
 } from "../../types";
@@ -16,7 +16,7 @@ function renderHoursSleptMessage(hoursSlept: number): string {
   return `Hours slept last night: <span class="thick">${hoursSlept}</span>`;
 }
 
-export function renderSleepSlider(entry: JournalEntry): Renderer {
+export function renderSleepSlider(entry: JournalEntry): RenderedWithEvents {
   const currentValue = entry.hoursSlept * 2;
   const percentFilled = (currentValue / MAX) * 100;
 

@@ -189,7 +189,10 @@ export type GraphName = (typeof GRAPH_NAMES)[number];
 /**
  * A graph renderer is something that takes a day, the entries, and returns a Renderer.
  */
-export type GraphRenderer = (today: Day, entries: JournalEntry[]) => Renderer;
+export type GraphRenderer = (
+  today: Day,
+  entries: JournalEntry[]
+) => RenderedWithEvents;
 
 export function isGraphName(str: string): str is GraphName {
   return GRAPH_NAMES.includes(str as GraphName);
@@ -213,7 +216,7 @@ export type EventHandler = {
  *
  * To understand how to use this, ctrl-f and look in the rendering files.
  */
-export type Renderer = {
+export type RenderedWithEvents = {
   body: string;
   eventListeners: EventHandler[];
 };

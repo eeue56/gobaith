@@ -3,7 +3,7 @@ import {
   dontSend,
   JournalEntry,
   LogEntry,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
 } from "../../types";
@@ -19,7 +19,7 @@ function renderJournalEntry(log: LogEntry): string {
 `;
 }
 
-export function renderLogs(journalEntry: JournalEntry): Renderer {
+export function renderLogs(journalEntry: JournalEntry): RenderedWithEvents {
   if (journalEntry.logs.length === 0) return { body: "", eventListeners: [] };
 
   return {
@@ -34,7 +34,7 @@ export function renderLogs(journalEntry: JournalEntry): Renderer {
   };
 }
 
-export function renderEnterTimestampMessage(today: Day): Renderer {
+export function renderEnterTimestampMessage(today: Day): RenderedWithEvents {
   const elementId = `update-journal-${dayToString(today)}`;
   return {
     body: `

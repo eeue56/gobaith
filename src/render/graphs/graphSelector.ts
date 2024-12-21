@@ -4,7 +4,7 @@ import {
   GRAPH_NAMES,
   GraphName,
   isGraphName,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
 } from "../../types";
@@ -16,7 +16,7 @@ function renderChoice(graphKey: GraphName, state: AppState): string {
 `;
 }
 
-export function renderGraphChoices(state: AppState): Renderer {
+export function renderGraphChoices(state: AppState): RenderedWithEvents {
   const choices = GRAPH_NAMES.map((key) => renderChoice(key, state)).join("\n");
 
   return {

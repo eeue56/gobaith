@@ -2,7 +2,7 @@ import {
   Day,
   Direction,
   EventHandler,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
 } from "../types";
@@ -13,7 +13,7 @@ import {
   numberOfDaysBetween,
 } from "../utils/dates";
 
-export function renderDate(today: Day): Renderer {
+export function renderDate(today: Day): RenderedWithEvents {
   const daysDiff = numberOfDaysBetween(today, dateToDay(new Date()));
   const isToday = isSameDay(dateToDay(new Date()), today);
 

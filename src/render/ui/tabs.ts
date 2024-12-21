@@ -1,6 +1,6 @@
 import {
   AppState,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
   Settings,
@@ -29,7 +29,7 @@ function renderTabChoice(
   currentTab: TabName,
   choice: TabName,
   label: string
-): Renderer {
+): RenderedWithEvents {
   if (choice === currentTab) {
     return {
       body: `
@@ -53,7 +53,7 @@ function renderTabChoice(
   };
 }
 
-export function renderTabNavigation(currentTab: TabName): Renderer {
+export function renderTabNavigation(currentTab: TabName): RenderedWithEvents {
   const tabs = [
     renderTabChoice(currentTab, "JOURNAL", "Journal"),
     renderTabChoice(currentTab, "GRAPH", "Graphs"),
@@ -76,7 +76,10 @@ export function renderTabNavigation(currentTab: TabName): Renderer {
   };
 }
 
-export function renderImport(state: AppState, settings: Settings): Renderer {
+export function renderImport(
+  state: AppState,
+  settings: Settings
+): RenderedWithEvents {
   return renderer`
 <div class="tab-content">
   ${renderTabTitle("Import and export data")}
@@ -88,7 +91,10 @@ ${renderTabNavigation(state.currentTab)}
 `;
 }
 
-export function renderSettings(state: AppState, settings: Settings): Renderer {
+export function renderSettings(
+  state: AppState,
+  settings: Settings
+): RenderedWithEvents {
   return renderer`
 <div class="tab-content">
   ${renderTabTitle("Settings")}

@@ -4,7 +4,7 @@ import {
   elevation,
   JournalEntry,
   psychosis,
-  Renderer,
+  RenderedWithEvents,
 } from "../../types";
 import { dayToString } from "../../utils/dates";
 import {
@@ -30,7 +30,7 @@ export function renderPeriod(
 export function renderBipolarPeriods(
   today: Day,
   journalEntries: JournalEntry[]
-): Renderer {
+): RenderedWithEvents {
   const numberOfDays = journalEntries.length;
 
   const elevatedPeriods = getElevatedPeriods(journalEntries);

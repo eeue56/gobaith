@@ -4,7 +4,7 @@ import {
   moodStateFromValue,
   MoodValue,
   Prompt,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
 } from "../../types";
@@ -24,13 +24,16 @@ function hoverText(moodValue: MoodValue): string {
   }
 }
 
-export function renderButtonSet(entry: JournalEntry, prompt: Prompt): Renderer {
+export function renderButtonSet(
+  entry: JournalEntry,
+  prompt: Prompt
+): RenderedWithEvents {
   const uniquePromptGroupId = idHash(
     dayToString(entry.day) + encodeURI(prompt)
   );
   const activeNumber = entry.promptResponses[prompt];
 
-  function renderMoodState(number: MoodValue): Renderer {
+  function renderMoodState(number: MoodValue): RenderedWithEvents {
     const text = moodStateFromValue(number);
     const isActive = activeNumber === number;
     const activeClass = isActive

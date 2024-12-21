@@ -7,7 +7,7 @@ import {
   JournalEntry,
   Prompt,
   PROMPTS,
-  Renderer,
+  RenderedWithEvents,
   Settings,
 } from "../../types";
 import { dayToDate } from "../../utils/dates";
@@ -23,11 +23,14 @@ function renderActiveGraph(
   day: Day,
   entries: JournalEntry[],
   currentGraph: GraphName
-): Renderer {
+): RenderedWithEvents {
   return GRAPHS[currentGraph](day, entries);
 }
 
-export function renderGraph(state: AppState, settings: Settings): Renderer {
+export function renderGraph(
+  state: AppState,
+  settings: Settings
+): RenderedWithEvents {
   return renderer`
 <div class="tab-content">
   ${renderGraphChoices(state)}

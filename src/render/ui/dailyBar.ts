@@ -5,7 +5,7 @@ import {
   JournalEntry,
   Prompt,
   PROMPTS,
-  Renderer,
+  RenderedWithEvents,
   sendUpdate,
   Sent,
   SHORT_PROMPTS,
@@ -13,7 +13,7 @@ import {
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
 import { idHash, renderer } from "../../utils/render";
 
-function renderSleepRow(entries: JournalEntry[]): Renderer {
+function renderSleepRow(entries: JournalEntry[]): RenderedWithEvents {
   const bodies: string[] = [];
   const callbacks: EventHandler[] = [];
 
@@ -51,7 +51,10 @@ function renderSleepRow(entries: JournalEntry[]): Renderer {
   };
 }
 
-function renderRowBars(prompt: Prompt, entries: JournalEntry[]): Renderer {
+function renderRowBars(
+  prompt: Prompt,
+  entries: JournalEntry[]
+): RenderedWithEvents {
   const bodies: string[] = [];
   const callbacks: EventHandler[] = [];
 
@@ -95,7 +98,7 @@ function renderPromptShortName(prompt: Prompt): string {
 export function renderDailyBar(
   today: Day,
   journalEntries: JournalEntry[]
-): Renderer {
+): RenderedWithEvents {
   let entries = entriesBeforeToday(today, journalEntries);
 
   entries.sort(sortEntriesByDate);
@@ -130,7 +133,7 @@ export function renderDailyBar(
 export function renderTotaledDailyBar(
   today: Day,
   journalEntries: JournalEntry[]
-): Renderer {
+): RenderedWithEvents {
   let entries = entriesBeforeToday(today, journalEntries);
   entries.sort(sortEntriesByDate);
 
