@@ -21,7 +21,8 @@
     "build-electron": "cd electron && npm run build",
     "test": "tsc --noEmit && npx playwright test",
     "test-electron": "IS_ELECTRON=true npx playwright test",
-    "test-all": "npm run test && npm run test-electron"
+    "test-all": "npm run test && npm run test-electron",
+    "generate": "ts-node src/utils/data.ts"
   },
   "engines": {
     "node": "21.x"
