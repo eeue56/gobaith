@@ -49,7 +49,7 @@ export function renderButtonSet(entry: JournalEntry, prompt: Prompt): Renderer {
 `,
       eventListeners: [
         {
-          elementSelector: `#${elementId}`,
+          elementId: elementId,
           eventName: "click",
           callback: () => updateMoodState(entry, prompt, number),
         },

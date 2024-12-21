@@ -20,7 +20,7 @@ function renderSleepRow(entries: JournalEntry[]): Renderer {
   for (const entry of entries) {
     const id = `daily-bar-sleep-goto-${idHash(dayToString(entry.day))}`;
     callbacks.push({
-      elementSelector: `#${id}`,
+      elementId: id,
       eventName: "click",
       callback: (): Sent => {
         return sendUpdate({
@@ -60,7 +60,7 @@ function renderRow(prompt: Prompt, entries: JournalEntry[]): Renderer {
       dayToString(entry.day)
     )}`;
     callbacks.push({
-      elementSelector: `#${id}`,
+      elementId: id,
       eventName: "click",
       callback: (): Sent => {
         return sendUpdate({

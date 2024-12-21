@@ -78,7 +78,7 @@ function render(state: AppState, settings: Settings): void {
     start = performance.now();
 
     for (const eventListener of body.eventListeners) {
-      const element = document.querySelector(eventListener.elementSelector);
+      const element = document.getElementById(eventListener.elementId);
 
       if (element) {
         element.addEventListener(
@@ -87,8 +87,8 @@ function render(state: AppState, settings: Settings): void {
         );
       } else {
         console.error(
-          "Could not find element with selector '",
-          eventListener.elementSelector,
+          "Could not find element with selector '#",
+          eventListener.elementId,
           "'"
         );
       }

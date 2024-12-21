@@ -36,7 +36,7 @@ export function renderDate(today: Day): Renderer {
     ? []
     : [
         {
-          elementSelector: "#reset-day",
+          elementId: "reset-day",
           eventName: "click",
           callback: () => resetCurrentDay(),
         },
@@ -69,12 +69,12 @@ export function renderDate(today: Day): Renderer {
 `,
     eventListeners: [
       {
-        elementSelector: "#previous-day",
+        elementId: "previous-day",
         eventName: "click",
         callback: () => updateCurrentDay("Previous"),
       },
       {
-        elementSelector: "#next-day",
+        elementId: "next-day",
         eventName: "click",
         callback: () => updateCurrentDay("Next"),
       },

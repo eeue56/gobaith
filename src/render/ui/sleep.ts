@@ -41,12 +41,12 @@ export function renderSleepSlider(entry: JournalEntry): Renderer {
     `,
     eventListeners: [
       {
-        elementSelector: "#sleep-slider",
+        elementId: "sleep-slider",
         eventName: "input",
         callback: (event) => dynamicallyShowSliderValue(event),
       },
       {
-        elementSelector: "#sleep-slider",
+        elementId: "sleep-slider",
         eventName: "change",
         callback: () => updateSleepValue(entry),
       },

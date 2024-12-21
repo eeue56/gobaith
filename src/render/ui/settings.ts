@@ -11,7 +11,7 @@ export function renderRemoveSettings(): Renderer {
 `,
     eventListeners: [
       {
-        elementSelector: "#remove-all-settings",
+        elementId: "remove-all-settings",
         eventName: "click",
         callback: updateRemoveSettings,
       },
@@ -36,7 +36,7 @@ export function renderRemoveAppState(): Renderer {
 `,
     eventListeners: [
       {
-        elementSelector: "#remove-app-state",
+        elementId: "remove-app-state",
         eventName: "click",
         callback: updateRemoveAppState,
       },

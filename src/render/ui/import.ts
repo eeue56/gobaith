@@ -13,12 +13,12 @@ export function renderEnterTextToImport(settings: Settings): Renderer {
   const ids: string[] = ["update-import-from-text", "import-from-file"];
   const eventHandlers: EventHandler[] = [
     {
-      elementSelector: `#${ids[0]}`,
+      elementId: ids[0],
       eventName: "click",
       callback: () => updateImport(settings),
     },
     {
-      elementSelector: `#${ids[1]}`,
+      elementId: ids[1],
       eventName: "change",
       callback: async (event) => await updateImportFile(event),
     },
@@ -122,7 +122,7 @@ export function renderExportedSettings(settings: Settings): Renderer {
 `,
     eventListeners: [
       {
-        elementSelector: `#${id}`,
+        elementId: id,
         eventName: "click",
         callback: (): Sent => {
           const blob = new Blob([JSON.stringify(settings)], {
@@ -161,7 +161,7 @@ export function renderExportedState(state: AppState): Renderer {
 `,
     eventListeners: [
       {
-        elementSelector: `#${id}`,
+        elementId: id,
         eventName: "click",
         callback: (): Sent => {
           const blob = new Blob([JSON.stringify(state)], {

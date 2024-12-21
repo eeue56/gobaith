@@ -38,12 +38,12 @@ export function renderPill(entry: JournalEntry, pill: string): Renderer {
 
   const handlers: EventHandler[] = [
     {
-      elementSelector: `#${ids[0]}`,
+      elementId: ids[0],
       eventName: "click",
       callback: makeCallback("Previous"),
     },
     {
-      elementSelector: `#${ids[1]}`,
+      elementId: ids[1],
       eventName: "click",
       callback: makeCallback("Next"),
     },
@@ -83,7 +83,7 @@ export function renderAddPill(): Renderer {
     eventListeners: [
       {
         eventName: "click",
-        elementSelector: "#add-pill",
+        elementId: "add-pill",
         callback: () => updateAddPill(),
       },
     ],
@@ -126,17 +126,17 @@ export function renderPillOrder(settings: Settings): Renderer {
 
       const localHandlers: EventHandler[] = [
         {
-          elementSelector: `#${ids[0]}`,
+          elementId: ids[0],
           eventName: "click",
           callback: makeCallback("Top"),
         },
         {
-          elementSelector: `#${ids[1]}`,
+          elementId: ids[1],
           eventName: "click",
           callback: makeCallback("Up"),
         },
         {
-          elementSelector: `#${ids[2]}`,
+          elementId: ids[2],
           eventName: "click",
           callback: makeCallback("Down"),
         },

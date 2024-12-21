@@ -203,7 +203,7 @@ export function isGraphName(str: string): str is GraphName {
 export type EventName = "click" | "input" | "change";
 
 export type EventHandler = {
-  elementSelector: `#${string}` | `.${string}`;
+  elementId: string;
   eventName: EventName;
   callback: (event: Event) => Sent;
 };

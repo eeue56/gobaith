@@ -51,7 +51,7 @@ export function renderEnterTimestampMessage(today: Day): Renderer {
 `,
     eventListeners: [
       {
-        elementSelector: `#${elementId}`,
+        elementId: elementId,
         eventName: "click",
         callback: () => updateLogEntries(today),
       },

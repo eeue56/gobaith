@@ -45,7 +45,7 @@ function renderTabChoice(
 `,
     eventListeners: [
       {
-        elementSelector: `#${id}`,
+        elementId: id,
         eventName: "click",
         callback: () => updateCurrentTab(choice),
       },

@@ -32,7 +32,7 @@ export function renderGraphChoices(state: AppState): Renderer {
     eventListeners: [
       {
         eventName: "change",
-        elementSelector: "#graph-selection",
+        elementId: "graph-selection",
         callback: (event: Event) => updateCurrentGraph(event),
       },
     ],
