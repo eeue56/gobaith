@@ -9,13 +9,13 @@ import {
   Settings,
 } from "../../types";
 
-export function renderEnterTextToImport(settings: Settings): Renderer {
+export function renderEnterTextToImport(): Renderer {
   const ids: string[] = ["update-import-from-text", "import-from-file"];
   const eventHandlers: EventHandler[] = [
     {
       elementId: ids[0],
       eventName: "click",
-      callback: () => updateImport(settings),
+      callback: () => updateImport(),
     },
     {
       elementId: ids[1],
@@ -71,7 +71,7 @@ function importer(imported: string | AppState | Settings): Sent {
   }
 }
 
-function updateImport(settings: Settings): Sent {
+function updateImport(): Sent {
   const textToImport =
     (
       document.getElementById("import-text") as HTMLTextAreaElement

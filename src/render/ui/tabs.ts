@@ -80,7 +80,7 @@ export function renderImport(state: AppState, settings: Settings): Renderer {
   return renderer`
 <div class="tab-content">
   ${renderTabTitle("Import and export data")}
-  ${renderEnterTextToImport(settings)}
+  ${renderEnterTextToImport()}
   ${renderExportedSettings(settings)}
   ${renderExportedState(state)}
 </div>
