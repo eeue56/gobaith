@@ -106,15 +106,14 @@ async function updateImportFile(event: Event): Promise<Sent> {
 
 export function renderExportedSettings(settings: Settings): Renderer {
   const id = "download-settings";
+  const stringSettings = JSON.stringify(settings);
   return {
     body: `
 <div class="pure-g"/>
     <div class="pure-u-1-5"></div>
     <div class="pure-form pure-u-3-5">
         <h3>Exported settings (including pills)</h3>
-        <textarea class="pure-u-1 export-data">${JSON.stringify(
-          settings
-        )}</textarea>
+        <textarea class="pure-u-1 export-data">${stringSettings}</textarea>
         <button class="pure-button" id="${id}">Download settings</button>
     </div>
     <div class="pure-u-1-5"></div>
@@ -124,20 +123,7 @@ export function renderExportedSettings(settings: Settings): Renderer {
       {
         elementId: id,
         eventName: "click",
-        callback: (): Sent => {
-          const blob = new Blob([JSON.stringify(settings)], {
-            type: "text/json",
-          });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "settings.json";
-
-          a.click();
-          URL.revokeObjectURL(url);
-
-          return dontSend();
-        },
+        callback: (): Sent => downloadJson(settings),
       },
     ],
   };
@@ -145,15 +131,14 @@ export function renderExportedSettings(settings: Settings): Renderer {
 
 export function renderExportedState(state: AppState): Renderer {
   const id = "download-state";
+  const stringState = JSON.stringify(state);
   return {
     body: `
 <div class="pure-g"/>
     <div class="pure-u-1-5"></div>
     <div class="pure-form pure-u-3-5">
         <h3>Exported state (including journal entries)</h3>
-        <textarea class="pure-u-1 export-data">${JSON.stringify(
-          state
-        )}</textarea>
+        <textarea class="pure-u-1 export-data">${stringState}</textarea>
         <button class="pure-button" id="${id}">Download state</button>
     </div>
     <div class="pure-u-1-5"></div>
@@ -163,21 +148,36 @@ export function renderExportedState(state: AppState): Renderer {
       {
         elementId: id,
         eventName: "click",
-        callback: (): Sent => {
-          const blob = new Blob([JSON.stringify(state)], {
-            type: "text/json",
-          });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "state.json";
-
-          a.click();
-          URL.revokeObjectURL(url);
-
-          return dontSend();
-        },
+        callback: (): Sent => downloadJson(state),
       },
     ],
   };
+}
+
+function downloadJson(object: AppState | Settings) {
+  let fileName;
+  switch (object.kind) {
+    case "AppState": {
+      fileName = "state.json";
+      break;
+    }
+    case "Settings": {
+      fileName = "settings.json";
+      break;
+    }
+  }
+
+  const blob = new Blob([JSON.stringify(object)], {
+    type: "text/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+
+  a.click();
+  URL.revokeObjectURL(url);
+
+  return dontSend();
 }
