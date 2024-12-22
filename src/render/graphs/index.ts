@@ -12,9 +12,9 @@ import {
 } from "../../types";
 import { dayToDate } from "../../utils/dates";
 import { renderer } from "../../utils/render";
-import { renderDailyBar, renderTotaledDailyBar } from "../ui/dailyBar";
 import { renderBipolarPeriods } from "../ui/periods";
 import { renderTabNavigation } from "../ui/tabs";
+import { renderDailyBar, renderTotaledDailyBar } from "./dailyBar";
 import { renderGraphChoices } from "./graphSelector";
 import { renderLineOverview } from "./lineOverview";
 import { renderSpiderweb } from "./spiderweb";
