@@ -12,11 +12,11 @@ import {
 } from "../../types";
 import { dayToDate } from "../../utils/dates";
 import { renderer } from "../../utils/render";
-import { renderBipolarPeriods } from "../ui/periods";
 import { renderTabNavigation } from "../ui/tabs";
 import { renderDailyBar, renderTotaledDailyBar } from "./dailyBar";
 import { renderGraphChoices } from "./graphSelector";
 import { renderLineOverview } from "./lineOverview";
+import { renderBipolarPeriods } from "./periods";
 import { renderSpiderweb } from "./spiderweb";
 
 function renderActiveGraph(
