@@ -211,14 +211,14 @@ function update(event: MessageEvent<Update>): number {
           );
           continue;
         }
-        const modified = addPill(pill, appState.journalEntries, data.settings);
+        const modified = addPill(pill, appState.journalEntries, settings);
 
         appState.journalEntries = modified.entries;
+        settings = modified.settings;
 
         console.log("Imported pill:", pill);
       }
       console.log("Imported settings");
-
       syncToDatabase(appState, settings);
       return sendRerender(appState, settings);
     }

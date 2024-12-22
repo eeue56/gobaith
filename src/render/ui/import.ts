@@ -113,7 +113,7 @@ export function renderExportedSettings(settings: Settings): RenderedWithEvents {
     <div class="pure-u-1-5"></div>
     <div class="pure-form pure-u-3-5">
         <h3>Exported settings (including pills)</h3>
-        <textarea class="pure-u-1 export-data">${stringSettings}</textarea>
+        <textarea id="textarea-export-settings" class="pure-u-1 export-data">${stringSettings}</textarea>
         <button class="pure-button" id="${id}">Download settings</button>
     </div>
     <div class="pure-u-1-5"></div>
@@ -138,7 +138,7 @@ export function renderExportedState(state: AppState): RenderedWithEvents {
     <div class="pure-u-1-5"></div>
     <div class="pure-form pure-u-3-5">
         <h3>Exported state (including journal entries)</h3>
-        <textarea class="pure-u-1 export-data">${stringState}</textarea>
+        <textarea id="textarea-export-state" class="pure-u-1 export-data">${stringState}</textarea>
         <button class="pure-button" id="${id}">Download state</button>
     </div>
     <div class="pure-u-1-5"></div>

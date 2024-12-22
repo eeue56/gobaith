@@ -48,7 +48,7 @@ export function renderButtonSet(
 
     return {
       body: `
-<button title="${hover}" class="pure-button pure-u-5-24 prompt-answer ${activeClass}" id="${elementId}">${text}</button>
+<button title="${hover}" data-mood-value="${number}" class="pure-button pure-u-5-24 prompt-answer ${activeClass}" id="${elementId}">${text}</button>
 `,
       eventListeners: [
         {

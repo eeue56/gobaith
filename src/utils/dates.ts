@@ -35,7 +35,6 @@ export function isSameDay(first: Day, second: Day): boolean {
   );
 }
 
-// todo: check the date api actually works with this format
 export function dayToDate(day: Day): Date {
   return new Date(dayToString(day));
 }
