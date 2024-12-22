@@ -1,5 +1,5 @@
-import { renderJournal } from "../src/render/daily";
 import { showLineOverview } from "./render/graphs/lineOverview";
+import { renderJournal } from "./render/journal";
 import {
   AppState,
   RenderBroadcast,
