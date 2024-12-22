@@ -11,7 +11,7 @@ import {
   renderEnterTextToImport,
   renderExportedSettings,
   renderExportedState,
-} from "./import";
+} from "./importer";
 import { renderAddPill, renderPillOrder } from "./pills";
 import { renderRemoveAppState, renderRemoveSettings } from "./settings";
 
