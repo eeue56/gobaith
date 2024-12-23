@@ -1,3 +1,4 @@
+import { cleanData } from "./cleaners";
 import {
   loadSettingsFromDatabase,
   loadStateToDatabase,
@@ -194,7 +195,7 @@ function update(event: MessageEvent<Update>): number {
       return sendRerender(appState, settings);
     }
     case "UpdateImportAppState": {
-      appState = data.state;
+      appState = cleanData(data.state) as AppState;
       console.log(
         `Imported state with ${appState.journalEntries.length} journal entries`
       );

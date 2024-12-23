@@ -159,11 +159,11 @@ export function renderQueryBuilder(query: Query | Duration): string {
 
 const depressedDaysWithoutElevationQuery = And(
   Filter(MoreThan, 1, "Today's feelings of depression"),
-  Filter(EqualTo, 1, "Today's feelings of elevatation")
+  Filter(EqualTo, 1, "Today's feelings of elevation")
 );
 
 const possiblyHarmfulManicDays = And(
-  Filter(MoreThan, 2, "Today's feelings of elevatation"),
+  Filter(MoreThan, 2, "Today's feelings of elevation"),
   Or(
     Filter(MoreThan, 1, "Today's feelings of irritableness"),
     Filter(MoreThan, 1, "Today's psychotic symptoms")
@@ -173,7 +173,7 @@ const possiblyHarmfulManicDays = And(
 const hypomania = Duration(
   And(
     Or(
-      Filter(MoreThan, 1, "Today's feelings of elevatation"),
+      Filter(MoreThan, 1, "Today's feelings of elevation"),
       Filter(MoreThan, 1, "Today's feelings of irritableness")
     ),
     Filter(EqualTo, 1, "Today's psychotic symptoms")
@@ -184,7 +184,7 @@ const hypomania = Duration(
 
 const mania = Duration(
   Or(
-    Filter(MoreThan, 2, "Today's feelings of elevatation"),
+    Filter(MoreThan, 2, "Today's feelings of elevation"),
     Filter(MoreThan, 2, "Today's feelings of irritableness")
   ),
   6,

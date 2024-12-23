@@ -38,7 +38,7 @@ async function closeElectron(electronApp: ElectronApplication) {
 const logEntries: Record<Prompt, string> = {
   "Today's feelings of anxiety":
     "I felt a bit anxious when getting on a crowded train",
-  "Today's feelings of elevatation": "I could do anything right now",
+  "Today's feelings of elevation": "I could do anything right now",
   "Today's feelings of depression": "I don't have anyone to talk to",
   "Today's feelings of irritableness": "I argued with my friend",
   "Today's psychotic symptoms": "I saw some unusual things",

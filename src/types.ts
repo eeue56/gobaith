@@ -31,7 +31,7 @@ export function generateRandomMoodValue(): MoodValue {
 export const PROMPTS = [
   "Today's feelings of depression",
   "Today's feelings of anxiety",
-  "Today's feelings of elevatation",
+  "Today's feelings of elevation",
   "Today's feelings of irritableness",
   "Today's psychotic symptoms",
 ] as const;
@@ -56,7 +56,7 @@ export function PromptResponses(
   return {
     "Today's feelings of depression": depression,
     "Today's feelings of anxiety": anxiety,
-    "Today's feelings of elevatation": elevation,
+    "Today's feelings of elevation": elevation,
     "Today's feelings of irritableness": irritableness,
     "Today's psychotic symptoms": psychotic,
   };
@@ -65,7 +65,7 @@ export function PromptResponses(
 export const SHORT_PROMPTS: Record<Prompt, string> = {
   "Today's feelings of depression": "Depression",
   "Today's feelings of anxiety": "Anxiety",
-  "Today's feelings of elevatation": "Elevation",
+  "Today's feelings of elevation": "Elevation",
   "Today's feelings of irritableness": "Irrability",
   "Today's psychotic symptoms": "Psychotic",
 };
@@ -79,7 +79,7 @@ export function anxiety(entry: JournalEntry): MoodValue {
 }
 
 export function elevation(entry: JournalEntry): MoodValue {
-  return entry.promptResponses["Today's feelings of elevatation"];
+  return entry.promptResponses["Today's feelings of elevation"];
 }
 
 export function irritableness(entry: JournalEntry): MoodValue {
