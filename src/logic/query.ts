@@ -1,5 +1,9 @@
-import { JournalEntry, MoodValue, Prompt } from "../types";
-import { dayToString } from "../utils/dates";
+import { Day, JournalEntry, MoodValue, Prompt } from "../types";
+import {
+  dayToString,
+  numberOfDaysBetween,
+  sortEntriesByDate,
+} from "../utils/dates";
 
 export const MoreThan = { kind: "MoreThan" } as const;
 export type MoreThan = typeof MoreThan;
@@ -63,6 +67,52 @@ export function Not(query: Query): Not {
     kind: "Not",
     query,
   };
+}
+
+export type Duration = {
+  kind: "Duration";
+  comparison: Comparison;
+  days: number;
+  query: Query;
+};
+export function Duration(
+  query: Query,
+  days: number,
+  comparison: Comparison
+): Duration {
+  return {
+    kind: "Duration",
+    query,
+    days,
+    comparison,
+  };
+}
+
+function continiousPeriods(entries: JournalEntry[]): JournalEntry[][] {
+  if (entries.length === 0) {
+    return [];
+  }
+  entries.sort(sortEntriesByDate);
+  const periods: JournalEntry[][] = [];
+  let currentPeriod = [entries[0]];
+  let previousDay: Day = entries[0].day;
+
+  for (let i = 1; i < entries.length; i++) {
+    const entry = entries[i];
+    if (numberOfDaysBetween(previousDay, entry.day) < 2) {
+      currentPeriod.push(entry);
+    } else {
+      periods.push(currentPeriod);
+      currentPeriod = [];
+    }
+    previousDay = entry.day;
+  }
+
+  if (currentPeriod.length > 0) {
+    periods.push(currentPeriod);
+  }
+
+  return periods;
 }
 
 /**
@@ -146,6 +196,33 @@ export function runQuery(
           }
         }
       });
+    }
+  }
+}
+
+/**
+ * Run a query against the journal entries to get durations matching the query
+ */
+export function runDurationQuery(
+  query: Duration,
+  entries: JournalEntry[]
+): JournalEntry[][] {
+  switch (query.kind) {
+    case "Duration": {
+      const results = runQuery(query.query, entries);
+      const periods = continiousPeriods(results);
+
+      switch (query.comparison.kind) {
+        case "EqualTo": {
+          return periods.filter((period) => period.length === query.days);
+        }
+        case "LessThan": {
+          return periods.filter((period) => period.length < query.days);
+        }
+        case "MoreThan": {
+          return periods.filter((period) => period.length > query.days);
+        }
+      }
     }
   }
 }
