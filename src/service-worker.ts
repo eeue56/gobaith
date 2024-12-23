@@ -11,6 +11,7 @@ import {
   AppState,
   isAppState,
   isSettings,
+  LATEST_DATABASE_VERSION,
   RenderBroadcast,
   Settings,
   TypedBroadcastChannel,
@@ -40,11 +41,13 @@ let appState: AppState = {
   currentGraph: "DAILY_BAR",
   journalEntries: [],
   day: dateToDay(new Date()),
+  databaseVersion: LATEST_DATABASE_VERSION,
 };
 
 let settings: Settings = {
   kind: "Settings",
   currentPills: [],
+  databaseVersion: LATEST_DATABASE_VERSION,
 };
 
 const initResult = initializeEntryForDay(
@@ -108,6 +111,7 @@ function update(event: MessageEvent<Update>): number {
       settings = {
         kind: "Settings",
         currentPills: [],
+        databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("Removed settings");
       syncToDatabase(appState, settings);
@@ -120,6 +124,7 @@ function update(event: MessageEvent<Update>): number {
         currentGraph: "DAILY_BAR",
         journalEntries: [],
         day: dateToDay(new Date()),
+        databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("Removed state");
       syncToDatabase(appState, settings);

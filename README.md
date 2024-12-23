@@ -146,7 +146,6 @@ To begin with changes, I suggest checking out the [types](./src/types.ts) file, 
 
 ## Future plans
 
-- Add more Playwright tests
 - A way to sync between mobile/desktop
 
 ## Support

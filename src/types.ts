@@ -112,6 +112,19 @@ export type LogEntry = {
   text: string;
 };
 
+export const DATABASE_VERSIONS = [0, 1, 2, 3, 4] as const;
+
+export type DatabaseVersion = (typeof DATABASE_VERSIONS)[number];
+
+export function isDatabaseVersion(version: number): version is DatabaseVersion {
+  return DATABASE_VERSIONS.includes(version as DatabaseVersion);
+}
+
+// this is the version of the db the app will be based on
+// any migrations needed in between the current db version
+// and the latest db version will be run
+export const LATEST_DATABASE_VERSION: DatabaseVersion = 4;
+
 /**
  * AppState includes UI state and data (journal entries)
  */
@@ -121,6 +134,7 @@ export type AppState = {
   currentTab: TabName;
   currentGraph: GraphName;
   journalEntries: JournalEntry[];
+  databaseVersion: DatabaseVersion;
 };
 
 export function isAppState(object: unknown): object is AppState {
@@ -138,6 +152,7 @@ export function isAppState(object: unknown): object is AppState {
 export type Settings = {
   kind: "Settings";
   currentPills: string[];
+  databaseVersion: DatabaseVersion;
 };
 
 export function isSettings(object: unknown): object is Settings {

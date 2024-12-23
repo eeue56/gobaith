@@ -3,6 +3,7 @@ import {
   AppState,
   isPrompt,
   JournalEntry,
+  LATEST_DATABASE_VERSION,
   LogEntry,
   PromptResponses,
   Settings,
@@ -29,6 +30,7 @@ test("the importer can import state", async ({ context, page }) => {
     currentTab: "IMPORT",
     currentGraph: "DAILY_BAR",
     journalEntries: [journalEntry],
+    databaseVersion: LATEST_DATABASE_VERSION,
   };
 
   const stringState = JSON.stringify(state);
@@ -78,6 +80,7 @@ test("the importer can import settings", async ({ context, page }) => {
   const settings: Settings = {
     kind: "Settings",
     currentPills: ["Ibux 200mg"],
+    databaseVersion: LATEST_DATABASE_VERSION,
   };
 
   const stringSettings = JSON.stringify(settings);

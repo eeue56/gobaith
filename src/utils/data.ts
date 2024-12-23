@@ -3,6 +3,7 @@ import {
   Day,
   generateRandomMoodValue,
   JournalEntry,
+  LATEST_DATABASE_VERSION,
   LogEntry,
   PromptResponses,
 } from "../types";
@@ -50,6 +51,7 @@ export function generateData(startDay: Day): AppState {
     currentGraph: "DAILY_BAR",
     currentTab: "SETTINGS",
     journalEntries: entries,
+    databaseVersion: LATEST_DATABASE_VERSION,
   };
 }
 

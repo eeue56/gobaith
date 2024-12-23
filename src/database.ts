@@ -1,26 +1,17 @@
 import {
   APP_STATE_OBJECT_STORE_NAME,
   AppState,
+  DatabaseVersion,
+  isDatabaseVersion,
+  LATEST_DATABASE_VERSION,
   Settings,
   SETTINGS_OBJECT_STORE_NAME,
   StoreName,
 } from "./types";
 
 import { renameStateFields } from "./cleaners/database_3";
+import { addDatabaseVersion } from "./cleaners/database_4";
 import { renameField } from "./cleaners/rename_fields";
-
-const DATABASE_VERSIONS = [0, 1, 2, 3] as const;
-
-type DatabaseVersion = (typeof DATABASE_VERSIONS)[number];
-
-function isDatabaseVersion(version: number): version is DatabaseVersion {
-  return DATABASE_VERSIONS.includes(version as DatabaseVersion);
-}
-
-// this is the version of the db the app will be based on
-// any migrations needed in between the current db version
-// and the latest db version will be run
-const LATEST_DATABASE_VERSION: DatabaseVersion = 3;
 
 /**
  * Run a migration for a specific version of the database
@@ -101,6 +92,88 @@ async function runMigration(
         obj.onerror = (event) => {
           const message = `IndexedDB: failed to fetch ${storeName}`;
           reject(message);
+        };
+      });
+    }
+    case 4: {
+      console.info(
+        "IndexedDB: Add database version to AppState / Settings so it's easier to import/export."
+      );
+
+      return new Promise((resolve, reject) => {
+        // load from the database
+
+        console.log("IndexedDB: creating transaction");
+        const appStateStore = transaction.objectStore(
+          APP_STATE_OBJECT_STORE_NAME
+        );
+        const appStateObject = appStateStore.get(APP_STATE_OBJECT_STORE_NAME);
+
+        const settingsStore = transaction.objectStore(
+          SETTINGS_OBJECT_STORE_NAME
+        );
+        const settingsObject = settingsStore.get(SETTINGS_OBJECT_STORE_NAME);
+
+        appStateObject.onsuccess = () => {
+          // run migration
+          const currentData = appStateObject.result;
+
+          if (typeof currentData === "undefined") {
+            console.log("IndexedDB: no entry yet, no need to migrate");
+            resolve(db);
+            return;
+          }
+
+          const newData = addDatabaseVersion(currentData);
+
+          // store in the database
+          console.info(
+            "IndexedDB: writing to the store",
+            APP_STATE_OBJECT_STORE_NAME,
+            newData
+          );
+          appStateStore.put(newData);
+        };
+
+        appStateObject.onerror = (event) => {
+          const message = `IndexedDB: failed to fetch ${APP_STATE_OBJECT_STORE_NAME}`;
+          reject(message);
+        };
+
+        settingsObject.onsuccess = () => {
+          // run migration
+          const currentData = settingsObject.result;
+
+          if (typeof currentData === "undefined") {
+            console.log("IndexedDB: no entry yet, no need to migrate");
+            resolve(db);
+            return;
+          }
+
+          const newData = addDatabaseVersion(currentData);
+
+          // store in the database
+          console.info(
+            "IndexedDB: writing to the store",
+            SETTINGS_OBJECT_STORE_NAME,
+            newData
+          );
+          settingsStore.put(newData);
+        };
+
+        settingsObject.onerror = (event) => {
+          const message = `IndexedDB: failed to fetch ${SETTINGS_OBJECT_STORE_NAME}`;
+          reject(message);
+        };
+
+        transaction.onerror = (event) => {
+          const message = `Database failed to write data during migration`;
+          console.error(message, event);
+          reject(message);
+        };
+
+        transaction.oncomplete = () => {
+          resolve(db);
         };
       });
     }
