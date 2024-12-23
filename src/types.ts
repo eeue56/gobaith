@@ -182,6 +182,7 @@ export const GRAPH_NAMES = [
   "DAILY_BAR",
   "BIPOLAR_PERIODS",
   "TOTALED_DAILY_BAR",
+  "Interactive queries",
 ] as const;
 
 export type GraphName = (typeof GRAPH_NAMES)[number];

@@ -15,6 +15,7 @@ import { renderer } from "../../utils/render";
 import { renderTabNavigation } from "../ui/tabs";
 import { renderDailyBar, renderTotaledDailyBar } from "./dailyBar";
 import { renderGraphChoices } from "./graphSelector";
+import { renderInteractiveQueries } from "./interactiveQueries";
 import { renderLineOverview } from "./lineOverview";
 import { renderBipolarPeriods } from "./periods";
 import { renderSpiderweb } from "./spiderweb";
@@ -69,6 +70,7 @@ export const GRAPHS: Record<GraphName, GraphRenderer> = {
   DAILY_BAR: renderDailyBar,
   BIPOLAR_PERIODS: renderBipolarPeriods,
   TOTALED_DAILY_BAR: renderTotaledDailyBar,
+  "Interactive queries": renderInteractiveQueries,
 };
 
 const COLOR_INDEX: string[] = [
