@@ -22,7 +22,9 @@
     "test": "tsc --noEmit && npx playwright test",
     "test-electron": "IS_ELECTRON=true npx playwright test",
     "test-all": "npm run test && npm run test-electron",
-    "generate": "ts-node src/utils/data.ts"
+    "generate": "ts-node src/utils/data.ts",
+    "generate-screenshots": "ts-node screenshots/generate_screenshots.ts"
+
   },
   "engines": {
     "node": "21.x"
