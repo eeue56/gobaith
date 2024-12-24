@@ -24,7 +24,6 @@
     "test-all": "npm run test && npm run test-electron",
     "generate": "ts-node src/utils/data.ts",
     "generate-screenshots": "ts-node screenshots/generate_screenshots.ts"
-
   },
   "engines": {
     "node": "21.x"

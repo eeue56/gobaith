@@ -120,9 +120,11 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
   return DATABASE_VERSIONS.includes(version as DatabaseVersion);
 }
 
-// this is the version of the db the app will be based on
-// any migrations needed in between the current db version
-// and the latest db version will be run
+/**
+ * This is the version of the db the app will be based on
+ * any migrations needed in between the current db version
+ * and the latest db version will be run
+ */
 export const LATEST_DATABASE_VERSION: DatabaseVersion = 4;
 
 /**
