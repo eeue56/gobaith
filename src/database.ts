@@ -13,6 +13,137 @@ import { renameStateFields } from "./cleaners/database_3";
 import { addDatabaseVersion } from "./cleaners/database_4";
 import { renameField } from "./cleaners/rename_fields";
 
+function upgradeDatabaseToVersion3(
+  db: IDBDatabase,
+  transaction: IDBTransaction
+): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    // load from the database
+    const storeName = APP_STATE_OBJECT_STORE_NAME;
+
+    console.log("IndexedDB: creating transaction");
+    const store = transaction.objectStore(storeName);
+    const obj = store.get(storeName);
+
+    obj.onsuccess = () => {
+      // run migration
+      const currentData = obj.result;
+
+      if (typeof currentData === "undefined") {
+        console.log("IndexedDB: no entry yet, no need to migrate");
+        resolve(db);
+        return;
+      }
+
+      console.info("IndexedDB: renaming the fields...");
+      const renamedData = renameField(renameStateFields, currentData);
+      console.log(`IndexedDB: migrated ${renamedData.migrated} entries.`);
+
+      if (renamedData.migrated === 0) {
+        console.log("IndexedDB: no changes to data, skipping write.");
+        resolve(db);
+        return;
+      }
+
+      // store in the database
+      console.info("IndexedDB: writing to the store");
+      store.put(renamedData.data);
+
+      transaction.onerror = (event) => {
+        const message = `Database failed to write data during migration`;
+        console.error(message, event);
+        reject(message);
+      };
+
+      transaction.oncomplete = () => {
+        resolve(db);
+      };
+    };
+
+    obj.onerror = (event) => {
+      const message = `IndexedDB: failed to fetch ${storeName}`;
+      reject(message);
+    };
+  });
+}
+
+function upgradeDatabaseToVersion4(
+  db: IDBDatabase,
+  transaction: IDBTransaction
+): IDBDatabase | PromiseLike<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    // load from the database
+    console.log("IndexedDB: creating transaction");
+    const appStateStore = transaction.objectStore(APP_STATE_OBJECT_STORE_NAME);
+    const appStateObject = appStateStore.get(APP_STATE_OBJECT_STORE_NAME);
+
+    const settingsStore = transaction.objectStore(SETTINGS_OBJECT_STORE_NAME);
+    const settingsObject = settingsStore.get(SETTINGS_OBJECT_STORE_NAME);
+
+    appStateObject.onsuccess = () => {
+      // run migration
+      const currentData = appStateObject.result;
+
+      if (typeof currentData === "undefined") {
+        console.log("IndexedDB: no entry yet, no need to migrate");
+        resolve(db);
+        return;
+      }
+
+      const newData = addDatabaseVersion(currentData);
+
+      // store in the database
+      console.info(
+        "IndexedDB: writing to the store",
+        APP_STATE_OBJECT_STORE_NAME,
+        newData
+      );
+      appStateStore.put(newData);
+    };
+
+    appStateObject.onerror = (event) => {
+      const message = `IndexedDB: failed to fetch ${APP_STATE_OBJECT_STORE_NAME}`;
+      reject(message);
+    };
+
+    settingsObject.onsuccess = () => {
+      // run migration
+      const currentData = settingsObject.result;
+
+      if (typeof currentData === "undefined") {
+        console.log("IndexedDB: no entry yet, no need to migrate");
+        resolve(db);
+        return;
+      }
+
+      const newData = addDatabaseVersion(currentData);
+
+      // store in the database
+      console.info(
+        "IndexedDB: writing to the store",
+        SETTINGS_OBJECT_STORE_NAME,
+        newData
+      );
+      settingsStore.put(newData);
+    };
+
+    settingsObject.onerror = (event) => {
+      const message = `IndexedDB: failed to fetch ${SETTINGS_OBJECT_STORE_NAME}`;
+      reject(message);
+    };
+
+    transaction.onerror = (event) => {
+      const message = `Database failed to write data during migration`;
+      console.error(message, event);
+      reject(message);
+    };
+
+    transaction.oncomplete = () => {
+      resolve(db);
+    };
+  });
+}
+
 /**
  * Run a migration for a specific version of the database
  * These should be written by hand, most of the time.
@@ -45,137 +176,13 @@ async function runMigration(
       console.info(
         "IndexedDB: Renaming elevatation => elevation\nThis was an intentional mispelling to demostrate how to rename fields without losing data."
       );
-
-      return new Promise((resolve, reject) => {
-        // load from the database
-        const storeName = APP_STATE_OBJECT_STORE_NAME;
-
-        console.log("IndexedDB: creating transaction");
-        const store = transaction.objectStore(storeName);
-        const obj = store.get(storeName);
-
-        obj.onsuccess = () => {
-          // run migration
-          const currentData = obj.result;
-
-          if (typeof currentData === "undefined") {
-            console.log("IndexedDB: no entry yet, no need to migrate");
-            resolve(db);
-            return;
-          }
-
-          console.info("IndexedDB: renaming the fields...");
-          const renamedData = renameField(renameStateFields, currentData);
-          console.log(`IndexedDB: migrated ${renamedData.migrated} entries.`);
-
-          if (renamedData.migrated === 0) {
-            console.log("IndexedDB: no changes to data, skipping write.");
-            resolve(db);
-            return;
-          }
-
-          // store in the database
-          console.info("IndexedDB: writing to the store");
-          store.put(renamedData.data);
-
-          transaction.onerror = (event) => {
-            const message = `Database failed to write data during migration`;
-            console.error(message, event);
-            reject(message);
-          };
-
-          transaction.oncomplete = () => {
-            resolve(db);
-          };
-        };
-
-        obj.onerror = (event) => {
-          const message = `IndexedDB: failed to fetch ${storeName}`;
-          reject(message);
-        };
-      });
+      return upgradeDatabaseToVersion3(db, transaction);
     }
     case 4: {
       console.info(
         "IndexedDB: Add database version to AppState / Settings so it's easier to import/export."
       );
-
-      return new Promise((resolve, reject) => {
-        // load from the database
-
-        console.log("IndexedDB: creating transaction");
-        const appStateStore = transaction.objectStore(
-          APP_STATE_OBJECT_STORE_NAME
-        );
-        const appStateObject = appStateStore.get(APP_STATE_OBJECT_STORE_NAME);
-
-        const settingsStore = transaction.objectStore(
-          SETTINGS_OBJECT_STORE_NAME
-        );
-        const settingsObject = settingsStore.get(SETTINGS_OBJECT_STORE_NAME);
-
-        appStateObject.onsuccess = () => {
-          // run migration
-          const currentData = appStateObject.result;
-
-          if (typeof currentData === "undefined") {
-            console.log("IndexedDB: no entry yet, no need to migrate");
-            resolve(db);
-            return;
-          }
-
-          const newData = addDatabaseVersion(currentData);
-
-          // store in the database
-          console.info(
-            "IndexedDB: writing to the store",
-            APP_STATE_OBJECT_STORE_NAME,
-            newData
-          );
-          appStateStore.put(newData);
-        };
-
-        appStateObject.onerror = (event) => {
-          const message = `IndexedDB: failed to fetch ${APP_STATE_OBJECT_STORE_NAME}`;
-          reject(message);
-        };
-
-        settingsObject.onsuccess = () => {
-          // run migration
-          const currentData = settingsObject.result;
-
-          if (typeof currentData === "undefined") {
-            console.log("IndexedDB: no entry yet, no need to migrate");
-            resolve(db);
-            return;
-          }
-
-          const newData = addDatabaseVersion(currentData);
-
-          // store in the database
-          console.info(
-            "IndexedDB: writing to the store",
-            SETTINGS_OBJECT_STORE_NAME,
-            newData
-          );
-          settingsStore.put(newData);
-        };
-
-        settingsObject.onerror = (event) => {
-          const message = `IndexedDB: failed to fetch ${SETTINGS_OBJECT_STORE_NAME}`;
-          reject(message);
-        };
-
-        transaction.onerror = (event) => {
-          const message = `Database failed to write data during migration`;
-          console.error(message, event);
-          reject(message);
-        };
-
-        transaction.oncomplete = () => {
-          resolve(db);
-        };
-      });
+      return upgradeDatabaseToVersion4(db, transaction);
     }
   }
 }
