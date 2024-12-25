@@ -14,6 +14,9 @@ import { renderGraph } from "./render/graphs/index";
 import { showSpiderweb } from "./render/graphs/spiderweb";
 import { renderImport, renderSettings } from "./render/ui/tabs";
 
+/**
+ * Keep track of last render time to avoid rendering too often
+ */
 let lastRenderTime = 0;
 
 /**
@@ -147,57 +150,57 @@ renderChannel.channel.addEventListener(
   }
 );
 
+async function tryToPersistStorage(): Promise<void> {
+  return navigator.storage.persist().then((persistent) => {
+    if (persistent) {
+      console.log("Storage will not be cleared except by explicit user action");
+    } else {
+      console.warn(
+        "Client-side storage may be cleared under storage pressure."
+      );
+    }
+  });
+}
+
 /**
  * Since most of the logic regarding state is handled in the service-worker, this
  * app currently requires a service-worker.
  */
 function attachServiceWorker(): Promise<void> {
   return new Promise(async (resolve, reject) => {
-    if (navigator.storage && navigator.storage.persist) {
-      navigator.storage.persist().then((persistent) => {
-        if (persistent) {
-          console.log(
-            "Storage will not be cleared except by explicit user action"
-          );
-        } else {
-          console.warn(
-            "Client-side storage may be cleared under storage pressure."
-          );
-        }
-      });
+    if (navigator.storage && "persist" in navigator.storage) {
+      await tryToPersistStorage();
     }
 
-    if ("serviceWorker" in navigator) {
-      await navigator.serviceWorker
-        .register("service-worker.js", {
-          scope: "./",
-        })
-        .then((registration) => {
-          let serviceWorker;
-          if (registration.installing) {
-            serviceWorker = registration.installing;
-          } else if (registration.waiting) {
-            serviceWorker = registration.waiting;
-          } else if (registration.active) {
-            serviceWorker = registration.active;
-          }
-          if (serviceWorker) {
-            serviceWorker.addEventListener("statechange", (event) => {
-              console.log((event.target as any).state);
-            });
-            resolve();
-            return;
-          }
-          reject("Did not register service worker");
-        })
-        .catch((error) => {
-          console.error(error);
-          reject(error);
-        });
-    } else {
+    if (!("serviceWorker" in navigator)) {
       console.error("Unable to register service worker");
       reject("No such serviceWorker in navigator");
+      return;
     }
+
+    await navigator.serviceWorker
+      .register("service-worker.js", {
+        scope: "./",
+      })
+      .then((registration) => {
+        let serviceWorker;
+        if (registration.installing) {
+          serviceWorker = registration.installing;
+        } else if (registration.waiting) {
+          serviceWorker = registration.waiting;
+        } else if (registration.active) {
+          serviceWorker = registration.active;
+        }
+        if (serviceWorker) {
+          resolve();
+          return;
+        }
+        reject("Did not register service worker");
+      })
+      .catch((error) => {
+        console.error(error);
+        reject(error);
+      });
   });
 }
 
