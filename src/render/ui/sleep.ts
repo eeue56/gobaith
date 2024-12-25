@@ -6,7 +6,7 @@ import {
   Sent,
 } from "../../types";
 
-const MAX = 48;
+const MAX_SLEEPING_30_MINUTE_SLOTS = 48;
 
 function sliderFillStyle(percentFilled: number): string {
   return `linear-gradient(to right, var(--pico-range-thumb-color) ${percentFilled}%, var(--pico-background-color) ${percentFilled}%`;
@@ -18,7 +18,7 @@ function renderHoursSleptMessage(hoursSlept: number): string {
 
 export function renderSleepSlider(entry: JournalEntry): RenderedWithEvents {
   const currentValue = entry.hoursSlept * 2;
-  const percentFilled = (currentValue / MAX) * 100;
+  const percentFilled = (currentValue / MAX_SLEEPING_30_MINUTE_SLOTS) * 100;
 
   return {
     body: `
@@ -32,7 +32,7 @@ export function renderSleepSlider(entry: JournalEntry): RenderedWithEvents {
 <div class="pure-g">
     <div class="pure-u-1-3"></div>
     <div class="slider-label">0</div>
-    <input title="Drag slider to find your sleep hours" type="range" min="0" max="${MAX}" step="1" list="steplist" value="${currentValue}" class="pure-u-1-3 slider" id="sleep-slider" style="background: ${sliderFillStyle(
+    <input title="Drag slider to find your sleep hours" type="range" min="0" max="${MAX_SLEEPING_30_MINUTE_SLOTS}" step="1" list="steplist" value="${currentValue}" class="pure-u-1-3 slider" id="sleep-slider" style="background: ${sliderFillStyle(
       percentFilled
     )}">
     <div class="slider-label">24</div>
@@ -78,7 +78,8 @@ function dynamicallyShowSliderValue(event: Event): Sent {
   }
 
   // set the slider fill
-  const percentFilled = (parseInt(target.value) / MAX) * 100;
+  const percentFilled =
+    (parseInt(target.value) / MAX_SLEEPING_30_MINUTE_SLOTS) * 100;
   target.style.background = sliderFillStyle(percentFilled);
 
   // temporarily show the value - it will get overwritten on next render anyway
