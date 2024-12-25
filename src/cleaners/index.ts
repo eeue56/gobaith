@@ -1,10 +1,12 @@
-import { LATEST_DATABASE_VERSION } from "../types";
+import { DatabaseVersion, LATEST_DATABASE_VERSION } from "../types";
 import { renameStateFields } from "./database_3";
 import { addDatabaseVersion } from "./database_4";
 import { renameField } from "./rename_fields";
 
 /**
  * Run each cleaner in order.
+ *
+ * The cleaners exist to adjust data from older versions before importing it into the database
  */
 export function cleanData(data: unknown): unknown {
   if (typeof data !== "object") {
@@ -20,7 +22,11 @@ export function cleanData(data: unknown): unknown {
       return cleanSettings(data);
     }
   }
+
+  return data;
 }
+
+type DataWithDatabaseVersion = unknown & { databaseVersion: DatabaseVersion };
 
 function cleanAppState(data: unknown): unknown {
   // databaseVersion was added in v4
@@ -33,17 +39,20 @@ function cleanAppState(data: unknown): unknown {
     console.log("Cleaner: added database version");
   }
 
+  const dataWithDatabaseVersion: DataWithDatabaseVersion =
+    data as DataWithDatabaseVersion;
+
   // make sure we don't overwrite future database versions
-  if (((data as any)["databaseVersion"] as number) > LATEST_DATABASE_VERSION) {
+  if (dataWithDatabaseVersion.databaseVersion > LATEST_DATABASE_VERSION) {
     console.warn(
       "Cleaner: imported data has a newer database version than the app!\nTry refreshing a few times before importing."
     );
-    return data;
+    return dataWithDatabaseVersion;
   }
 
   // here database version specific cleaning will be added
 
-  return data;
+  return dataWithDatabaseVersion;
 }
 
 function cleanSettings(data: unknown): unknown {
@@ -53,15 +62,18 @@ function cleanSettings(data: unknown): unknown {
     console.log("Cleaner: added database version");
   }
 
+  const dataWithDatabaseVersion: DataWithDatabaseVersion =
+    data as DataWithDatabaseVersion;
+
   // make sure we don't overwrite future database versions
-  if (((data as any)["databaseVersion"] as number) > LATEST_DATABASE_VERSION) {
+  if (dataWithDatabaseVersion.databaseVersion > LATEST_DATABASE_VERSION) {
     console.warn(
       "Cleaner: imported data has a newer database version than the app!\nTry refreshing a few times before importing."
     );
-    return data;
+    return dataWithDatabaseVersion;
   }
 
   // here database version specific cleaning will be added
 
-  return data;
+  return dataWithDatabaseVersion;
 }
