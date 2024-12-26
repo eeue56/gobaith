@@ -44,6 +44,15 @@ const logEntries: Record<Prompt, string> = {
   "Today's psychotic symptoms": "I saw some unusual things",
 };
 
+export async function addLogEntryForScreenshot(
+  prompName: Prompt,
+  page: Page
+): Promise<void> {
+  const logEntryToFill = logEntries[prompName];
+  await page.locator("#new-journal-entry").fill(logEntryToFill);
+  await page.locator(".save-log-entry-button").first().click();
+}
+
 async function screenshotDailyTracker(page: Page) {
   await page.locator('.tab:text("Journal")').click();
 
@@ -57,9 +66,9 @@ async function screenshotDailyTracker(page: Page) {
 
     if (isPrompt(prompName)) {
       if (moodValue > 2) {
-        const logEntryToFill = logEntries[prompName];
-        //await page.locator("#new-journal-entry").fill(logEntryToFill);
-        //await page.locator(".save-log-entry-button").first().click();
+        // this will add log entries for screenshot purposes,
+        // but ignore it for now
+        // await addLogEntryForScreenshot(prompName, page);
       }
     } else {
       console.error(`Expected a prompt, but got "${prompName}"`);

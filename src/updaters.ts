@@ -124,6 +124,7 @@ export function updatePillOrder(
     }
     case "Down": {
       move(settings.currentPills, pillIndex, pillIndex + 1);
+      break;
     }
     case "Top": {
       move(settings.currentPills, pillIndex, 0);

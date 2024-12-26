@@ -24,7 +24,7 @@ export function showSpiderweb(today: Day, entries: JournalEntry[]): void {
   const labels = PROMPTS.slice(0);
   const todaysData = getDataOnlyForToday(today, entries);
 
-  const spiderwebChart = new Chart(ctx, {
+  new Chart(ctx, {
     type: "radar",
     data: {
       labels: labels,

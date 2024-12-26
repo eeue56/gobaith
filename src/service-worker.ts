@@ -90,6 +90,7 @@ function sendRerender(state: AppState, settings: Settings): number {
 
 function update(event: MessageEvent<Update>): number {
   const data = event.data;
+  console.info("ServiceWorker: recieved event", data.kind);
 
   switch (data.kind) {
     case "AddJournalEntry": {
@@ -403,6 +404,14 @@ async function initDatabase(shouldLoadFromBackend: boolean) {
   }
 }
 
+/**
+ * Checks if the server has a healthcheck enabled
+ *
+ * Limit healthcheck request to 50ms, so that it doesn't block for too long when the server is down.
+ *
+ * If the status code is anything other than 200, return false
+ * If the server is unhealthy, then the server-worker won't try to read/write to the server
+ */
 async function hasHeartbeat(): Promise<boolean> {
   try {
     const healthcheck = await fetch("/healthcheck", {

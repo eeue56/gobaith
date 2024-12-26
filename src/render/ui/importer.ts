@@ -154,7 +154,7 @@ export function renderExportedState(state: AppState): RenderedWithEvents {
   };
 }
 
-function downloadJson(object: AppState | Settings) {
+function downloadJson(object: AppState | Settings): Sent {
   let fileName;
   switch (object.kind) {
     case "AppState": {

@@ -36,7 +36,7 @@ export function showLineOverview(entries: JournalEntry[]): void {
     .sort(sortEntriesByDate)
     .map((entry) => dayToString(entry.day));
 
-  const lineChart = new Chart(ctx, {
+  new Chart(ctx, {
     type: "line",
     data: {
       datasets: datasets,
