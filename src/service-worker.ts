@@ -9,6 +9,7 @@ import {
 import { initializeEntryForDay } from "./logic/journal";
 import {
   AppState,
+  DebuggingInfo,
   isAppState,
   isSettings,
   LATEST_DATABASE_VERSION,
@@ -50,6 +51,11 @@ let settings: Settings = {
   databaseVersion: LATEST_DATABASE_VERSION,
 };
 
+let debuggingInfo: DebuggingInfo = {
+  kind: "DebuggingInfo",
+  eventLog: [],
+};
+
 const initResult = initializeEntryForDay(
   dateToDay(new Date()),
   appState.journalEntries,
@@ -84,6 +90,7 @@ function sendRerender(state: AppState, settings: Settings): number {
     kind: "rerender",
     state: state,
     settings: settings,
+    debuggingInfo: debuggingInfo,
   });
   return 0;
 }
@@ -91,6 +98,8 @@ function sendRerender(state: AppState, settings: Settings): number {
 function update(event: MessageEvent<Update>): number {
   const data = event.data;
   console.info("ServiceWorker: recieved event", data.kind);
+
+  debuggingInfo.eventLog.push(data.kind);
 
   switch (data.kind) {
     case "AddJournalEntry": {

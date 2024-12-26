@@ -70,7 +70,7 @@ function upgradeDatabaseToVersion3(
 function upgradeDatabaseToVersion4(
   db: IDBDatabase,
   transaction: IDBTransaction
-): IDBDatabase | PromiseLike<IDBDatabase> {
+): IDBDatabase | Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     // load from the database
     console.log("IndexedDB: creating transaction");

@@ -394,6 +394,12 @@ canvas {
   padding-right: 5px;
 }
 
+.event-log {
+  max-height: 30vh;
+  overflow: scroll;
+  border: 1px solid blue;
+}
+
 #download-settings,
 #download-state {
   margin-top: 10px;

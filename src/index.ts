@@ -15,6 +15,7 @@ import type { Chart } from "chart.js";
 import { renderGraph } from "./render/graphs/index";
 import { showSpiderweb } from "./render/graphs/spiderweb";
 import { renderImport, renderSettings } from "./render/ui/tabs";
+import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
 /**
  * Keep track of last render time to avoid rendering too often
@@ -46,7 +47,11 @@ function renderBody(state: AppState, settings: Settings): RenderedWithEvents {
       return renderGraph(state, settings);
     }
     case "SETTINGS": {
-      return renderSettings(state, settings);
+      let info = getDebuggingInfo();
+      if (!info) {
+        info = { kind: "DebuggingInfo", eventLog: [] };
+      }
+      return renderSettings(state, settings, info);
     }
   }
 }
@@ -168,6 +173,7 @@ renderChannel.channel.addEventListener(
   "message",
   (event: MessageEvent<RenderBroadcast>) => {
     if (event.data.kind === "rerender") {
+      storeDebuggingInfo(event.data.debuggingInfo);
       render(event.data.state, event.data.settings);
     }
   }

@@ -151,6 +151,11 @@ export function isAppState(object: unknown): object is AppState {
   return false;
 }
 
+export type DebuggingInfo = {
+  kind: "DebuggingInfo";
+  eventLog: Update["kind"][];
+};
+
 export type Settings = {
   kind: "Settings";
   currentPills: string[];
@@ -309,6 +314,7 @@ export type RenderBroadcast =
       kind: "rerender";
       state: AppState;
       settings: Settings;
+      debuggingInfo: DebuggingInfo;
     }
   | { kind: "ReadyToRender" };
 

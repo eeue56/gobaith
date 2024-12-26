@@ -1,5 +1,6 @@
 import {
   AppState,
+  DebuggingInfo,
   RenderedWithEvents,
   sendUpdate,
   Sent,
@@ -7,6 +8,7 @@ import {
   TabName,
 } from "../../types";
 import { renderer } from "../../utils/render";
+import { renderDebuggingInfo } from "./debugger";
 import {
   renderEnterTextToImport,
   renderExportedSettings,
@@ -93,7 +95,8 @@ ${renderTabNavigation(state.currentTab)}
 
 export function renderSettings(
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  info: DebuggingInfo
 ): RenderedWithEvents {
   return renderer`
 <div class="tab-content">
@@ -102,6 +105,7 @@ export function renderSettings(
   ${renderRemoveAppState()}
   ${renderPillOrder(settings)}
   ${renderAddPill()}
+  ${renderDebuggingInfo(info)}
 </div>
 ${renderTabNavigation(state.currentTab)}
 `;
