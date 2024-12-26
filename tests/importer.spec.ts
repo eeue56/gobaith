@@ -43,7 +43,7 @@ test("the importer can import state", async ({ context, page }) => {
 
   await page.locator("#update-import-from-text").dispatchEvent("click");
 
-  expect(await page.locator("#textarea-export-state").inputValue()).toContain(
+  expect(await page.locator("#textarea-download-state").inputValue()).toContain(
     logEntry.text
   );
 
@@ -96,6 +96,6 @@ test("the importer can import settings", async ({ context, page }) => {
   await page.waitForTimeout(500);
 
   expect(
-    await page.locator("#textarea-export-settings").inputValue()
+    await page.locator("#textarea-download-settings").inputValue()
   ).toContain("Ibux 200mg");
 });

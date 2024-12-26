@@ -104,54 +104,53 @@ async function updateImportFile(event: Event): Promise<Sent> {
   return dontSend();
 }
 
-export function renderExportedSettings(settings: Settings): RenderedWithEvents {
-  const id = "download-settings";
-  const stringSettings = JSON.stringify(settings);
+function renderExported(
+  title: string,
+  downloadText: string,
+  id: string,
+  data: AppState | Settings
+): RenderedWithEvents {
+  const stringData = JSON.stringify(data);
   return {
     body: `
-<div class="pure-g"/>
+  <div class="pure-g"/>
     <div class="pure-u-1-5"></div>
     <div class="pure-form pure-u-3-5">
-        <h3>Exported settings (including pills)</h3>
-        <textarea id="textarea-export-settings" class="pure-u-1 export-data">${stringSettings}</textarea>
-        <button class="pure-button" id="${id}">Download settings</button>
+        <h3>${title}</h3>
+        <textarea id="textarea-${id}" class="pure-u-1 export-data">${stringData}</textarea>
+        <button class="pure-button" id="${id}">${downloadText}</button>
     </div>
     <div class="pure-u-1-5"></div>
-</div>
-`,
+  </div>
+  `,
     eventListeners: [
       {
         elementId: id,
         eventName: "click",
-        callback: (): Sent => downloadJson(settings),
+        callback: (): Sent => downloadJson(data),
       },
     ],
   };
 }
 
+export function renderExportedSettings(settings: Settings): RenderedWithEvents {
+  const id = "download-settings";
+  return renderExported(
+    "Exported settings (including pills)",
+    "Download settings",
+    id,
+    settings
+  );
+}
+
 export function renderExportedState(state: AppState): RenderedWithEvents {
   const id = "download-state";
-  const stringState = JSON.stringify(state);
-  return {
-    body: `
-<div class="pure-g"/>
-    <div class="pure-u-1-5"></div>
-    <div class="pure-form pure-u-3-5">
-        <h3>Exported state (including journal entries)</h3>
-        <textarea id="textarea-export-state" class="pure-u-1 export-data">${stringState}</textarea>
-        <button class="pure-button" id="${id}">Download state</button>
-    </div>
-    <div class="pure-u-1-5"></div>
-</div>
-`,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "click",
-        callback: (): Sent => downloadJson(state),
-      },
-    ],
-  };
+  return renderExported(
+    "Exported state (including journal entries)",
+    "Download state",
+    id,
+    state
+  );
 }
 
 function downloadJson(object: AppState | Settings): Sent {

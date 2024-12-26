@@ -12,17 +12,12 @@ import {
 import { dayToString } from "../../utils/dates";
 import { idHash } from "../../utils/render";
 
-// todo: pick this up dynamically
-const IS_MOBILE = false;
-
 export function renderPill(
   entry: JournalEntry,
   pill: string
 ): RenderedWithEvents {
   const uniquePillGroupId = "pill-" + dayToString(entry.day) + idHash(pill);
   const amountTaken = entry.pills[pill];
-  const size = IS_MOBILE ? 4 : 6;
-
   const ids: string[] = [
     `${uniquePillGroupId}-minus`,
     `${uniquePillGroupId}-plus`,
@@ -62,9 +57,9 @@ export function renderPill(
     </div>
     <div class="pure-button-group" role="group" aria-label="...">
         <div class="pure-u-1-6 prompt-side"></div>
-        <button class="pure-button pure-u-1-${size} prompt-answer" id="${ids[0]}">Minus</button>
+        <button class="pure-button pure-u-1-6 prompt-answer" id="${ids[0]}">Minus</button>
         <div class="pure-u-1-4 pill-amount-taken">${amountTaken}</div>
-        <button class="pure-button pure-u-1-${size} prompt-answer" id="${ids[1]}">Plus</button>
+        <button class="pure-button pure-u-1-6 prompt-answer" id="${ids[1]}">Plus</button>
         <div class="pure-u-1-6 prompt-side"></div>
     </div>
 </div>
