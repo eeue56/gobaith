@@ -2,6 +2,7 @@ import { showLineOverview } from "./render/graphs/lineOverview";
 import { renderJournal } from "./render/journal";
 import {
   AppState,
+  GraphName,
   RenderBroadcast,
   RenderedWithEvents,
   RenderError,
@@ -10,6 +11,7 @@ import {
   TypedBroadcastChannel,
 } from "./types";
 
+import type { Chart } from "chart.js";
 import { renderGraph } from "./render/graphs/index";
 import { showSpiderweb } from "./render/graphs/spiderweb";
 import { renderImport, renderSettings } from "./render/ui/tabs";
@@ -18,6 +20,16 @@ import { renderImport, renderSettings } from "./render/ui/tabs";
  * Keep track of last render time to avoid rendering too often
  */
 let lastRenderTime = 0;
+
+type ActiveChart = {
+  graphName: GraphName;
+  chart: Chart<any, any>;
+};
+
+/**
+ * Track the active chart so we can call destroy on it when tabs change
+ */
+let activeChart: ActiveChart | null = null;
 
 /**
  * Call the individual render functions
@@ -121,6 +133,12 @@ function render(state: AppState, settings: Settings): void {
  */
 function postRender(state: AppState, settings: Settings): void {
   if (state.currentTab === "GRAPH") {
+    if (activeChart !== null) {
+      if (activeChart.graphName !== state.currentGraph) {
+        activeChart.chart.destroy();
+        activeChart = null;
+      }
+    }
     switch (state.currentGraph) {
       case "SPIDERWEB": {
         showSpiderweb(state.day, state.journalEntries);
@@ -133,6 +151,11 @@ function postRender(state: AppState, settings: Settings): void {
       case "DAILY_BAR":
       case "BIPOLAR_PERIODS":
       case "TOTALED_DAILY_BAR":
+    }
+  } else {
+    if (activeChart !== null) {
+      activeChart.chart.destroy();
+      activeChart = null;
     }
   }
 }

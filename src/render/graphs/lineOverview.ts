@@ -1,8 +1,31 @@
-import { Chart } from "chart.js";
+import {
+  Chart,
+  Colors,
+  Filler,
+  Legend,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
 import { getDataPerPrompt } from ".";
 import { JournalEntry, RenderedWithEvents } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
 import { renderer } from "../../utils/render";
+
+Chart.register(
+  Colors,
+  LinearScale,
+  LineController,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Filler,
+  Title,
+  Legend
+);
 
 export function renderLineOverview(): RenderedWithEvents {
   return renderer`
@@ -16,18 +39,20 @@ export function renderLineOverview(): RenderedWithEvents {
 `;
 }
 
-export function showLineOverview(entries: JournalEntry[]): void {
+export function showLineOverview(
+  entries: JournalEntry[]
+): Chart<any, any> | null {
   const element = document.getElementById(
     "line-overview"
   ) as HTMLCanvasElement | null;
   if (!element) {
     console.error("Unable to find line-overview element");
-    return;
+    return null;
   }
   const ctx = element.getContext("2d");
   if (!ctx) {
     console.error("No 2d context for line-overview");
-    return;
+    return null;
   }
 
   const datasets = getDataPerPrompt(entries);
@@ -36,13 +61,14 @@ export function showLineOverview(entries: JournalEntry[]): void {
     .sort(sortEntriesByDate)
     .map((entry) => dayToString(entry.day));
 
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: "line",
     data: {
       datasets: datasets,
       labels: days,
     },
     options: {
+      animation: false,
       font: {
         size: 30,
       },
