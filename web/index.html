@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="dark">
+<html data-theme="dark" lang="en-GB">
   <head>
     <title>Mood Tracker - loading</title>
     <link
@@ -15,8 +15,18 @@
       sizes="16x16"
     />
     <link rel="manifest" href="./manifest.json" />
-    <link rel="stylesheet" href="./pico.min.css" />
-    <link rel="stylesheet" href="./pure-min-3.0.0.css" />
+    <link
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      href="./pico.min.css"
+    />
+    <link
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+      href="./pure-min-3.0.0.css"
+    />
     <link rel="stylesheet" href="./style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
