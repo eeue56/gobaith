@@ -10,6 +10,7 @@
     "@playwright/test": "^1.49.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
+    "@types/serviceworker": "^0.0.108",
     "electron": "^33.2.1",
     "esbuild": "^0.24.0",
     "express": "^4.21.2",

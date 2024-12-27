@@ -97,7 +97,7 @@ function sendRerender(state: AppState, settings: Settings): number {
 
 function update(event: MessageEvent<Update>): number {
   const data = event.data;
-  console.info("ServiceWorker: recieved event", data.kind);
+  console.info("ServiceWorker: received event", data.kind);
 
   // just ignore debug info if it doesn't exist, to avoid breaking the update loop
   try {
@@ -455,6 +455,7 @@ async function hasHeartbeat(): Promise<boolean> {
 
 self.addEventListener("install", async function (e) {
   console.info("ServiceWorker: Install event:", e);
+  self.skipWaiting();
   const shouldLoadFromBackend = await hasHeartbeat();
   hasBackend = shouldLoadFromBackend;
 
@@ -462,6 +463,7 @@ self.addEventListener("install", async function (e) {
 });
 
 self.addEventListener("activate", async function (e) {
+  clients.claim();
   const shouldLoadFromBackend = await hasHeartbeat();
   hasBackend = shouldLoadFromBackend;
   console.info("ServiceWorker: Activate event:", e);
