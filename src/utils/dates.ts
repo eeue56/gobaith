@@ -36,7 +36,7 @@ export function isSameDay(first: Day, second: Day): boolean {
 }
 
 export function dayToDate(day: Day): Date {
-  return new Date(dayToString(day));
+  return new Date(day.year, day.month - 1, day.day, 0, 0, 0, 0);
 }
 
 export function dateToDay(date: Date): Day {
@@ -80,6 +80,10 @@ export function stringToDay(string: string): Day | null {
   return null;
 }
 
+/**
+ * Returns the number of days between two days, with direction
+ * (i.e 27/12/2024 to 26/12/2024 is -1, but 26/12/2024 is 1)
+ */
 export function numberOfDaysBetween(firstDay: Day, secondDay: Day): number {
   const firstDate = dayToDate(firstDay);
   const secondDate = dayToDate(secondDay);
@@ -88,4 +92,16 @@ export function numberOfDaysBetween(firstDay: Day, secondDay: Day): number {
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
   return diffInDays;
+}
+
+export function previousDay(today: Day): Day {
+  const date = dayToDate(today);
+  date.setDate(date.getDate() - 1);
+  return dateToDay(date);
+}
+
+export function nextDay(today: Day): Day {
+  const date = dayToDate(today);
+  date.setDate(date.getDate() + 1);
+  return dateToDay(date);
 }

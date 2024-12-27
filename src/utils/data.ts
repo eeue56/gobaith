@@ -7,8 +7,7 @@ import {
   LogEntry,
   PromptResponses,
 } from "../types";
-import { previousDay } from "../updaters";
-import { dateToDay } from "./dates";
+import { dateToDay, previousDay } from "./dates";
 
 /**
  * Generates data for one day for use in examples

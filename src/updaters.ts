@@ -10,7 +10,7 @@ import {
   Settings,
   TabName,
 } from "./types";
-import { dateToDay, dayToDate, isSameDay } from "./utils/dates";
+import { isSameDay } from "./utils/dates";
 
 export function addJournalEntry(
   day: Day,
@@ -79,18 +79,6 @@ export function updatePillValue(
   }
 
   return { ...state, journalEntries: state.journalEntries };
-}
-
-export function previousDay(today: Day): Day {
-  const date = dayToDate(today);
-  date.setDate(date.getDate() - 1);
-  return dateToDay(date);
-}
-
-export function nextDay(today: Day): Day {
-  const date = dayToDate(today);
-  date.setDate(date.getDate() + 1);
-  return dateToDay(date);
 }
 
 export function updateCurrentTab(tab: TabName, state: AppState): AppState {

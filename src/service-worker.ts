@@ -21,8 +21,6 @@ import {
 import {
   addJournalEntry,
   addPill,
-  nextDay,
-  previousDay,
   updateCurrentGraph,
   updateCurrentTab,
   updatePillOrder,
@@ -30,7 +28,7 @@ import {
   updatePromptValue,
   updateSleepValue,
 } from "./updaters";
-import { dateToDay } from "./utils/dates";
+import { dateToDay, nextDay, previousDay } from "./utils/dates";
 
 const renderChannel = TypedBroadcastChannel<RenderBroadcast>("render");
 
