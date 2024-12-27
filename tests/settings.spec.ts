@@ -50,3 +50,47 @@ test("the user removes app state (including journals)", async ({
   // ...and all the bars should be at the default value (1)
   await expect((await page.locator(".daily-bar-1").all()).length).toEqual(5);
 });
+
+test("the debug log contains events triggered", async ({ context, page }) => {
+  await page.locator('.tab:text("Settings")').click();
+
+  await expect(await page.locator(".event-log").innerText()).toEqual(
+    "ReadyToRender\nUpdateCurrentTab"
+  );
+
+  await page.locator('.tab:text("Journal")').click();
+
+  {
+    // Go back one day
+    await page.locator("#previous-day").click();
+
+    await expect(
+      await page.locator(".current-day").first().innerHTML()
+    ).toContain("1 day ago");
+  }
+
+  const promptGroups = await page.locator(".prompt-group").all();
+
+  for (const group of promptGroups) {
+    const responseButton = await group.locator(".prompt-answer").nth(2);
+    responseButton.click();
+    await expect(responseButton).toHaveClass(/pure-button-active/);
+  }
+
+  await page.locator('.tab:text("Settings")').click();
+
+  await expect(await page.locator(".event-log").innerText()).toEqual(
+    `
+ReadyToRender
+UpdateCurrentTab
+UpdateCurrentTab
+UpdateCurrentDay
+UpdatePromptValue
+UpdatePromptValue
+UpdatePromptValue
+UpdatePromptValue
+UpdatePromptValue
+UpdateCurrentTab
+  `.trim()
+  );
+});
