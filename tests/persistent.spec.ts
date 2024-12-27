@@ -1,6 +1,8 @@
 import { expect } from "@playwright/test";
 import { testPeristentElectron } from "./fixtures";
 
+testPeristentElectron.describe.configure({ mode: "serial" });
+
 testPeristentElectron("the user adds a pill", async ({ context, page }) => {
   if (!process.env.IS_ELECTRON) return;
   await page.locator('.tab:text("Settings")').click();

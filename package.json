@@ -21,7 +21,7 @@
     "build": "esbuild --bundle src/index.ts --outfile=web/out.js --minify && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js --minify",
     "build-electron": "cd electron && npm run build",
     "test": "tsc --noEmit && npx playwright test",
-    "test-electron": "IS_ELECTRON=true npx playwright test",
+    "test-electron": "IS_ELECTRON=true npx playwright test --workers=1",
     "test-all": "npm run test && npm run test-electron",
     "generate": "ts-node src/utils/data.ts",
     "generate-screenshots": "ts-node screenshots/generate_screenshots.ts"
