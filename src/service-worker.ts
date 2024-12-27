@@ -99,7 +99,17 @@ function update(event: MessageEvent<Update>): number {
   const data = event.data;
   console.info("ServiceWorker: recieved event", data.kind);
 
-  debuggingInfo.eventLog.push(data.kind);
+  // just ignore debug info if it doesn't exist, to avoid breaking the update loop
+  try {
+    debuggingInfo.eventLog.push(data.kind);
+  } catch (error) {
+    console.error(
+      "ServiceWorker: unable to add event",
+      data.kind,
+      "to the event log due to",
+      error
+    );
+  }
 
   switch (data.kind) {
     case "AddJournalEntry": {
@@ -274,6 +284,11 @@ function update(event: MessageEvent<Update>): number {
       }
       return sendRerender(appState, settings);
     }
+    case "SetDebuggingInfo": {
+      debuggingInfo = data.info;
+
+      return sendRerender(appState, settings);
+    }
   }
 }
 
@@ -439,7 +454,7 @@ async function hasHeartbeat(): Promise<boolean> {
 }
 
 self.addEventListener("install", async function (e) {
-  console.info("Install event:", e);
+  console.info("ServiceWorker: Install event:", e);
   const shouldLoadFromBackend = await hasHeartbeat();
   hasBackend = shouldLoadFromBackend;
 
@@ -449,7 +464,7 @@ self.addEventListener("install", async function (e) {
 self.addEventListener("activate", async function (e) {
   const shouldLoadFromBackend = await hasHeartbeat();
   hasBackend = shouldLoadFromBackend;
-  console.info("Activate event:", e);
+  console.info("ServiceWorker: Activate event:", e);
   await initDatabase(false);
 });
 

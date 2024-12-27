@@ -2,6 +2,7 @@ import { showLineOverview } from "./render/graphs/lineOverview";
 import { renderJournal } from "./render/journal";
 import {
   AppState,
+  DebuggingInfo,
   GraphName,
   RenderBroadcast,
   RenderedWithEvents,
@@ -47,7 +48,7 @@ function renderBody(state: AppState, settings: Settings): RenderedWithEvents {
       return renderGraph(state, settings);
     }
     case "SETTINGS": {
-      let info = getDebuggingInfo();
+      let info: DebuggingInfo | null = getDebuggingInfo();
       if (!info) {
         info = { kind: "DebuggingInfo", eventLog: [] };
       }
@@ -235,6 +236,11 @@ function attachServiceWorker(): Promise<void> {
 
 async function main() {
   await attachServiceWorker();
+  let info = getDebuggingInfo();
+  if (!info) {
+    info = { kind: "DebuggingInfo", eventLog: [] };
+  }
+  sendUpdate({ kind: "SetDebuggingInfo", info });
   sendUpdate({ kind: "ReadyToRender" });
 }
 

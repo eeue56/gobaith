@@ -285,7 +285,8 @@ export type Update =
       direction: PillOrderDirection;
     }
   | { kind: "ReadyToRender" }
-  | { kind: "InitializeDay" };
+  | { kind: "InitializeDay" }
+  | { kind: "SetDebuggingInfo"; info: DebuggingInfo };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel
