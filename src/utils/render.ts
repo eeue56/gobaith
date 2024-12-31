@@ -1,4 +1,4 @@
-import { RenderedWithEvents } from "../types";
+import { EventHandler, RenderedWithEvents } from "../types";
 
 let unique = "a";
 
@@ -36,35 +36,37 @@ export function staticHash(str: string): string {
 /**
  * Use as a template-literal prefix to enforce renderer structure
  *
- * Only allows strings or `Renderer` in the template string literal.
+ * Only allows numbers, strings or `Renderer` in the template string literal.
  *
  * e.g
  *
  * This will throw an error:
  *
  * ```
- * const x = 5;
- * renderer`${5}`
+ *  const x = {};
+ *  renderer`${x}`
  * ```
  */
 export function renderer(
   strings: TemplateStringsArray,
-  ...vars: (string | RenderedWithEvents)[]
+  ...vars: (string | number | RenderedWithEvents)[]
 ): RenderedWithEvents {
-  const body = [];
-  const eventListeners = [];
+  const body: string[] = [];
+  const eventListeners: EventHandler[] = [];
   for (var i = 0; i < strings.length; i++) {
     const value = strings[i];
-    const maybeVar = vars[i];
 
     body.push(value);
 
-    if (maybeVar) {
-      if (typeof maybeVar === "string") {
-        body.push(maybeVar);
+    if (i < vars.length) {
+      const currentVariable = vars[i];
+      if (typeof currentVariable === "string") {
+        body.push(currentVariable);
+      } else if (typeof currentVariable === "number") {
+        body.push(currentVariable.toString());
       } else {
-        body.push(maybeVar.body);
-        eventListeners.push(...maybeVar.eventListeners);
+        body.push(currentVariable.body);
+        eventListeners.push(...currentVariable.eventListeners);
       }
     }
   }
