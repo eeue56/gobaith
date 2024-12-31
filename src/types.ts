@@ -1,3 +1,5 @@
+import { Queryable } from "./logic/query";
+
 /**
  * Rename these as you want - the `MoodState` is a text representation of `MoodValue`
  */
@@ -112,7 +114,7 @@ export type LogEntry = {
   text: string;
 };
 
-export const DATABASE_VERSIONS = [0, 1, 2, 3, 4] as const;
+export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5] as const;
 
 export type DatabaseVersion = (typeof DATABASE_VERSIONS)[number];
 
@@ -125,7 +127,7 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
  * any migrations needed in between the current db version
  * and the latest db version will be run
  */
-export const LATEST_DATABASE_VERSION: DatabaseVersion = 4;
+export const LATEST_DATABASE_VERSION: DatabaseVersion = 5;
 
 /**
  * AppState includes UI state and data (journal entries)
@@ -159,6 +161,7 @@ export type DebuggingInfo = {
 export type Settings = {
   kind: "Settings";
   currentPills: string[];
+  queries: Queryable[];
   databaseVersion: DatabaseVersion;
 };
 
@@ -210,11 +213,11 @@ export const GRAPH_NAMES = [
 export type GraphName = (typeof GRAPH_NAMES)[number];
 
 /**
- * A graph renderer is something that takes a day, the entries, and returns a Renderer.
+ * A graph renderer is something that takes the app state and settings, and returns a Renderer.
  */
 export type GraphRenderer = (
-  today: Day,
-  entries: JournalEntry[]
+  state: AppState,
+  settings: Settings
 ) => RenderedWithEvents;
 
 export function isGraphName(str: string): str is GraphName {
@@ -286,7 +289,8 @@ export type Update =
     }
   | { kind: "ReadyToRender" }
   | { kind: "InitializeDay" }
-  | { kind: "SetDebuggingInfo"; info: DebuggingInfo };
+  | { kind: "SetDebuggingInfo"; info: DebuggingInfo }
+  | { kind: "SetQueryDuration"; hash: string; duration: number };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel

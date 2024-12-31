@@ -4,6 +4,7 @@ import {
   numberOfDaysBetween,
   sortEntriesByDate,
 } from "../utils/dates";
+import { staticHash } from "../utils/render";
 
 export const MoreThan = { kind: "MoreThan" } as const;
 export type MoreThan = typeof MoreThan;
@@ -128,6 +129,8 @@ function continiousPeriods(entries: JournalEntry[]): JournalEntry[][] {
  */
 export type Query = And | Or | Not | Filter;
 
+export type Queryable = Query | Duration;
+
 /**
  * Run a query against the journal entries
  */
@@ -224,5 +227,98 @@ export function runDurationQuery(
         }
       }
     }
+  }
+}
+
+export const depressedDaysWithoutElevationQuery = And(
+  Filter(MoreThan, 1, "Today's feelings of depression"),
+  Filter(EqualTo, 1, "Today's feelings of elevation")
+);
+export const possiblyHarmfulManicDays = And(
+  Filter(MoreThan, 2, "Today's feelings of elevation"),
+  Or(
+    Filter(MoreThan, 1, "Today's feelings of irritableness"),
+    Filter(MoreThan, 1, "Today's psychotic symptoms")
+  )
+);
+
+export const hypomania = Duration(
+  And(
+    Or(
+      Filter(MoreThan, 1, "Today's feelings of elevation"),
+      Filter(MoreThan, 1, "Today's feelings of irritableness")
+    ),
+    Filter(EqualTo, 1, "Today's psychotic symptoms")
+  ),
+  3,
+  MoreThan
+);
+
+export const mania = Duration(
+  Or(
+    Filter(MoreThan, 2, "Today's feelings of elevation"),
+    Filter(MoreThan, 2, "Today's feelings of irritableness")
+  ),
+  6,
+  MoreThan
+);
+
+export const psychosis = Duration(
+  Filter(MoreThan, 2, "Today's psychotic symptoms"),
+  30,
+  MoreThan
+);
+
+export const depression = Duration(
+  Filter(MoreThan, 1, "Today's feelings of depression"),
+  14,
+  MoreThan
+);
+
+export const BUILT_IN_QUERIES: (Duration | Query)[] = [
+  depressedDaysWithoutElevationQuery,
+  possiblyHarmfulManicDays,
+  hypomania,
+  mania,
+  psychosis,
+  depression,
+];
+
+function hashAnd(query: And): string {
+  return `${query.kind}-${hashQuery(query.left)}-${hashQuery(query.right)}`;
+}
+
+function hashOr(query: Or): string {
+  return `${query.kind}-${hashQuery(query.left)}-${hashQuery(query.right)}`;
+}
+
+function hashNot(query: Not): string {
+  return `${query.kind}-${hashQuery(query.query)}`;
+}
+
+function hashFilter(query: Filter): string {
+  return `${query.kind}-${query.comparison.kind}-${query.value}-${staticHash(
+    query.prompt
+  )}`;
+}
+
+function hashDuration(duration: Duration): string {
+  return `${duration.kind}-${duration.comparison.kind}-${
+    duration.days
+  }-${hashQuery(duration.query)}`;
+}
+
+export function hashQuery(query: Query | Duration): string {
+  switch (query.kind) {
+    case "And":
+      return hashAnd(query);
+    case "Or":
+      return hashOr(query);
+    case "Not":
+      return hashNot(query);
+    case "Filter":
+      return hashFilter(query);
+    case "Duration":
+      return hashDuration(query);
   }
 }

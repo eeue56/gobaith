@@ -1,7 +1,6 @@
 import { getDataForPrompt } from "../../logic/journal";
 import {
   AppState,
-  Day,
   GraphName,
   GraphRenderer,
   JournalEntry,
@@ -21,11 +20,10 @@ import { renderBipolarPeriods } from "./periods";
 import { renderSpiderweb } from "./spiderweb";
 
 function renderActiveGraph(
-  day: Day,
-  entries: JournalEntry[],
-  currentGraph: GraphName
+  state: AppState,
+  settings: Settings
 ): RenderedWithEvents {
-  return GRAPHS[currentGraph](day, entries);
+  return GRAPHS[state.currentGraph](state, settings);
 }
 
 export function renderGraph(
@@ -35,7 +33,7 @@ export function renderGraph(
   return renderer`
 <div class="tab-content">
   ${renderGraphChoices(state)}
-  ${renderActiveGraph(state.day, state.journalEntries, state.currentGraph)}
+  ${renderActiveGraph(state, settings)}
 </div>
 ${renderTabNavigation(state.currentTab)}
 `;

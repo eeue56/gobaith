@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { BUILT_IN_QUERIES } from "../src/logic/query";
 import {
   AppState,
   isPrompt,
@@ -80,6 +81,7 @@ test("the importer can import settings", async ({ context, page }) => {
   const settings: Settings = {
     kind: "Settings",
     currentPills: ["Ibux 200mg"],
+    queries: [...BUILT_IN_QUERIES],
     databaseVersion: LATEST_DATABASE_VERSION,
   };
 

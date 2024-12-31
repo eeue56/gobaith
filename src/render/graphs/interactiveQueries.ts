@@ -1,25 +1,27 @@
 import {
-  And,
   Comparison,
   COMPARISONS,
   Duration,
-  EqualTo,
   Filter,
-  MoreThan,
-  Or,
+  hashQuery,
   Query,
   runDurationQuery,
   runQuery,
 } from "../../logic/query";
 import {
-  Day,
+  AppState,
+  dontSend,
   JournalEntry,
   MOOD_VALUES,
   MoodValue,
   Prompt,
   PROMPTS,
   RenderedWithEvents,
+  sendUpdate,
+  Sent,
+  Settings,
 } from "../../types";
+import { renderer } from "../../utils/render";
 
 function renderComparisonChoice(
   comparison: Comparison,
@@ -116,15 +118,86 @@ function isANestedQuery(query: Query): boolean {
   }
 }
 
-export function renderQueryBuilder(query: Query | Duration): string {
+function renderDurationDaySelector(
+  days: number,
+  queryHash: string
+): RenderedWithEvents {
+  const id = `${queryHash}-duration-day-selector`;
+  return {
+    body: `
+<div class="day-selector">
+  <form onsubmit="return false">
+    <input id="${id}" type="number" value="${days.toString()}"/>
+  </form>
+</div>`,
+    eventListeners: [
+      {
+        elementId: id,
+        eventName: "change",
+        callback: (event: Event): Sent => {
+          if (!event.target) {
+            return dontSend();
+          }
+          const value = parseInt((event.target as HTMLInputElement).value);
+          return sendUpdate({
+            kind: "SetQueryDuration",
+            hash: queryHash,
+            duration: value,
+          });
+        },
+      },
+    ],
+  };
+}
+
+function renderFilterBuilder(
+  query: Filter,
+  queryHash: string
+): RenderedWithEvents {
+  return renderer`
+${renderPromptChoices(query.prompt)}
+${renderComparisonChoices(query.comparison)}
+${renderMoodValueChoices(query.value)}
+  `;
+}
+
+function renderDurationBuilder(
+  query: Duration,
+  queryHash: string
+): RenderedWithEvents {
+  return renderer`
+${renderDurationDaySelector(query.days, queryHash)}
+${renderComparisonChoices(query.comparison)}
+${renderQueryBuilder(query.query)}
+  `;
+}
+
+function renderQueryBuilder(query: Query | Duration): RenderedWithEvents {
+  const queryHash = hashQuery(query);
+
+  switch (query.kind) {
+    case "And":
+    case "Or":
+    case "Not":
+      return renderer``;
+    case "Filter": {
+      return renderFilterBuilder(query, queryHash);
+    }
+    case "Duration": {
+      return renderDurationBuilder(query, queryHash);
+    }
+  }
+}
+
+export function renderQueryExplaination(query: Query | Duration): string {
   switch (query.kind) {
     case "And": {
-      const leftInner = renderQueryBuilder(query.left);
+      const leftInner = renderQueryExplaination(query.left);
       const left = isANestedQuery(query.left)
         ? `(${leftInner})`
         : `${leftInner}`;
 
-      const rightInner = renderQueryBuilder(query.right);
+      const rightInner = renderQueryExplaination(query.right);
       const right = isANestedQuery(query.right)
         ? `(${rightInner})`
         : `${rightInner}`;
@@ -132,76 +205,30 @@ export function renderQueryBuilder(query: Query | Duration): string {
       return `${left} AND ${right}`;
     }
     case "Or": {
-      const leftInner = renderQueryBuilder(query.left);
+      const leftInner = renderQueryExplaination(query.left);
       const left = isANestedQuery(query.left)
         ? `(${leftInner})`
         : `${leftInner}`;
 
-      const rightInner = renderQueryBuilder(query.right);
+      const rightInner = renderQueryExplaination(query.right);
       const right = isANestedQuery(query.right)
         ? `(${rightInner})`
         : `${rightInner}`;
       return `${left} OR ${right}`;
     }
     case "Not": {
-      return `NOT ${renderQueryBuilder(query.query)}`;
+      return `NOT ${renderQueryExplaination(query.query)}`;
     }
     case "Filter": {
       return `${query.prompt} ${query.comparison.kind} ${query.value}`;
     }
     case "Duration": {
-      return `${renderQueryBuilder(query.query)} for ${query.comparison.kind} ${
-        query.days
-      } days`;
+      return `${renderQueryExplaination(query.query)} for ${
+        query.comparison.kind
+      } ${query.days} days`;
     }
   }
 }
-
-const depressedDaysWithoutElevationQuery = And(
-  Filter(MoreThan, 1, "Today's feelings of depression"),
-  Filter(EqualTo, 1, "Today's feelings of elevation")
-);
-
-const possiblyHarmfulManicDays = And(
-  Filter(MoreThan, 2, "Today's feelings of elevation"),
-  Or(
-    Filter(MoreThan, 1, "Today's feelings of irritableness"),
-    Filter(MoreThan, 1, "Today's psychotic symptoms")
-  )
-);
-
-const hypomania = Duration(
-  And(
-    Or(
-      Filter(MoreThan, 1, "Today's feelings of elevation"),
-      Filter(MoreThan, 1, "Today's feelings of irritableness")
-    ),
-    Filter(EqualTo, 1, "Today's psychotic symptoms")
-  ),
-  3,
-  MoreThan
-);
-
-const mania = Duration(
-  Or(
-    Filter(MoreThan, 2, "Today's feelings of elevation"),
-    Filter(MoreThan, 2, "Today's feelings of irritableness")
-  ),
-  6,
-  MoreThan
-);
-
-const psychosis = Duration(
-  Filter(MoreThan, 2, "Today's psychotic symptoms"),
-  30,
-  MoreThan
-);
-
-const depression = Duration(
-  Filter(MoreThan, 1, "Today's feelings of depression"),
-  14,
-  MoreThan
-);
 
 function renderPeriod(entries: JournalEntry[]): string {
   return `<div>${entries.length} days</div>`;
@@ -212,45 +239,39 @@ function renderPeriods(periods: JournalEntry[][]): string {
 }
 
 export function renderInteractiveQueries(
-  today: Day,
-  entries: JournalEntry[]
+  state: AppState,
+  settings: Settings
 ): RenderedWithEvents {
-  const hypomaniaPeriods = runDurationQuery(hypomania, entries);
-  const maniaPeriods = runDurationQuery(mania, entries);
-  const psychosisPeriods = runDurationQuery(psychosis, entries);
-  const depressionPeriods = runDurationQuery(depression, entries);
+  const results: RenderedWithEvents[] = [];
+
+  for (const query of settings.queries) {
+    switch (query.kind) {
+      case "And":
+      case "Or":
+      case "Not":
+      case "Filter": {
+        const days = runQuery(query, state.journalEntries).length;
+        results.push(renderer`
+<div>
+    <div>${renderQueryExplaination(query)}</div>
+    <div>Results in: ${days} days</div>
+</div>`);
+        break;
+      }
+      case "Duration": {
+        results.push(renderer`<div>
+    <div>${renderQueryExplaination(query)}</div>
+    <div>Results in: ${renderPeriods(
+      runDurationQuery(query, state.journalEntries)
+    )}</div>
+</div>`);
+        break;
+      }
+    }
+  }
 
   return {
-    body: `
-<div>
-    <div>${renderQueryBuilder(depressedDaysWithoutElevationQuery)}</div>
-    <div>Results in: ${
-      runQuery(depressedDaysWithoutElevationQuery, entries).length
-    } days</div>
-</div>
-<div>
-    <div>${renderQueryBuilder(possiblyHarmfulManicDays)}</div>
-    <div>Results in: ${
-      runQuery(possiblyHarmfulManicDays, entries).length
-    } days</div>
-</div>
-<div>
-    <div>${renderQueryBuilder(hypomania)}</div>
-    <div>Results in: ${renderPeriods(hypomaniaPeriods)}</div>
-</div>
-<div>
-    <div>${renderQueryBuilder(mania)}</div>
-    <div>Results in: ${renderPeriods(maniaPeriods)}</div>
-</div>
-<div>
-    <div>${renderQueryBuilder(psychosis)}</div>
-    <div>Results in: ${renderPeriods(psychosisPeriods)}</div>
-</div>
-<div>
-    <div>${renderQueryBuilder(depression)}</div>
-    <div>Results in: ${renderPeriods(depressionPeriods)}</div>
-</div>
-    `,
-    eventListeners: [],
+    body: results.map((result) => result.body).join(""),
+    eventListeners: results.map((result) => result.eventListeners).flat(),
   };
 }

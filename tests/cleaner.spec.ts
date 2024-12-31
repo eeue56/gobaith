@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { cleanData } from "../src/cleaners";
+import { BUILT_IN_QUERIES } from "../src/logic/query";
+import { LATEST_DATABASE_VERSION } from "../src/types";
 import { dateToDay } from "../src/utils/dates";
 
 test("version 0, 1, 2 AppState gets successfully converted to the current version", () => {
@@ -40,10 +42,13 @@ test("version 0, 1, 2 AppState gets successfully converted to the current versio
   ).toEqual(undefined);
 
   // databaseVersion should be added
-  expect(cleanedData).toHaveProperty("databaseVersion", 4);
+  expect(cleanedData).toHaveProperty(
+    "databaseVersion",
+    LATEST_DATABASE_VERSION
+  );
 });
 
-test("version 4 AppState is untouched", () => {
+test("version 5 AppState is untouched", () => {
   const exampleData = {
     kind: "AppState",
     day: dateToDay(new Date()),
@@ -78,14 +83,20 @@ test("version 0, 1, 2 Settings gets successfully converted to the current versio
   };
   const cleanedData = cleanData(exampleData);
 
+  expect(cleanedData).toHaveProperty("queries");
+
   // databaseVersion should be added
-  expect(cleanedData).toHaveProperty("databaseVersion", 4);
+  expect(cleanedData).toHaveProperty(
+    "databaseVersion",
+    LATEST_DATABASE_VERSION
+  );
 });
 
-test("version 4 Settings is untouched", () => {
+test("version 5 Settings is untouched", () => {
   const exampleData = {
     kind: "Settings",
     currentPills: [],
+    queries: [...BUILT_IN_QUERIES],
     databaseVersion: 4,
   };
   const cleanedData = cleanData(exampleData);

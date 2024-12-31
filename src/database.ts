@@ -11,53 +11,19 @@ import {
 
 import { renameStateFields } from "./cleaners/database_3";
 import { addDatabaseVersion } from "./cleaners/database_4";
+import { addQueriesToSettings } from "./cleaners/database_5";
 import { renameField } from "./cleaners/rename_fields";
 
-function upgradeDatabaseToVersion3(
-  db: IDBDatabase,
+async function getObject(
+  storeName: StoreName,
   transaction: IDBTransaction
-): Promise<IDBDatabase> {
+): Promise<unknown> {
   return new Promise((resolve, reject) => {
-    // load from the database
-    const storeName = APP_STATE_OBJECT_STORE_NAME;
-
-    console.log("IndexedDB: creating transaction");
     const store = transaction.objectStore(storeName);
     const obj = store.get(storeName);
 
     obj.onsuccess = () => {
-      // run migration
-      const currentData = obj.result;
-
-      if (typeof currentData === "undefined") {
-        console.log("IndexedDB: no entry yet, no need to migrate");
-        resolve(db);
-        return;
-      }
-
-      console.info("IndexedDB: renaming the fields...");
-      const renamedData = renameField(renameStateFields, currentData);
-      console.log(`IndexedDB: migrated ${renamedData.migrated} entries.`);
-
-      if (renamedData.migrated === 0) {
-        console.log("IndexedDB: no changes to data, skipping write.");
-        resolve(db);
-        return;
-      }
-
-      // store in the database
-      console.info("IndexedDB: writing to the store");
-      store.put(renamedData.data);
-
-      transaction.onerror = (event) => {
-        const message = `Database failed to write data during migration`;
-        console.error(message, event);
-        reject(message);
-      };
-
-      transaction.oncomplete = () => {
-        resolve(db);
-      };
+      resolve(obj.result);
     };
 
     obj.onerror = (event) => {
@@ -67,22 +33,78 @@ function upgradeDatabaseToVersion3(
   });
 }
 
+async function putObject(
+  storeName: StoreName,
+  value: unknown,
+  transaction: IDBTransaction,
+  db: IDBDatabase
+): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const store = transaction.objectStore(storeName);
+
+    store.put(value);
+
+    transaction.onerror = (event) => {
+      const message = `Database failed to write data during migration`;
+      console.error(message, event);
+      reject(message);
+    };
+
+    transaction.oncomplete = () => {
+      resolve(db);
+    };
+  });
+}
+
+function upgradeDatabaseToVersion3(
+  db: IDBDatabase,
+  transaction: IDBTransaction
+): Promise<IDBDatabase> {
+  return new Promise(async (resolve, reject) => {
+    // load from the database
+    const storeName = APP_STATE_OBJECT_STORE_NAME;
+
+    console.log("IndexedDB: creating transaction");
+    const currentData = await getObject(storeName, transaction);
+
+    if (typeof currentData === "undefined") {
+      console.log("IndexedDB: no entry yet, no need to migrate");
+      resolve(db);
+      return;
+    }
+
+    console.info("IndexedDB: renaming the fields...");
+    const renamedData = renameField(renameStateFields, currentData);
+    console.log(`IndexedDB: migrated ${renamedData.migrated} entries.`);
+
+    if (renamedData.migrated === 0) {
+      console.log("IndexedDB: no changes to data, skipping write.");
+      resolve(db);
+      return;
+    }
+
+    // store in the database
+    console.info("IndexedDB: writing to the store");
+    try {
+      const _db = await putObject(storeName, renamedData.data, transaction, db);
+      resolve(_db);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 function upgradeDatabaseToVersion4(
   db: IDBDatabase,
   transaction: IDBTransaction
 ): IDBDatabase | Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // load from the database
     console.log("IndexedDB: creating transaction");
-    const appStateStore = transaction.objectStore(APP_STATE_OBJECT_STORE_NAME);
-    const appStateObject = appStateStore.get(APP_STATE_OBJECT_STORE_NAME);
 
-    const settingsStore = transaction.objectStore(SETTINGS_OBJECT_STORE_NAME);
-    const settingsObject = settingsStore.get(SETTINGS_OBJECT_STORE_NAME);
-
-    appStateObject.onsuccess = () => {
-      // run migration
-      const currentData = appStateObject.result;
+    {
+      const storeName = APP_STATE_OBJECT_STORE_NAME;
+      const currentData = await getObject(storeName, transaction);
 
       if (typeof currentData === "undefined") {
         console.log("IndexedDB: no entry yet, no need to migrate");
@@ -98,17 +120,18 @@ function upgradeDatabaseToVersion4(
         APP_STATE_OBJECT_STORE_NAME,
         newData
       );
-      appStateStore.put(newData);
-    };
 
-    appStateObject.onerror = (event) => {
-      const message = `IndexedDB: failed to fetch ${APP_STATE_OBJECT_STORE_NAME}`;
-      reject(message);
-    };
+      try {
+        await putObject(storeName, newData, transaction, db);
+      } catch (error) {
+        reject(error);
+        return;
+      }
+    }
 
-    settingsObject.onsuccess = () => {
-      // run migration
-      const currentData = settingsObject.result;
+    {
+      const storeName = SETTINGS_OBJECT_STORE_NAME;
+      const currentData = await getObject(storeName, transaction);
 
       if (typeof currentData === "undefined") {
         console.log("IndexedDB: no entry yet, no need to migrate");
@@ -124,23 +147,50 @@ function upgradeDatabaseToVersion4(
         SETTINGS_OBJECT_STORE_NAME,
         newData
       );
-      settingsStore.put(newData);
-    };
 
-    settingsObject.onerror = (event) => {
-      const message = `IndexedDB: failed to fetch ${SETTINGS_OBJECT_STORE_NAME}`;
-      reject(message);
-    };
+      try {
+        await putObject(storeName, newData, transaction, db);
+      } catch (error) {
+        reject(error);
+        return;
+      }
+    }
 
-    transaction.onerror = (event) => {
-      const message = `Database failed to write data during migration`;
-      console.error(message, event);
-      reject(message);
-    };
+    resolve(db);
+  });
+}
 
-    transaction.oncomplete = () => {
+function upgradeDatabaseToVersion5(
+  db: IDBDatabase,
+  transaction: IDBTransaction
+): IDBDatabase | Promise<IDBDatabase> {
+  return new Promise(async (resolve, reject) => {
+    // load from the database
+    console.log("IndexedDB: creating transaction");
+    const storeName = SETTINGS_OBJECT_STORE_NAME;
+    const currentData = await getObject(storeName, transaction);
+
+    if (typeof currentData === "undefined") {
+      console.log("IndexedDB: no entry yet, no need to migrate");
       resolve(db);
-    };
+      return;
+    }
+
+    const newData = addQueriesToSettings(currentData);
+
+    // store in the database
+    console.info(
+      "IndexedDB: writing to the store",
+      SETTINGS_OBJECT_STORE_NAME,
+      newData
+    );
+
+    try {
+      await putObject(storeName, newData, transaction, db);
+    } catch (error) {
+      reject(error);
+      return;
+    }
   });
 }
 
@@ -184,6 +234,10 @@ async function runMigration(
       );
       return upgradeDatabaseToVersion4(db, transaction);
     }
+    case 5: {
+      console.info("IndexedDB: Adding queries to settings");
+      return upgradeDatabaseToVersion5(db, transaction);
+    }
   }
 }
 
@@ -195,13 +249,18 @@ async function runMigrations(
   transaction: IDBTransaction,
   previousVersion: DatabaseVersion,
   newVersion: DatabaseVersion
-): Promise<IDBDatabase> {
-  for (let i = previousVersion; i <= newVersion; i++) {
+): Promise<IDBDatabase | string> {
+  const versionToStartPatchAt = previousVersion + 1;
+  if (!isDatabaseVersion(versionToStartPatchAt)) {
+    return `Error: ${versionToStartPatchAt} is not a known database version`;
+  }
+
+  for (let i = versionToStartPatchAt; i <= newVersion; i++) {
     try {
       db = await runMigration(i, db, transaction);
     } catch (error) {
       console.error(error);
-      break;
+      return `Error running migration from version ${previousVersion} to ${newVersion}`;
     }
   }
 
@@ -209,7 +268,7 @@ async function runMigrations(
 }
 
 export function openDatabase(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const request = indexedDB.open("mood-tracker", LATEST_DATABASE_VERSION);
 
     request.onupgradeneeded = async (event: IDBVersionChangeEvent) => {
@@ -248,15 +307,18 @@ export function openDatabase(): Promise<IDBDatabase> {
           "IndexedDB: Database versions make sense, running migration..."
         );
         try {
-          await runMigrations(
+          const migrationResult = await runMigrations(
             db,
             transaction as IDBTransaction,
             event.oldVersion as DatabaseVersion,
             event.newVersion as DatabaseVersion
           );
+          if (typeof migrationResult === "string") {
+            throw migrationResult;
+          }
           console.info("IndexedDB: Migrations run!");
         } catch (error) {
-          console.error("IndexedDB failed to run migrations", error);
+          console.error("IndexedDB failed to run migrations:", error);
           reject(error);
         }
       }
@@ -267,6 +329,7 @@ export function openDatabase(): Promise<IDBDatabase> {
     };
 
     request.onerror = () => {
+      request.transaction?.abort();
       reject(request.error);
     };
   });

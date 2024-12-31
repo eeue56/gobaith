@@ -1,6 +1,6 @@
 import { daysBeforeToday as entriesBeforeToday } from "../../logic/journal";
 import {
-  Day,
+  AppState,
   EventHandler,
   JournalEntry,
   Prompt,
@@ -8,6 +8,7 @@ import {
   RenderedWithEvents,
   sendUpdate,
   Sent,
+  Settings,
   SHORT_PROMPTS,
 } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
@@ -96,10 +97,10 @@ function renderPromptShortName(prompt: Prompt): string {
 }
 
 export function renderDailyBar(
-  today: Day,
-  journalEntries: JournalEntry[]
+  state: AppState,
+  settings: Settings
 ): RenderedWithEvents {
-  let entries = entriesBeforeToday(today, journalEntries);
+  let entries = entriesBeforeToday(state.day, state.journalEntries);
 
   entries.sort(sortEntriesByDate);
   entries = entries.slice(Math.max(entries.length - 60, 0));
@@ -131,10 +132,10 @@ export function renderDailyBar(
 }
 
 export function renderTotaledDailyBar(
-  today: Day,
-  journalEntries: JournalEntry[]
+  state: AppState,
+  settings: Settings
 ): RenderedWithEvents {
-  let entries = entriesBeforeToday(today, journalEntries);
+  let entries = entriesBeforeToday(state.day, state.journalEntries);
   entries.sort(sortEntriesByDate);
 
   const dailyBars: string[] = [];

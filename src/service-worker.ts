@@ -7,6 +7,7 @@ import {
   syncStateToDatabase,
 } from "./database";
 import { initializeEntryForDay } from "./logic/journal";
+import { BUILT_IN_QUERIES, Queryable } from "./logic/query";
 import {
   AppState,
   DebuggingInfo,
@@ -23,6 +24,7 @@ import {
   addPill,
   updateCurrentGraph,
   updateCurrentTab,
+  updateDuration,
   updatePillOrder,
   updatePillValue,
   updatePromptValue,
@@ -43,9 +45,12 @@ let appState: AppState = {
   databaseVersion: LATEST_DATABASE_VERSION,
 };
 
+const queries: Queryable[] = [...BUILT_IN_QUERIES];
+
 let settings: Settings = {
   kind: "Settings",
   currentPills: [],
+  queries: queries,
   databaseVersion: LATEST_DATABASE_VERSION,
 };
 
@@ -129,6 +134,7 @@ function update(event: MessageEvent<Update>): number {
       settings = {
         kind: "Settings",
         currentPills: [],
+        queries,
         databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("Removed settings");
@@ -284,6 +290,12 @@ function update(event: MessageEvent<Update>): number {
     }
     case "SetDebuggingInfo": {
       debuggingInfo = data.info;
+
+      return sendRerender(appState, settings);
+    }
+    case "SetQueryDuration": {
+      const newQueries = updateDuration(data.hash, data.duration, queries);
+      settings.queries = newQueries;
 
       return sendRerender(appState, settings);
     }

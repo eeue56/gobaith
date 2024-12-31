@@ -1,6 +1,10 @@
 import { DatabaseVersion, LATEST_DATABASE_VERSION } from "../types";
 import { renameStateFields } from "./database_3";
 import { addDatabaseVersion } from "./database_4";
+import {
+  addDatabaseVersionToAppState,
+  addQueriesToSettings,
+} from "./database_5";
 import { renameField } from "./rename_fields";
 
 /**
@@ -52,6 +56,8 @@ function cleanAppState(data: unknown): unknown {
 
   // here database version specific cleaning will be added
 
+  addDatabaseVersionToAppState(dataWithDatabaseVersion);
+
   return dataWithDatabaseVersion;
 }
 
@@ -75,5 +81,7 @@ function cleanSettings(data: unknown): unknown {
 
   // here database version specific cleaning will be added
 
-  return dataWithDatabaseVersion;
+  const dataVersion5 = addQueriesToSettings(dataWithDatabaseVersion);
+
+  return dataVersion5;
 }

@@ -14,7 +14,14 @@ import {
   Tooltip,
 } from "chart.js";
 import { getDataOnlyForToday } from "../../logic/journal";
-import { Day, JournalEntry, PROMPTS, RenderedWithEvents } from "../../types";
+import {
+  AppState,
+  Day,
+  JournalEntry,
+  PROMPTS,
+  RenderedWithEvents,
+  Settings,
+} from "../../types";
 import { dayToString } from "../../utils/dates";
 import { renderer } from "../../utils/render";
 import { renderDate } from "../date";
@@ -34,9 +41,12 @@ Chart.register(
   Legend
 );
 
-export function renderSpiderweb(today: Day): RenderedWithEvents {
+export function renderSpiderweb(
+  state: AppState,
+  settings: Settings
+): RenderedWithEvents {
   return renderer`
-${renderDate(today)}
+${renderDate(state.day)}
 <div class="pure-g">
     <div class="pure-u-1-24"></div>
     <div class="pure-u-22-24" height="500">

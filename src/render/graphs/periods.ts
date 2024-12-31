@@ -1,10 +1,11 @@
 import {
-  Day,
+  AppState,
   depression,
   elevation,
   JournalEntry,
   psychosis,
   RenderedWithEvents,
+  Settings,
 } from "../../types";
 import { dayToString } from "../../utils/dates";
 import {
@@ -28,24 +29,24 @@ export function renderPeriod(
 }
 
 export function renderBipolarPeriods(
-  today: Day,
-  journalEntries: JournalEntry[]
+  state: AppState,
+  settings: Settings
 ): RenderedWithEvents {
-  const numberOfDays = journalEntries.length;
+  const numberOfDays = state.journalEntries.length;
 
-  const elevatedPeriods = getElevatedPeriods(journalEntries);
+  const elevatedPeriods = getElevatedPeriods(state.journalEntries);
   const renderedElevatedPeriods = elevatedPeriods.map((period) =>
     renderPeriod(elevation, period)
   );
   const totalAmountElevated = sumPeriod(elevatedPeriods);
 
-  const depressedPeriods = getDepressedPeriods(journalEntries);
+  const depressedPeriods = getDepressedPeriods(state.journalEntries);
   const renderedDepressedPeriods = depressedPeriods.map((period) =>
     renderPeriod(depression, period)
   );
   const totalAmountDepressed = sumPeriod(depressedPeriods);
 
-  const psychoticPeriods = getPsychoticPeriods(journalEntries);
+  const psychoticPeriods = getPsychoticPeriods(state.journalEntries);
   const renderedPsychoticPeriods = psychoticPeriods.map((period) =>
     renderPeriod(psychosis, period)
   );

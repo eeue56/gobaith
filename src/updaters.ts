@@ -1,3 +1,4 @@
+import { hashQuery, Queryable } from "./logic/query";
 import {
   AppState,
   Day,
@@ -150,4 +151,27 @@ export function addPill(
     entries,
     settings,
   };
+}
+
+export function updateDuration(
+  id: string,
+  newDuration: number,
+  queries: Queryable[]
+): Queryable[] {
+  return queries.map((query) => {
+    switch (query.kind) {
+      case "And":
+      case "Or":
+      case "Not":
+      case "Filter":
+        return query;
+      case "Duration": {
+        const queryId = hashQuery(query);
+
+        if (id !== queryId) return query;
+
+        return { ...query, days: newDuration };
+      }
+    }
+  });
 }
