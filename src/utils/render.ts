@@ -23,6 +23,17 @@ export function idHash(str: string): string {
 }
 
 /**
+ * Similar to idHash, but converts the string to a lowercase uri-encoded string
+ *
+ * Useful for hashes that need to be used both in the service worker, and the DOM
+ *
+ * Not the default, since idHash will create smaller DOM ids.
+ */
+export function staticHash(str: string): string {
+  return encodeURI(str).toLowerCase();
+}
+
+/**
  * Use as a template-literal prefix to enforce renderer structure
  *
  * Only allows strings or `Renderer` in the template string literal.
