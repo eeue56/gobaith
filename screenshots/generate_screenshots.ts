@@ -140,6 +140,15 @@ async function screenshotGraphTotaledBar(page: Page) {
   });
 }
 
+async function screenshotGraphInteractiveQueries(page: Page) {
+  await page.locator('.tab:text("Graphs")').click();
+  await page.locator("#graph-selection").selectOption("Interactive queries");
+
+  await page.screenshot({
+    path: "./screenshots/images/graph_interactive_queries.png",
+  });
+}
+
 async function screenshotSettings(page: Page) {
   await page.locator('.tab:text("Settings")').click();
 
@@ -158,6 +167,7 @@ async function main() {
   await screenshotGraphLineOverview(page);
   await screenshotGraphBipolarPeriods(page);
   await screenshotGraphTotaledBar(page);
+  await screenshotGraphInteractiveQueries(page);
   await closeElectron(electronApp);
 }
 

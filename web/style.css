@@ -409,6 +409,42 @@ canvas {
   padding: 2px;
 }
 
+.day-selector-form > .pure-g {
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+}
+
+.day-selector-form > .pure-g > input {
+  width: 80%;
+  margin-bottom: 0px;
+}
+
+.day-selector-form > .pure-g > label {
+  text-align: center;
+}
+
+.indent {
+  margin-left: 50px;
+}
+
+.filter-query,
+.duration-query {
+  border: 2px solid var(--pico-color-zinc-300);
+  margin: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.filter-query-result,
+.duration-query-result {
+  text-align: center;
+}
+
+.add-query-buttons {
+  margin-top: 50px;
+}
+
 @media (min-width: 1000px) {
   body {
     padding-left: 15vw;

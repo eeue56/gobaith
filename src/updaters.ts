@@ -1,4 +1,4 @@
-import { hashQuery, Queryable } from "./logic/query";
+import { Queryable, QueryPath, QueryUpdate } from "./logic/query";
 import {
   AppState,
   Day,
@@ -153,25 +153,357 @@ export function addPill(
   };
 }
 
-export function updateDuration(
-  id: string,
-  newDuration: number,
-  queries: Queryable[]
-): Queryable[] {
-  return queries.map((query) => {
-    switch (query.kind) {
-      case "And":
-      case "Or":
-      case "Not":
-      case "Filter":
-        return query;
-      case "Duration": {
-        const queryId = hashQuery(query);
+// function updateQueryForOneQuery(
+//   path: QueryPath[],
+//   update: QueryUpdate,
+//   query: Queryable
+// ): Queryable {
+//   switch (query.kind) {
+//     case "And":
+//     case "Or": {
+//       if (hashQuery(query) === id) {
+//         if (update.kind !== "CombineQuery") {
+//           return query;
+//         }
+//         switch (update.combineQueryKind) {
+//           case "And": {
+//             return {
+//               kind: "And",
+//               left: updateQueryForOneQuery(
+//                 id,
+//                 key,
+//                 `${key}-left`,
+//                 update,
+//                 query.left
+//               ) as Query,
+//               right: updateQueryForOneQuery(
+//                 id,
+//                 key,
+//                 `${key}-right`,
+//                 update,
+//                 query.right
+//               ) as Query,
+//             };
+//           }
+//           case "Or": {
+//             return {
+//               kind: "Or",
+//               left: updateQueryForOneQuery(
+//                 id,
+//                 `${key}-left`,
+//                 update,
+//                 query.left
+//               ) as Query,
+//               right: updateQueryForOneQuery(
+//                 id,
+//                 `${key}-right`,
+//                 update,
+//                 query.right
+//               ) as Query,
+//             };
+//           }
+//           case "Not": {
+//             {
+//               return {
+//                 kind: "Not",
+//                 query: updateQueryForOneQuery(
+//                   id,
+//                   `${key}-not`,
+//                   update,
+//                   query.left
+//                 ) as Query,
+//               };
+//             }
+//           }
+//         }
+//       }
+//       return {
+//         ...query,
+//         left: updateQueryForOneQuery(id, update, query.left) as Query,
+//         right: updateQueryForOneQuery(id, update, query.right) as Query,
+//       };
+//     }
+//     case "Not": {
+//       if (hashQuery(query) === id) {
+//         if (update.kind !== "CombineQuery") {
+//           return query;
+//         }
+//         switch (update.combineQueryKind) {
+//           case "And": {
+//             return {
+//               kind: "And",
+//               left: query.query,
+//               right: query.query,
+//             };
+//           }
+//           case "Or": {
+//             return {
+//               kind: "Or",
+//               left: query.query,
+//               right: query.query,
+//             };
+//           }
+//           case "Not": {
+//             return query;
+//           }
+//         }
+//       }
+//       return {
+//         ...query,
+//         query: updateQueryForOneQuery(id, update, query.query) as Query,
+//       };
+//     }
+//     case "Filter": {
+//       if (hashQuery(query) === id) {
+//         switch (update.kind) {
+//           case "Prompt": {
+//             return { ...query, prompt: update.prompt };
+//           }
+//           case "MoodValue": {
+//             return { ...query, value: update.moodValue };
+//           }
+//           case "Comparison": {
+//             return { ...query, comparison: update.comparison };
+//           }
+//           case "Duration": {
+//             return query;
+//           }
+//           case "CombineQuery": {
+//             return query;
+//           }
+//         }
+//       }
+//       return query;
+//     }
+//     case "Duration": {
+//       switch (update.kind) {
+//         case "Prompt":
+//         case "MoodValue":
+//         case "CombineQuery": {
+//           return {
+//             ...query,
+//             query: updateQueryForOneQuery(id, update, query.query) as Query,
+//           };
+//         }
+//         case "Comparison": {
+//           if (hashQuery(query) === id) {
+//             return { ...query, comparison: update.comparison };
+//           }
 
-        if (id !== queryId) return query;
+//           return {
+//             ...query,
+//             query: updateQueryForOneQuery(id, update, query.query) as Query,
+//           };
+//         }
+//         case "Duration": {
+//           if (hashQuery(query) === id) {
+//             return { ...query, days: update.duration };
+//           }
+//           // durations can't be nested, so just exit early
+//           return updateQueryForOneQuery(id, update, query);
+//         }
+//       }
+//     }
+//   }
+// }
 
-        return { ...query, days: newDuration };
+type ErrorMessage = { kind: "Error"; message: string };
+type QueryPathResult = Queryable | ErrorMessage;
+
+function getQueryByPath(
+  path: QueryPath[],
+  entryQuery: Queryable
+): QueryPathResult {
+  let currentQuery = entryQuery;
+  for (const pathPart of path) {
+    const potentialErrorMessage: ErrorMessage = {
+      kind: "Error",
+      message: `Expected a query with a ${pathPart}, but got ${
+        currentQuery.kind
+      }. Full path: ${path.join(" -> ")}`,
+    };
+    switch (pathPart) {
+      case "Left": {
+        switch (currentQuery.kind) {
+          case "And":
+          case "Or": {
+            currentQuery = currentQuery.left;
+            break;
+          }
+          case "Not":
+          case "Filter":
+          case "Duration": {
+            return potentialErrorMessage;
+          }
+        }
+        break;
+      }
+      case "Right": {
+        switch (currentQuery.kind) {
+          case "And":
+          case "Or": {
+            currentQuery = currentQuery.right;
+            break;
+          }
+          case "Not":
+          case "Filter":
+          case "Duration": {
+            return potentialErrorMessage;
+          }
+        }
+        break;
+      }
+      case "DirectChild": {
+        switch (currentQuery.kind) {
+          case "And":
+          case "Or": {
+            return potentialErrorMessage;
+          }
+          case "Not":
+          case "Duration": {
+            currentQuery = currentQuery.query;
+            break;
+          }
+          case "Filter": {
+            return potentialErrorMessage;
+          }
+        }
+        break;
       }
     }
-  });
+  }
+  return currentQuery;
+}
+
+function mutableModify(queryToModify: Queryable, queryToSet: Queryable): void {
+  const _modifiedQuery = queryToModify as any;
+  for (const key of Object.keys(queryToModify)) {
+    delete _modifiedQuery[key];
+  }
+
+  for (const key of Object.keys(queryToSet)) {
+    _modifiedQuery[key] = (queryToSet as any)[key];
+  }
+}
+
+function updateQueryable(
+  queryToUpdate: Queryable,
+  update: QueryUpdate
+): Queryable {
+  switch (queryToUpdate.kind) {
+    case "And":
+    case "Or": {
+      if (update.kind !== "CombineQuery") {
+        // if it's not a combine query change, it can't do anything on this query
+        return queryToUpdate;
+      }
+      switch (update.combineQueryKind) {
+        case "And": {
+          return {
+            kind: "And",
+            left: queryToUpdate.left,
+            right: queryToUpdate.right,
+          };
+        }
+        case "Or": {
+          return {
+            kind: "Or",
+            left: queryToUpdate.left,
+            right: queryToUpdate.right,
+          };
+        }
+        case "Not": {
+          return { kind: "Not", query: queryToUpdate.left };
+        }
+      }
+    }
+    case "Not": {
+      if (update.kind !== "CombineQuery") {
+        // if it's not a combine query change, it can't do anything on this query
+        return queryToUpdate;
+      }
+      switch (update.combineQueryKind) {
+        case "And": {
+          return {
+            kind: "And",
+            left: queryToUpdate.query,
+            right: queryToUpdate.query,
+          };
+        }
+        case "Or": {
+          return {
+            kind: "Or",
+            left: queryToUpdate.query,
+            right: queryToUpdate.query,
+          };
+        }
+        case "Not": {
+          return queryToUpdate;
+        }
+      }
+    }
+    case "Filter": {
+      switch (update.kind) {
+        case "Prompt": {
+          return { ...queryToUpdate, prompt: update.prompt };
+        }
+        case "MoodValue": {
+          return { ...queryToUpdate, value: update.moodValue };
+        }
+        case "Comparison": {
+          return { ...queryToUpdate, comparison: update.comparison };
+        }
+        case "Duration":
+        case "CombineQuery": {
+          return queryToUpdate;
+        }
+      }
+    }
+    case "Duration": {
+      switch (update.kind) {
+        case "Prompt":
+        case "MoodValue":
+        case "CombineQuery": {
+          return queryToUpdate;
+        }
+        case "Comparison": {
+          return { ...queryToUpdate, comparison: update.comparison };
+        }
+        case "Duration": {
+          return { ...queryToUpdate, days: update.duration };
+        }
+      }
+    }
+  }
+}
+
+function updateOneQuery(
+  path: QueryPath[],
+  update: QueryUpdate,
+  query: Queryable
+): Queryable {
+  const queryToUpdate = getQueryByPath(path, query);
+
+  if (queryToUpdate.kind === "Error") {
+    console.error("QueryUpdate:", queryToUpdate.message);
+    return query;
+  }
+
+  mutableModify(queryToUpdate, updateQueryable(queryToUpdate, update));
+
+  return query;
+}
+
+export function updateQuery(
+  index: number,
+  path: QueryPath[],
+  update: QueryUpdate,
+  queries: Queryable[]
+): Queryable[] {
+  const newQueries: Queryable[] = [...queries];
+
+  // only update the one query by index
+  newQueries[index] = updateOneQuery(path, update, queries[index]);
+
+  return newQueries;
 }

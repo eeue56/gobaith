@@ -1,4 +1,9 @@
-import { Queryable } from "./logic/query";
+import {
+  CombineQueryKind,
+  Comparison,
+  Queryable,
+  QueryPath,
+} from "./logic/query";
 
 /**
  * Rename these as you want - the `MoodState` is a text representation of `MoodValue`
@@ -6,6 +11,10 @@ import { Queryable } from "./logic/query";
 export type MoodState = "None" | "Slight" | "Some" | "Intense";
 export const MOOD_VALUES = [1, 2, 3, 4] as const;
 export type MoodValue = (typeof MOOD_VALUES)[number];
+
+export function isMoodValue(number: number): number is MoodValue {
+  return MOOD_VALUES.includes(number as MoodValue);
+}
 
 export function moodStateFromValue(value: MoodValue): MoodState {
   switch (value) {
@@ -290,7 +299,39 @@ export type Update =
   | { kind: "ReadyToRender" }
   | { kind: "InitializeDay" }
   | { kind: "SetDebuggingInfo"; info: DebuggingInfo }
-  | { kind: "SetQueryDuration"; hash: string; duration: number };
+  | {
+      kind: "SetQueryDuration";
+      index: number;
+      path: QueryPath[];
+      duration: number;
+    }
+  | {
+      kind: "SetPromptChoice";
+      index: number;
+      path: QueryPath[];
+      prompt: Prompt;
+    }
+  | {
+      kind: "SetComparisonChoice";
+      index: number;
+      path: QueryPath[];
+      comparison: Comparison;
+    }
+  | {
+      kind: "SetMoodValueChoice";
+      index: number;
+      path: QueryPath[];
+      moodValue: MoodValue;
+    }
+  | {
+      kind: "SetCombineQuery";
+      index: number;
+      path: QueryPath[];
+      combineQueryKind: CombineQueryKind;
+    }
+  | { kind: "AddNewDurationQuery" }
+  | { kind: "AddNewFilterQuery" }
+  | { kind: "DeleteQuery"; index: number; path: QueryPath[] };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel

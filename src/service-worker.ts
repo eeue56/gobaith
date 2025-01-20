@@ -7,7 +7,7 @@ import {
   syncStateToDatabase,
 } from "./database";
 import { initializeEntryForDay } from "./logic/journal";
-import { BUILT_IN_QUERIES, Queryable } from "./logic/query";
+import { BUILT_IN_QUERIES, EqualTo, Queryable } from "./logic/query";
 import {
   AppState,
   DebuggingInfo,
@@ -24,10 +24,10 @@ import {
   addPill,
   updateCurrentGraph,
   updateCurrentTab,
-  updateDuration,
   updatePillOrder,
   updatePillValue,
   updatePromptValue,
+  updateQuery,
   updateSleepValue,
 } from "./updaters";
 import { dateToDay, nextDay, previousDay } from "./utils/dates";
@@ -45,12 +45,12 @@ let appState: AppState = {
   databaseVersion: LATEST_DATABASE_VERSION,
 };
 
-const queries: Queryable[] = [...BUILT_IN_QUERIES];
+const DEFAULT_QUERIES: readonly Queryable[] = [...BUILT_IN_QUERIES];
 
 let settings: Settings = {
   kind: "Settings",
   currentPills: [],
-  queries: queries,
+  queries: [...DEFAULT_QUERIES],
   databaseVersion: LATEST_DATABASE_VERSION,
 };
 
@@ -134,7 +134,7 @@ function update(event: MessageEvent<Update>): number {
       settings = {
         kind: "Settings",
         currentPills: [],
-        queries,
+        queries: [...DEFAULT_QUERIES],
         databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("Removed settings");
@@ -150,7 +150,7 @@ function update(event: MessageEvent<Update>): number {
         day: dateToDay(new Date()),
         databaseVersion: LATEST_DATABASE_VERSION,
       };
-      console.log("Removed state");
+      console.log("ServiceWorker: Removed state");
       syncToDatabase(appState, settings);
       return sendRerender(appState, settings);
     }
@@ -290,13 +290,95 @@ function update(event: MessageEvent<Update>): number {
     }
     case "SetDebuggingInfo": {
       debuggingInfo = data.info;
-
+      syncToDatabase(appState, settings);
       return sendRerender(appState, settings);
     }
     case "SetQueryDuration": {
-      const newQueries = updateDuration(data.hash, data.duration, queries);
+      const newQueries = updateQuery(
+        data.index,
+        data.path,
+        { kind: "Duration", duration: data.duration },
+        settings.queries
+      );
       settings.queries = newQueries;
+      syncToDatabase(appState, settings);
+      return sendRerender(appState, settings);
+    }
+    case "SetPromptChoice": {
+      const newQueries = updateQuery(
+        data.index,
+        data.path,
+        { kind: "Prompt", prompt: data.prompt },
+        settings.queries
+      );
+      settings.queries = newQueries;
+      syncToDatabase(appState, settings);
+      return sendRerender(appState, settings);
+    }
+    case "SetComparisonChoice": {
+      const newQueries = updateQuery(
+        data.index,
+        data.path,
+        { kind: "Comparison", comparison: data.comparison },
+        settings.queries
+      );
+      settings.queries = newQueries;
+      syncToDatabase(appState, settings);
 
+      return sendRerender(appState, settings);
+    }
+    case "SetMoodValueChoice": {
+      const newQueries = updateQuery(
+        data.index,
+        data.path,
+        { kind: "MoodValue", moodValue: data.moodValue },
+        settings.queries
+      );
+      settings.queries = newQueries;
+      syncToDatabase(appState, settings);
+
+      return sendRerender(appState, settings);
+    }
+    case "SetCombineQuery": {
+      const newQueries = updateQuery(
+        data.index,
+        data.path,
+        { kind: "CombineQuery", combineQueryKind: data.combineQueryKind },
+        settings.queries
+      );
+      settings.queries = newQueries;
+      syncToDatabase(appState, settings);
+
+      return sendRerender(appState, settings);
+    }
+    case "AddNewDurationQuery": {
+      settings.queries.splice(0, 0, {
+        kind: "Duration",
+        comparison: EqualTo,
+        days: 1,
+        query: {
+          kind: "Filter",
+          comparison: EqualTo,
+          prompt: "Today's feelings of anxiety",
+          value: 1,
+        },
+      });
+      syncToDatabase(appState, settings);
+      return sendRerender(appState, settings);
+    }
+    case "AddNewFilterQuery": {
+      settings.queries.splice(0, 0, {
+        kind: "Filter",
+        comparison: EqualTo,
+        prompt: "Today's feelings of anxiety",
+        value: 1,
+      });
+      syncToDatabase(appState, settings);
+      return sendRerender(appState, settings);
+    }
+    case "DeleteQuery": {
+      settings.queries.splice(data.index, 1);
+      syncToDatabase(appState, settings);
       return sendRerender(appState, settings);
     }
   }

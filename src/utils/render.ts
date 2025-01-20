@@ -30,7 +30,7 @@ export function idHash(str: string): string {
  * Not the default, since idHash will create smaller DOM ids.
  */
 export function staticHash(str: string): string {
-  return encodeURI(str).toLowerCase();
+  return encodeURI(str.replaceAll("'", "").replaceAll('"', "")).toLowerCase();
 }
 
 /**

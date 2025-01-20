@@ -22,6 +22,7 @@ Some screenshots based on generated data (no real human's tracking, see the [gen
 | An interactive line chart of moods | ![](./screenshots/images/graph_line_overview.png) |
 | Spiderweb graph to compare moods | ![](./screenshots/images/graph_spiderweb.png) |
 | A combined representation of the extremes of all moods | ![](./screenshots/images/graph_totaled_bar.png) |
+| Interactive query builder for personalised data | ![](./screenshots/images/graph_interactive_queries.png) |
 | Importer | ![](./screenshots/images/importer.png) |
 | Settings | ![](./screenshots/images/settings.png) |
 

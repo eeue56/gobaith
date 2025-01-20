@@ -22,6 +22,10 @@ export type Comparison = EqualTo | LessThan | MoreThan;
 
 export const COMPARISONS: Comparison[] = [MoreThan, LessThan, EqualTo];
 
+export function isComparison(str: { kind: string }): str is Comparison {
+  return COMPARISONS.map((c) => c.kind).includes(str.kind as any);
+}
+
 /**
  * A filter for a particular prompt compared against a particular value
  */
@@ -116,6 +120,18 @@ function continiousPeriods(entries: JournalEntry[]): JournalEntry[][] {
   return periods;
 }
 
+export type CombineQuery = And | Or | Not;
+
+export type CombineQueryKind = CombineQuery["kind"];
+
+export const COMBINE_QUERIES: CombineQueryKind[] = ["And", "Or", "Not"];
+
+export type QueryPath = "Left" | "Right" | "DirectChild";
+
+export function isCombineQueryKind(kind: string): kind is CombineQueryKind {
+  return COMBINE_QUERIES.includes(kind as CombineQueryKind);
+}
+
 /**
  * Queries can either be a simple filter, or an infinitely nested tree of combinations.
  *
@@ -130,6 +146,13 @@ function continiousPeriods(entries: JournalEntry[]): JournalEntry[][] {
 export type Query = And | Or | Not | Filter;
 
 export type Queryable = Query | Duration;
+
+export type QueryUpdate =
+  | { kind: "Prompt"; prompt: Prompt }
+  | { kind: "MoodValue"; moodValue: MoodValue }
+  | { kind: "Comparison"; comparison: Comparison }
+  | { kind: "Duration"; duration: number }
+  | { kind: "CombineQuery"; combineQueryKind: CombineQueryKind };
 
 /**
  * Run a query against the journal entries
@@ -321,4 +344,43 @@ export function hashQuery(query: Query | Duration): string {
     case "Duration":
       return hashDuration(query);
   }
+}
+
+function keyToPath(key: string): { index: number; path: QueryPath[] } {
+  const pieces = key.split("-");
+  const index = parseInt(pieces[0]);
+  const path: QueryPath[] = [];
+  const pathPieces = pieces.slice(1, pieces.length);
+
+  for (const piece of pathPieces) {
+    switch (piece) {
+      case "left": {
+        path.push("Left");
+        break;
+      }
+      case "right": {
+        path.push("Right");
+        break;
+      }
+      case "child": {
+        path.push("DirectChild");
+        break;
+      }
+      default: {
+        console.error("Unexpected path direction", piece);
+      }
+    }
+  }
+
+  return { index, path };
+}
+
+export function pathToKey(index: number, path: QueryPath[]): string {
+  const pathParts: string[] = [`index-${index}`];
+
+  for (const part of path) {
+    pathParts.push(part);
+  }
+
+  return pathParts.join("-");
 }
