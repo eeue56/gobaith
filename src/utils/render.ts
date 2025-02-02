@@ -14,7 +14,7 @@ export function idHash(str: string): string {
   if (!(str in hashCache)) {
     // if we need more characters to create a unique id (i.e we are at "z", then go to "aa")
     if (latestHashString.endsWith("z")) {
-      latestHashString = "a".repeat(unique.length + 1);
+      latestHashString = "a".repeat(latestHashString.length + 1);
     } else {
       // otherwise, just increment the last char in the string (i.e "ab" goes to "ac")
       const lastChar = latestHashString.charCodeAt(latestHashString.length - 1);
