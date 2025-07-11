@@ -20,6 +20,7 @@ import {
   isPrompt,
   JournalEntry,
   MOOD_VALUES,
+  moodStateFromValue,
   MoodValue,
   Prompt,
   PROMPTS,
@@ -45,7 +46,9 @@ function renderMoodValueChoice(
   activeValue: MoodValue
 ): string {
   const selectedText = value === activeValue ? "selected" : "";
-  return `<option value="${value}" ${selectedText}>${value}</option>`;
+  return `<option value="${value}" ${selectedText}>${moodStateFromValue(
+    value
+  )}</option>`;
 }
 
 function renderPromptChoice(prompt: Prompt, activePrompt: Prompt): string {
