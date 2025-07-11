@@ -4,21 +4,21 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "chart.js": "^4.4.7"
+    "chart.js": "^4.5.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.10.1",
-    "@types/serviceworker": "^0.0.108",
-    "electron": "^33.2.1",
-    "esbuild": "^0.24.0",
-    "express": "^4.21.2",
-    "typescript": "^5.7.2"
+    "@playwright/test": "^1.54.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.13",
+    "@types/serviceworker": "^0.0.141",
+    "electron": "^37.2.1",
+    "esbuild": "^0.25.6",
+    "express": "^5.1.0",
+    "typescript": "^5.8.3"
   },
   "scripts": {
     "serve": "npm run build && ts-node server/host.ts",
-    "build": "esbuild --bundle src/index.ts --outfile=web/out.js --minify && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js --minify",
+    "build": "esbuild --bundle src/index.ts --outfile=web/out.js && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js",
     "build-electron": "cd electron && npm run build",
     "test": "tsc --noEmit && npx playwright test",
     "test-electron": "IS_ELECTRON=true npx playwright test --workers=1",
@@ -27,7 +27,7 @@
     "generate-screenshots": "ts-node screenshots/generate_screenshots.ts"
   },
   "engines": {
-    "node": "21.x"
+    "node": "24.x"
   },
   "author": "",
   "license": "AGPL-3.0-only"
