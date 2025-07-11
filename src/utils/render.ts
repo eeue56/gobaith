@@ -1,22 +1,27 @@
 import { EventHandler, RenderedWithEvents } from "../types";
 
-let unique = "a";
+let latestHashString = "a";
 
 const hashCache: Record<string, string> = {};
 
 /**
  * Makes a unique id from a string that is compatible with the DOM
+ *
+ * ids are intentionally short strings from the letters a-z, repeated
  */
 export function idHash(str: string): string {
+  // when we haven't cached an id for this string
   if (!(str in hashCache)) {
-    if (unique.endsWith("z")) {
-      unique = "a".repeat(unique.length + 1);
+    // if we need more characters to create a unique id (i.e we are at "z", then go to "aa")
+    if (latestHashString.endsWith("z")) {
+      latestHashString = "a".repeat(latestHashString.length + 1);
     } else {
-      const finalChar = unique.charCodeAt(unique.length - 1);
-      unique =
-        unique.slice(0, unique.length - 1) + String.fromCharCode(finalChar + 1);
+      // otherwise, just increment the last char in the string (i.e "ab" goes to "ac")
+      const lastChar = latestHashString.charCodeAt(latestHashString.length - 1);
+      latestHashString =
+        latestHashString.slice(0, latestHashString.length - 1) + String.fromCharCode(lastChar + 1);
     }
-    hashCache[str] = unique;
+    hashCache[str] = latestHashString;
   }
 
   return hashCache[str];
