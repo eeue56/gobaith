@@ -14,6 +14,8 @@ import { addDatabaseVersion } from "./cleaners/database_4";
 import { addQueriesToSettings } from "./cleaners/database_5";
 import { renameField } from "./cleaners/rename_fields";
 
+import * as defaultObjects from "./defaultObjects";
+
 async function getObject(
   storeName: StoreName,
   transaction: IDBTransaction
@@ -262,6 +264,11 @@ async function runMigrations(
       console.error(error);
       return `Error running migration from version ${previousVersion} to ${newVersion}`;
     }
+  }
+
+  if (versionToStartPatchAt === 0) {
+    await syncSettingsToDatabase(defaultObjects.settings);
+    await syncStateToDatabase(defaultObjects.appState);
   }
 
   return db;

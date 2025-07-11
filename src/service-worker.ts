@@ -6,8 +6,9 @@ import {
   syncSettingsToDatabase,
   syncStateToDatabase,
 } from "./database";
+import * as defaultObjects from "./defaultObjects";
 import { initializeEntryForDay } from "./logic/journal";
-import { BUILT_IN_QUERIES, EqualTo, Queryable } from "./logic/query";
+import { EqualTo } from "./logic/query";
 import {
   AppState,
   DebuggingInfo,
@@ -35,24 +36,8 @@ import { dateToDay, nextDay, previousDay } from "./utils/dates";
 const renderChannel = TypedBroadcastChannel<RenderBroadcast>("render");
 
 let hasBackend = false;
-
-let appState: AppState = {
-  kind: "AppState",
-  currentTab: "JOURNAL",
-  currentGraph: "DAILY_BAR",
-  journalEntries: [],
-  day: dateToDay(new Date()),
-  databaseVersion: LATEST_DATABASE_VERSION,
-};
-
-const DEFAULT_QUERIES: readonly Queryable[] = [...BUILT_IN_QUERIES];
-
-let settings: Settings = {
-  kind: "Settings",
-  currentPills: [],
-  queries: [...DEFAULT_QUERIES],
-  databaseVersion: LATEST_DATABASE_VERSION,
-};
+let appState = defaultObjects.appState;
+let settings = defaultObjects.settings;
 
 let debuggingInfo: DebuggingInfo = {
   kind: "DebuggingInfo",
@@ -134,7 +119,7 @@ function update(event: MessageEvent<Update>): number {
       settings = {
         kind: "Settings",
         currentPills: [],
-        queries: [...DEFAULT_QUERIES],
+        queries: [...defaultObjects.DEFAULT_QUERIES],
         databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("Removed settings");
