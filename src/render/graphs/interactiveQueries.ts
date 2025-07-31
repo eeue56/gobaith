@@ -1,3 +1,4 @@
+import { pathToKey, runDurationQuery, runQuery } from "../../logic/query";
 import {
   COMBINE_QUERIES,
   CombineQueryKind,
@@ -7,12 +8,9 @@ import {
   Filter,
   isCombineQueryKind,
   isComparison,
-  pathToKey,
   Query,
   QueryPath,
-  runDurationQuery,
-  runQuery,
-} from "../../logic/query";
+} from "../../logic/query/types";
 import {
   AppState,
   dontSend,

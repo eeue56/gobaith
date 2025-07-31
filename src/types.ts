@@ -3,7 +3,7 @@ import {
   Comparison,
   Queryable,
   QueryPath,
-} from "./logic/query";
+} from "./logic/query/types";
 
 /**
  * Rename these as you want - the `MoodState` is a text representation of `MoodValue`
@@ -345,6 +345,7 @@ export function dontSend(): Sent {
 }
 
 export function sendUpdate(update: Update): Sent {
+  navigator.serviceWorker.startMessages();
   const renderChannel = TypedBroadcastChannel<Update>("render");
   renderChannel.postMessage(update);
 
@@ -373,6 +374,9 @@ export function TypedBroadcastChannel<type>(
   name: string
 ): TypedBroadcastChannel<type> {
   const channel = new BroadcastChannel(name);
+  channel.onmessageerror = (event) => {
+    console.log("CHANNEL ERROR:", event);
+  };
   return {
     channel: channel,
     postMessage: (message: type) => channel.postMessage(message),

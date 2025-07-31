@@ -6,7 +6,7 @@ import {
 } from "@playwright/test";
 import { mkdtempSync } from "fs";
 import { mkdtemp } from "fs/promises";
-import { awaitForServiceWorker } from "./helpers";
+import { awaitForTitleToChange } from "./helpers";
 
 const url = "http://localhost:3003";
 
@@ -27,7 +27,8 @@ export const test = base.extend<Page, BrowserContext>({
       await electronApp.close();
     } else {
       await page.goto(url.toString());
-      await awaitForServiceWorker(context);
+      // await awaitForServiceWorker(context);
+      await awaitForTitleToChange(page);
       await use(page);
     }
   },

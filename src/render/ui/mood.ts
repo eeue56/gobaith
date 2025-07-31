@@ -54,7 +54,14 @@ export function renderButtonSet(
         {
           elementId: elementId,
           eventName: "click",
-          callback: () => updateMoodState(entry, prompt, number),
+          callback: () => {
+            console.log("DEBUG: calling update mode state", {
+              entry,
+              prompt,
+              number,
+            });
+            return updateMoodState(entry, prompt, number);
+          },
         },
       ],
     };

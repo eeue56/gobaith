@@ -11,6 +11,7 @@ import {
 } from "../src/types";
 import { dateToDay } from "../src/utils/dates";
 import { test } from "./fixtures";
+import { awaitForTitleToChange } from "./helpers";
 
 test("the importer can import state", async ({ context, page }) => {
   await page.locator('.tab:text("Importer")').click();
@@ -44,8 +45,8 @@ test("the importer can import state", async ({ context, page }) => {
 
   await page.locator("#update-import-from-text").dispatchEvent("click");
 
-  expect(await page.locator("#textarea-download-state").inputValue()).toContain(
-    logEntry.text
+  expect(await page.locator("#textarea-download-state")).toHaveValue(
+    new RegExp(logEntry.text)
   );
 
   await page.locator('.tab:text("Journal")').click();
@@ -96,6 +97,14 @@ test("the importer can import settings", async ({ context, page }) => {
   await page.locator("#update-import-from-text").dispatchEvent("click");
 
   await page.waitForTimeout(500);
+
+  expect(
+    await page.locator("#textarea-download-settings").inputValue()
+  ).toContain("Ibux 200mg");
+
+  await page.reload();
+
+  await awaitForTitleToChange(page);
 
   expect(
     await page.locator("#textarea-download-settings").inputValue()

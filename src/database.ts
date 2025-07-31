@@ -257,6 +257,16 @@ async function runMigrations(
     return `Error: ${versionToStartPatchAt} is not a known database version`;
   }
 
+  if (previousVersion === 0) {
+    console.log("DATABASE: Writing first version...");
+    db = await runMigration(0, db, transaction);
+
+    await syncSettingsToDatabase(defaultObjects.settings);
+    await syncStateToDatabase(defaultObjects.appState);
+
+    return db;
+  }
+
   for (let i = versionToStartPatchAt; i <= newVersion; i++) {
     try {
       db = await runMigration(i, db, transaction);
@@ -264,11 +274,6 @@ async function runMigrations(
       console.error(error);
       return `Error running migration from version ${previousVersion} to ${newVersion}`;
     }
-  }
-
-  if (versionToStartPatchAt === 0) {
-    await syncSettingsToDatabase(defaultObjects.settings);
-    await syncStateToDatabase(defaultObjects.appState);
   }
 
   return db;
@@ -380,22 +385,28 @@ async function syncToDatabase<
   storeName extends StoreName,
   objectToSave extends ObjectStoreToSave<storeName>
 >(storeName: storeName, object: objectToSave): Promise<void> {
-  try {
-    const db = await openDatabase();
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await openDatabase();
 
-    const transaction = db.transaction(storeName, "readwrite");
-    const store = transaction.objectStore(storeName);
+      const transaction = db.transaction(storeName, "readwrite");
+      const store = transaction.objectStore(storeName);
 
-    store.put(object);
+      store.put(object);
 
-    transaction.oncomplete = () => {};
+      transaction.oncomplete = () => {
+        resolve();
+      };
 
-    transaction.onerror = (event) => {
-      console.error("IndexedDB: Transaction failed", event);
-    };
-  } catch (error) {
-    console.error("IndexedDB: Failed to open database:", error);
-  }
+      transaction.onerror = (event) => {
+        console.error("IndexedDB: Transaction failed", event);
+        reject();
+      };
+    } catch (error) {
+      console.error("IndexedDB: Failed to open database:", error);
+      reject();
+    }
+  });
 }
 
 export async function syncSettingsToDatabase(
@@ -414,4 +425,31 @@ export async function syncStateToDatabase(state: AppState): Promise<void> {
 
 export async function loadStateToDatabase(): Promise<AppState> {
   return loadFromDatabase(APP_STATE_OBJECT_STORE_NAME);
+}
+
+export async function syncStateAndSettingsToDatabase(
+  state: AppState,
+  settings: Settings
+): Promise<void> {
+  await syncSettingsToDatabase(settings);
+  await syncStateToDatabase(state);
+}
+
+export async function initIndexedDB(): Promise<{
+  settings: Settings;
+  appState: AppState;
+} | null> {
+  await openDatabase();
+
+  try {
+    const maybeSettings = await loadSettingsFromDatabase();
+
+    const maybeState = await loadStateToDatabase();
+
+    return { settings: maybeSettings, appState: maybeState };
+  } catch (error) {
+    console.error("Error:", error);
+
+    return null;
+  }
 }

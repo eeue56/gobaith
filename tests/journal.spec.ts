@@ -75,27 +75,21 @@ test("the user can move between dates", async ({ context, page }) => {
     // Go back one day
     await page.locator("#previous-day").click();
 
-    await expect(
-      await page.locator(".current-day").first().innerHTML()
-    ).toContain("1 day ago");
+    await expect(await page.locator(".current-day")).toHaveText(/1 day ago/);
   }
 
   {
     // Go to today
     await page.locator("#reset-day").click();
 
-    await expect(
-      await page.locator(".current-day").first().innerHTML()
-    ).toContain("Today");
+    await expect(await page.locator(".current-day")).toHaveText(/Today/);
   }
 
   {
     // Go forward one day
     await page.locator("#next-day").click();
 
-    await expect(
-      await page.locator(".current-day").first().innerHTML()
-    ).toContain("1 day ahead");
+    await expect(await page.locator(".current-day")).toHaveText(/1 day ahead/);
 
     await page.locator("#reset-day").click();
   }

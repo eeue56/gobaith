@@ -1,4 +1,4 @@
-import { Queryable, QueryPath, QueryUpdate } from "./logic/query";
+import { Queryable, QueryPath, QueryUpdate } from "./logic/query/types";
 import {
   AppState,
   Day,

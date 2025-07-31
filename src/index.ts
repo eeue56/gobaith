@@ -18,6 +18,8 @@ import { showSpiderweb } from "./render/graphs/spiderweb";
 import { renderImport, renderSettings } from "./render/ui/tabs";
 import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
+import { registerUpdateHandler } from "./update";
+
 /**
  * Keep track of last render time to avoid rendering too often
  */
@@ -71,13 +73,13 @@ function render(state: AppState, settings: Settings): void {
   const diff = rightNow - lastRenderTime;
 
   // try to avoid re-rendering too much
-  if (diff > 5 || lastRenderTime === 0) {
-    lastRenderTime = rightNow;
-  } else {
-    return;
-  }
+  // if (diff > 0.5 || lastRenderTime === 0) {
+  //   lastRenderTime = rightNow;
+  // } else {
+  //   console.log("Ignoring render", rightNow, diff, lastRenderTime);
+  //   return;
+  // }
 
-  document.title = "Mood tracker";
   const mainElement = document.getElementById("main");
 
   console.group("Rendering info");
@@ -235,7 +237,16 @@ function attachServiceWorker(): Promise<void> {
 }
 
 async function main() {
+  console.log("Main: Starting script...");
+
+  console.log("Main: Attaching service worker...");
   await attachServiceWorker();
+  console.log("Main: registering update handle");
+  await registerUpdateHandler();
+
+  console.log("Main: changing document title...");
+  document.title = "Mood tracker";
+
   let info = getDebuggingInfo();
   if (!info) {
     info = { kind: "DebuggingInfo", eventLog: [] };

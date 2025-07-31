@@ -1,4 +1,5 @@
-import { BUILT_IN_QUERIES, Queryable } from "./logic/query";
+import { BUILT_IN_QUERIES } from "./logic/query";
+import type { Queryable } from "./logic/query/types";
 import { AppState, LATEST_DATABASE_VERSION, Settings } from "./types";
 import { dateToDay } from "./utils/dates";
 
