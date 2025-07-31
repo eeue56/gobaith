@@ -193,6 +193,9 @@ function attachServiceWorker(): Promise<void> {
       reject("No such serviceWorker in navigator");
       return;
     }
+
+    // todo: bring back the service worker
+    resolve();
   });
 }
 
