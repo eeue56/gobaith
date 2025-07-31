@@ -22,7 +22,7 @@ test("the user can choose answers to prompts", async ({ context, page }) => {
   const promptGroups = await page.locator(".prompt-group").all();
 
   const numberOfPrompts = Object.keys(PROMPTS).length;
-  expect(promptGroups).toHaveLength(numberOfPrompts);
+  await expect(promptGroups).toHaveLength(numberOfPrompts);
 
   {
     // prompts should start at "None"

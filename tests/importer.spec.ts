@@ -45,7 +45,7 @@ test("the importer can import state", async ({ context, page }) => {
 
   await page.locator("#update-import-from-text").dispatchEvent("click");
 
-  expect(await page.locator("#textarea-download-state")).toHaveValue(
+  await expect(await page.locator("#textarea-download-state")).toHaveValue(
     new RegExp(logEntry.text)
   );
 
@@ -96,17 +96,15 @@ test("the importer can import settings", async ({ context, page }) => {
 
   await page.locator("#update-import-from-text").dispatchEvent("click");
 
-  await page.waitForTimeout(500);
-
-  expect(
-    await page.locator("#textarea-download-settings").inputValue()
-  ).toContain("Ibux 200mg");
+  await expect(await page.locator("#textarea-download-settings")).toHaveValue(
+    /Ibux 200mg/
+  );
 
   await page.reload();
 
   await awaitForTitleToChange(page);
 
-  expect(
-    await page.locator("#textarea-download-settings").inputValue()
-  ).toContain("Ibux 200mg");
+  await expect(await page.locator("#textarea-download-settings")).toHaveValue(
+    /Ibux 200mg/
+  );
 });
