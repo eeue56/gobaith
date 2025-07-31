@@ -20,11 +20,6 @@ import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
 import { registerUpdateHandler } from "./update";
 
-/**
- * Keep track of last render time to avoid rendering too often
- */
-let lastRenderTime = 0;
-
 type ActiveChart = {
   graphName: GraphName;
   chart: Chart<any, any>;
@@ -69,17 +64,6 @@ function renderBody(state: AppState, settings: Settings): RenderedWithEvents {
  * By default, it logs info on rendering + event attachment time
  */
 function render(state: AppState, settings: Settings): void {
-  const rightNow = performance.now();
-  const diff = rightNow - lastRenderTime;
-
-  // try to avoid re-rendering too much
-  // if (diff > 0.5 || lastRenderTime === 0) {
-  //   lastRenderTime = rightNow;
-  // } else {
-  //   console.log("Ignoring render", rightNow, diff, lastRenderTime);
-  //   return;
-  // }
-
   const mainElement = document.getElementById("main");
 
   console.group("Rendering info");
@@ -209,30 +193,6 @@ function attachServiceWorker(): Promise<void> {
       reject("No such serviceWorker in navigator");
       return;
     }
-
-    await navigator.serviceWorker
-      .register("service-worker.js", {
-        scope: "./",
-      })
-      .then((registration) => {
-        let serviceWorker;
-        if (registration.installing) {
-          serviceWorker = registration.installing;
-        } else if (registration.waiting) {
-          serviceWorker = registration.waiting;
-        } else if (registration.active) {
-          serviceWorker = registration.active;
-        }
-        if (serviceWorker) {
-          resolve();
-          return;
-        }
-        reject("Did not register service worker");
-      })
-      .catch((error) => {
-        console.error(error);
-        reject(error);
-      });
   });
 }
 
