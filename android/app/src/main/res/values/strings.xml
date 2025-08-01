@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">gobaith</string>
+    <string name="title_activity_main">gobaith</string>
+    <string name="package_name">com.gobaith.eeue56</string>
+    <string name="custom_url_scheme">com.gobaith.eeue56</string>
+</resources>
