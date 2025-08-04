@@ -1,9 +1,7 @@
 import { expect } from "@playwright/test";
 import { PROMPTS } from "../src/types";
 import { test } from "./fixtures";
-import { getActiveTab } from "./helpers";
-
-const url = "http://localhost:3003";
+import { expectActiveTab, getActiveTab } from "./helpers";
 
 test("renders", async ({ context, page }) => {
   await expect(page).toHaveTitle("Mood tracker");
@@ -17,13 +15,17 @@ test("it starts on daily page", async ({ context, page }) => {
   await expect(await getActiveTab(page)).toBe("Journal");
 });
 
-test("the user can choose answers to prompts", async ({ context, page }) => {
-  await expect(page).toHaveTitle("Mood tracker");
-  const promptGroups = await page.locator(".prompt-group").all();
-
+test("the user can choose answers to prompts", async ({
+  context,
+  page,
+  baseURL,
+}) => {
   const numberOfPrompts = Object.keys(PROMPTS).length;
-  await expect(promptGroups).toHaveLength(numberOfPrompts);
+  await expect(await page.locator(".prompt-group")).toHaveCount(
+    numberOfPrompts
+  );
 
+  const promptGroups = await page.locator(".prompt-group").all();
   {
     // prompts should start at "None"
     const promptAnswers = await page
@@ -47,8 +49,14 @@ test("the user can choose answers to prompts", async ({ context, page }) => {
     await page.locator(".pure-button-active.prompt-answer").all()
   ).toHaveLength(numberOfPrompts);
 
-  if (!process.env.IS_ELECTRON) {
-    await page.goto(url.toString());
+  if (!process.env.IS_ELECTRON && !process.env.IS_ANDROID) {
+    await page.goto(baseURL || "");
+  } else {
+    await page.locator('.tab:text("Graphs")').click();
+    await expectActiveTab(page, "Graphs");
+
+    await page.locator('.tab:text("Journal")').click();
+    await expectActiveTab(page, "Journal");
   }
 
   await expect(page).toHaveTitle("Mood tracker");
@@ -100,7 +108,7 @@ test("the user can enter log entries", async ({ context, page }) => {
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");
 
-  await expect((await page.locator(".journal-entry").all()).length).toEqual(0);
+  await expect(await page.locator(".journal-entry")).toHaveCount(0);
 
   const logEntryToFill = "Today was a good day";
   await page.locator("#new-journal-entry").fill(logEntryToFill);

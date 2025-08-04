@@ -11,7 +11,7 @@ testPeristentElectron("the user adds a pill", async ({ context, page }) => {
   await page.locator("#add-pill").click();
 
   await page.locator('.tab:text("Journal")').click();
-  await expect((await page.locator(".journal-pill").all()).length).toEqual(1);
+  await expect(await page.locator(".journal-pill")).toHaveCount(1);
   await expect(await page.locator(".journal-pill").first()).toContainText(
     "Paracetamol 100mg"
   );
@@ -25,7 +25,7 @@ testPeristentElectron(
     await page.locator('.tab:text("Settings")').click();
     await page.locator('.tab:text("Journal")').click();
 
-    await expect((await page.locator(".journal-pill").all()).length).toEqual(1);
+    await expect(await page.locator(".journal-pill")).toHaveCount(1);
     await expect(await page.locator(".journal-pill").first()).toContainText(
       "Paracetamol 100mg"
     );

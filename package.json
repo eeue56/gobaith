@@ -21,12 +21,14 @@
     "@eeue56/gweld": "^1.0.1"
   },
   "scripts": {
-    "serve": "npm run build && ts-node server/host.ts",
+    "serve-backend": "npm run build && ts-node server/host.ts",
+    "serve-frontend": "npx @eeue56/gweld web/ 8000",
     "build": "esbuild --bundle src/index.ts --outfile=web/out.js && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js",
     "build-electron": "cd electron && npm run build",
     "test": "tsc --noEmit && npx playwright test",
     "test-electron": "IS_ELECTRON=true npx playwright test --workers=1",
-    "test-all": "npm run test && npm run test-electron",
+    "test-android": "IS_ANDROID=true npx playwright test --workers=1 --project 'chromium - system time'",
+    "test-all": "npm run test && npm run test-electron && npm run test-android",
     "generate": "ts-node src/utils/data.ts",
     "generate-screenshots": "ts-node screenshots/generate_screenshots.ts"
   },
