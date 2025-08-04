@@ -36,13 +36,13 @@ export async function loadAppStateFromServer(): Promise<AppState | string> {
     return "No backend";
   }
 
-  const settings = await response.json();
+  const state = await response.json();
 
-  if (isAppState(settings)) {
-    return settings;
+  if (isAppState(state)) {
+    return state;
   }
 
-  console.error(settings);
+  console.error(state);
   return "Failed to load AppState";
 }
 

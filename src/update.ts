@@ -4,6 +4,11 @@ import * as defaultObjects from "./defaultObjects";
 import { initializeEntryForDay } from "./logic/journal";
 import { EqualTo } from "./logic/query/types";
 import {
+  loadAppStateFromServer,
+  loadSettingsFromServer,
+  saveToServer,
+} from "./saveToServer";
+import {
   AppState,
   DebuggingInfo,
   LATEST_DATABASE_VERSION,
@@ -72,6 +77,19 @@ export function sendRerender(state: AppState, settings: Settings): number {
   return 0;
 }
 
+async function syncStateAndSettings(
+  hasBackend: boolean,
+  appState: AppState,
+  settings: Settings
+): Promise<void> {
+  if (hasBackend) {
+    await saveToServer(appState, settings);
+    await syncStateAndSettingsToDatabase(appState, settings);
+  } else {
+    await syncStateAndSettingsToDatabase(appState, settings);
+  }
+}
+
 export async function update(event: MessageEvent<Update>): Promise<number> {
   const data = event.data;
   console.info("UpdateHandler: received event", data.kind);
@@ -91,7 +109,7 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
   switch (data.kind) {
     case "AddJournalEntry": {
       appState = addJournalEntry(data.day, data.text, data.time, appState);
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdatePromptValue": {
@@ -101,7 +119,7 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
         data.newValue,
         appState
       );
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "RemoveSettings": {
@@ -112,7 +130,7 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
         databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("UpdateHandler: Removed settings");
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "RemoveAppState": {
@@ -125,24 +143,24 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
         databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("UpdateHandler: Removed state");
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdateSleepValue": {
       const entry = data.entry;
       const value = data.value;
       appState = updateSleepValue(entry, value, appState);
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdateCurrentTab": {
       appState = updateCurrentTab(data.tab, appState);
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdateCurrentGraph": {
       appState = updateCurrentGraph(data.graphName, appState);
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "AddPill": {
@@ -154,12 +172,12 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
 
       appState.journalEntries = modified.entries;
       settings = modified.settings;
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "ResetCurrentDay": {
       appState.day = dateToDay(new Date());
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdateCurrentDay": {
@@ -188,13 +206,13 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
 
       appState.day = day;
 
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "GoToSpecificDay": {
       appState.day = data.entry.day;
       appState.currentTab = data.tab;
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdateImportAppState": {
@@ -202,7 +220,7 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
       console.log(
         `Imported state with ${appState.journalEntries.length} journal entries`
       );
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdateImportSettings": {
@@ -223,7 +241,7 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
         console.log("Imported pill:", pill);
       }
       console.log("Imported settings");
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdatePillValue": {
@@ -233,12 +251,12 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
         data.direction,
         appState
       );
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "UpdatePillOrder": {
       settings = updatePillOrder(settings, data.pillName, data.direction);
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "ReadyToRender": {
@@ -264,7 +282,7 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
     }
     case "SetDebuggingInfo": {
       debuggingInfo = data.info;
-      await syncStateAndSettingsToDatabase(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, settings);
       return sendRerender(appState, settings);
     }
     case "SetQueryDuration": {
@@ -361,9 +379,38 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
 export async function registerUpdateHandler(): Promise<void> {
   const maybeDatabaseRecords = await initIndexedDB();
 
-  if (maybeDatabaseRecords !== null) {
-    appState = maybeDatabaseRecords.appState;
-    settings = maybeDatabaseRecords.settings;
+  hasBackend = await hasHeartbeat();
+
+  if (hasBackend) {
+    const [maybeAppState, maybeSettings] = await Promise.all([
+      loadAppStateFromServer(),
+      loadSettingsFromServer(),
+    ]);
+
+    if (typeof maybeAppState === "string") {
+      console.error(maybeAppState);
+
+      if (maybeDatabaseRecords) {
+        appState = maybeDatabaseRecords.appState;
+      }
+    } else {
+      appState = maybeAppState;
+    }
+
+    if (typeof maybeSettings === "string") {
+      console.error(maybeSettings);
+
+      if (maybeDatabaseRecords) {
+        settings = maybeDatabaseRecords.settings;
+      }
+    } else {
+      settings = maybeSettings;
+    }
+  } else {
+    if (maybeDatabaseRecords !== null) {
+      appState = maybeDatabaseRecords.appState;
+      settings = maybeDatabaseRecords.settings;
+    }
   }
 
   const initResult = initializeEntryForDay(
@@ -386,6 +433,4 @@ export async function registerUpdateHandler(): Promise<void> {
   renderChannel.channel.addEventListener("messageerror", (error) =>
     console.error("CHANNEL ERROR:", error)
   );
-
-  hasBackend = await hasHeartbeat();
 }
