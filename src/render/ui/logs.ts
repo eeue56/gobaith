@@ -1,65 +1,85 @@
 import {
-  Day,
-  dontSend,
-  JournalEntry,
-  LogEntry,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
-} from "../../types";
-import { dayToString } from "../../utils/dates";
+  attribute,
+  button,
+  class_,
+  div,
+  fieldset,
+  form,
+  HtmlNode,
+  on,
+  p,
+  text,
+  textarea,
+} from "@eeue56/coed";
+import { Day, dontSend, JournalEntry, LogEntry, Update } from "../../types";
+import { iconSave } from "./icons";
 
-function renderJournalEntry(log: LogEntry): string {
-  return `
-<div class="pure-g"/>
-  <div class="pure-u-1-5"></div>
-  <p class="pure-u-3-5 journal-entry">${log.time} - ${log.text}</p>
-  <div class="pure-u-1-5"></div>
-</div>
-`;
+function renderJournalEntry(log: LogEntry): HtmlNode<never> {
+  return div(
+    [],
+    [],
+    [p([], [class_("journal-entry")], [text(`${log.time} - ${log.text}`)])]
+  );
 }
 
-export function renderLogs(journalEntry: JournalEntry): RenderedWithEvents {
-  if (journalEntry.logs.length === 0) return { body: "", eventListeners: [] };
+export function renderLogs(journalEntry: JournalEntry): HtmlNode<never> {
+  if (journalEntry.logs.length === 0) return div([], [], []);
 
-  return {
-    body:
-      `<div class="journal-entries">` +
-      journalEntry.logs
-        .sort((log: LogEntry) => log.time.valueOf())
-        .map(renderJournalEntry)
-        .join("\n") +
-      `</div>`,
-    eventListeners: [],
-  };
+  return div(
+    [],
+    [class_("journal-entries")],
+    journalEntry.logs
+      .sort((log: LogEntry) => log.time.valueOf())
+      .map(renderJournalEntry)
+  );
 }
 
-export function renderEnterTimestampMessage(today: Day): RenderedWithEvents {
-  const elementId = `update-journal-${dayToString(today)}`;
-  return {
-    body: `
-<div class="pure-g">
-    <div class="pure-u-1-6"></div>
-    <form class="pure-form pure-u-2-3" onsubmit="return false;">
-        <fieldset class="pure-g">
-            <textarea id="new-journal-entry" class="pure-u-4-5" placeholder="Enter a timestamped journal log entry..."></textarea>
-            <button title="Save the entry" class="pure-button pure-button-primary pure-u-1-5 save-log-entry-button" id="${elementId}">Save</button>
-        </fieldset>
-    </form>
-    <div class="pure-u-1-6"></div>
-</div>
-`,
-    eventListeners: [
-      {
-        elementId: elementId,
-        eventName: "click",
-        callback: () => updateLogEntries(today),
-      },
-    ],
-  };
+export function renderEnterTimestampMessage(today: Day): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      form(
+        [
+          on("submit", (event) => {
+            event.preventDefault();
+            return dontSend();
+          }),
+        ],
+        [],
+        [
+          fieldset(
+            [],
+            [class_("new-journal-entry-containter")],
+            [
+              textarea(
+                [],
+                [
+                  attribute("id", "new-journal-entry"),
+                  attribute(
+                    "placeholder",
+                    "Enter a timestamped journal log entry..."
+                  ),
+                ],
+                []
+              ),
+              button(
+                [on("click", () => updateLogEntries(today))],
+                [
+                  attribute("title", "Save the entry"),
+                  class_("save-log-entry-button"),
+                ],
+                [text("Save"), iconSave]
+              ),
+            ]
+          ),
+        ]
+      ),
+    ]
+  );
 }
 
-function updateLogEntries(day: Day): Sent {
+function updateLogEntries(day: Day): Update {
   const journalEntryElement = document.getElementById(
     "new-journal-entry"
   ) as HTMLTextAreaElement | null;
@@ -72,10 +92,10 @@ function updateLogEntries(day: Day): Sent {
   const logEntry = journalEntryElement.value;
   const currentTime = new Date();
 
-  return sendUpdate({
+  return {
     kind: "AddJournalEntry",
     day: day,
     time: currentTime,
     text: logEntry,
-  });
+  };
 }

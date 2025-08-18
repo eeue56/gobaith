@@ -1,17 +1,17 @@
+import { class_, div, HtmlNode } from "@eeue56/coed";
 import { getDataForPrompt } from "../../logic/journal";
 import {
   AppState,
   GraphName,
   GraphRenderer,
   JournalEntry,
+  Model,
   Prompt,
   PROMPTS,
-  RenderedWithEvents,
   Settings,
+  Update,
 } from "../../types";
 import { dayToDate } from "../../utils/dates";
-import { renderer } from "../../utils/render";
-import { renderTabNavigation } from "../ui/tabs";
 import { renderDailyBar, renderTotaledDailyBar } from "./dailyBar";
 import { renderGraphChoices } from "./graphSelector";
 import { renderInteractiveQueries } from "./interactiveQueries";
@@ -22,21 +22,19 @@ import { renderSpiderweb } from "./spiderweb";
 function renderActiveGraph(
   state: AppState,
   settings: Settings
-): RenderedWithEvents {
+): HtmlNode<Update> {
   return GRAPHS[state.currentGraph](state, settings);
 }
 
-export function renderGraph(
-  state: AppState,
-  settings: Settings
-): RenderedWithEvents {
-  return renderer`
-<div class="tab-content">
-  ${renderGraphChoices(state)}
-  ${renderActiveGraph(state, settings)}
-</div>
-${renderTabNavigation(state.currentTab)}
-`;
+export function renderGraph(model: Model): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("tab-content")],
+    [
+      renderGraphChoices(model.appState),
+      renderActiveGraph(model.appState, model.settings),
+    ]
+  );
 }
 
 export function getDataPerPrompt(entries: JournalEntry[]): PromptRenderData[] {

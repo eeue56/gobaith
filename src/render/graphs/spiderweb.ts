@@ -1,3 +1,4 @@
+import { attribute, canvas, div, HtmlNode, style_ } from "@eeue56/coed";
 import {
   BarController,
   BarElement,
@@ -19,11 +20,10 @@ import {
   Day,
   JournalEntry,
   PROMPTS,
-  RenderedWithEvents,
   Settings,
+  Update,
 } from "../../types";
 import { dayToString } from "../../utils/dates";
-import { renderer } from "../../utils/render";
 import { renderDate } from "../date";
 
 Chart.register(
@@ -44,17 +44,30 @@ Chart.register(
 export function renderSpiderweb(
   state: AppState,
   settings: Settings
-): RenderedWithEvents {
-  return renderer`
-${renderDate(state.day)}
-<div class="pure-g">
-    <div class="pure-u-1-24"></div>
-    <div class="pure-u-22-24" height="500">
-        <canvas id="spiderweb" width="400" height="800" background-color="white"></canvas>
-    </div>
-    <div class="pure-u-1-24"></div>
-</div>
-`;
+): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      renderDate(state.day),
+      div(
+        [],
+        [attribute("height", "500")],
+        [
+          canvas(
+            [],
+            [
+              attribute("id", "spiderweb"),
+              attribute("width", "400"),
+              attribute("height", "800"),
+              style_("background-color", "white"),
+            ],
+            []
+          ),
+        ]
+      ),
+    ]
+  );
 }
 
 export function showSpiderweb(

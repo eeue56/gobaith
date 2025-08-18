@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test";
 import { PROMPTS } from "../src/types";
 import { test } from "./fixtures";
-import { expectActiveTab, getActiveTab } from "./helpers";
+import { expectActiveTab } from "./helpers";
 
 test("renders", async ({ context, page }) => {
   await expect(page).toHaveTitle("Mood tracker");
@@ -12,7 +12,7 @@ test("it starts on daily page", async ({ context, page }) => {
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");
 
-  await expect(await getActiveTab(page)).toBe("Journal");
+  await expectActiveTab(page, "Journal");
 });
 
 test("the user can choose answers to prompts", async ({
@@ -29,25 +29,27 @@ test("the user can choose answers to prompts", async ({
   {
     // prompts should start at "None"
     const promptAnswers = await page
-      .locator(".pure-button-active.prompt-answer")
+      .locator(".prompt-button-container.active")
       .all();
     await expect(promptAnswers).toHaveLength(numberOfPrompts);
 
     for (const promptAnswer of promptAnswers) {
-      expect(await promptAnswer.innerHTML()).toContain("None");
+      await expect(await promptAnswer.innerHTML()).toContain("None");
     }
   }
 
   for (const group of promptGroups) {
-    for (const responseButton of await group.locator(".prompt-answer").all()) {
+    for (const responseButton of await group
+      .locator(".circle-container")
+      .all()) {
       responseButton.click();
-      await expect(responseButton).toHaveClass(/pure-button-active/);
+      await expect(responseButton).toHaveClass(/active/);
     }
   }
 
-  await expect(
-    await page.locator(".pure-button-active.prompt-answer").all()
-  ).toHaveLength(numberOfPrompts);
+  await expect(await page.locator(".prompt-answer.active")).toHaveCount(
+    numberOfPrompts
+  );
 
   if (!process.env.IS_ELECTRON && !process.env.IS_ANDROID) {
     await page.goto(baseURL || "");
@@ -64,7 +66,7 @@ test("the user can choose answers to prompts", async ({
   {
     // Prompts should keep state after refreshing
     const promptAnswers = await page
-      .locator(".pure-button-active.prompt-answer")
+      .locator(".prompt-button-container.active")
       .all();
     await expect(promptAnswers).toHaveLength(numberOfPrompts);
 

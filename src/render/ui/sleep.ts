@@ -1,10 +1,15 @@
 import {
-  dontSend,
-  JournalEntry,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
-} from "../../types";
+  attribute,
+  class_,
+  div,
+  HtmlNode,
+  input,
+  on,
+  p,
+  span,
+  text,
+} from "@eeue56/coed";
+import { dontSend, JournalEntry, Update } from "../../types";
 
 const MAX_SLEEPING_30_MINUTE_SLOTS = 48;
 
@@ -12,85 +17,73 @@ function sliderFillStyle(percentFilled: number): string {
   return `linear-gradient(to right, var(--pico-range-thumb-color) ${percentFilled}%, var(--pico-background-color) ${percentFilled}%`;
 }
 
-function renderHoursSleptMessage(hoursSlept: number): string {
-  return `Hours slept last night: <span class="thick">${hoursSlept}</span>`;
+function renderHoursSleptMessage(hoursSlept: number): HtmlNode<never> {
+  return p(
+    [],
+    [class_("hours-slept-last-night-message")],
+    [
+      text(`Hours slept last night:`),
+      span(
+        [],
+        [attribute("id", "hours-slept"), class_("thick")],
+        [text(hoursSlept.toString())]
+      ),
+    ]
+  );
 }
 
-export function renderSleepSlider(entry: JournalEntry): RenderedWithEvents {
+export function renderSleepSlider(entry: JournalEntry): HtmlNode<Update> {
   const currentValue = entry.hoursSlept * 2;
   const percentFilled = (currentValue / MAX_SLEEPING_30_MINUTE_SLOTS) * 100;
 
-  return {
-    body: `
-<div class="pure-g">
-    <div class="pure-u-1-3"></div>
-    <p class="pure-u-1-3" id="hours-slept">${renderHoursSleptMessage(
-      entry.hoursSlept
-    )}</p>
-    <div class="pure-u-1-3"></div>
-</div>
-<div class="pure-g">
-    <div class="pure-u-1-3"></div>
-    <div class="slider-label">0</div>
-    <input title="Drag slider to find your sleep hours" type="range" min="0" max="${MAX_SLEEPING_30_MINUTE_SLOTS}" step="1" list="steplist" value="${currentValue}" class="pure-u-1-3 slider" id="sleep-slider" style="background: ${sliderFillStyle(
-      percentFilled
-    )}">
-    <div class="slider-label">24</div>
-    <div class="pure-u-1-3"></div>
-</div>
-    `,
-    eventListeners: [
-      {
-        elementId: "sleep-slider",
-        eventName: "input",
-        callback: (event) => dynamicallyShowSliderValue(event),
-      },
-      {
-        elementId: "sleep-slider",
-        eventName: "change",
-        callback: () => updateSleepValue(entry),
-      },
-    ],
-  };
+  return div(
+    [],
+    [],
+    [
+      renderHoursSleptMessage(entry.hoursSlept),
+      div(
+        [],
+        [class_("hours-slept-last-night-message")],
+        [
+          div([], [class_("slider-label")], [text("0")]),
+          input(
+            [on("input", (event) => dynamicallyShowSliderValue(event, entry))],
+            [
+              attribute("id", "sleep-slider"),
+              attribute("title", "Drag slider to find your sleep hours"),
+              class_("slider"),
+              attribute("type", "range"),
+              attribute("min", "0"),
+              attribute("max", MAX_SLEEPING_30_MINUTE_SLOTS.toString()),
+              attribute("step", "1"),
+              attribute("list", "steplist"),
+              attribute("value", currentValue.toString()),
+              attribute(
+                "style",
+                `background: ${sliderFillStyle(percentFilled)}`
+              ),
+            ]
+          ),
+          div([], [class_("slider-label")], [text("24")]),
+        ]
+      ),
+    ]
+  );
 }
 
-function updateSleepValue(entry: JournalEntry): Sent {
-  const sleepSliderElement = document.getElementById(
-    "sleep-slider"
-  ) as HTMLInputElement | null;
-
-  if (!sleepSliderElement) {
-    console.error("Did not find sleep-slider");
-    return dontSend();
-  }
-
-  return sendUpdate({
-    kind: "UpdateSleepValue",
-    entry: entry,
-    value: parseInt(sleepSliderElement.value, 10) / 2,
-  });
-}
-
-function dynamicallyShowSliderValue(event: Event): Sent {
+function dynamicallyShowSliderValue(event: Event, entry: JournalEntry): Update {
   const target = event.target as HTMLInputElement | null;
   if (!target) {
     return dontSend();
   }
 
-  // set the slider fill
   const percentFilled =
     (parseInt(target.value) / MAX_SLEEPING_30_MINUTE_SLOTS) * 100;
   target.style.background = sliderFillStyle(percentFilled);
 
-  // temporarily show the value - it will get overwritten on next render anyway
-  const hoursSleptContainer = document.getElementById("hours-slept");
-  if (!hoursSleptContainer) {
-    return dontSend();
-  }
-
-  hoursSleptContainer.innerHTML = renderHoursSleptMessage(
-    parseInt(target.value) / 2
-  );
-
-  return dontSend();
+  return {
+    kind: "UpdateSleepValue",
+    entry: entry,
+    value: parseInt((event.target as HTMLInputElement).value, 10) / 2,
+  };
 }

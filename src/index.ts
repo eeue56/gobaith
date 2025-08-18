@@ -1,24 +1,20 @@
 import { showLineOverview } from "./render/graphs/lineOverview";
 import { renderJournal } from "./render/journal";
-import {
-  AppState,
-  DebuggingInfo,
-  GraphName,
-  RenderBroadcast,
-  RenderedWithEvents,
-  RenderError,
-  sendUpdate,
-  Settings,
-  TypedBroadcastChannel,
-} from "./types";
+import { DebuggingInfo, GraphName, Model, Update } from "./types";
 
 import type { Chart } from "chart.js";
 import { renderGraph } from "./render/graphs/index";
 import { showSpiderweb } from "./render/graphs/spiderweb";
-import { renderImport, renderSettings } from "./render/ui/tabs";
-import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
+import {
+  renderImport,
+  renderSettings,
+  renderTabNavigation,
+} from "./render/ui/tabs";
+import { getDebuggingInfo } from "./utils/localstorage";
 
-import { registerUpdateHandler } from "./update";
+import { div, HtmlNode, Program, program } from "@eeue56/coed";
+import { fetchModelFromStores, update } from "./update";
+import { pushHistoryState } from "./updaters";
 
 type ActiveChart = {
   graphName: GraphName;
@@ -33,89 +29,33 @@ let activeChart: ActiveChart | null = null;
 /**
  * Call the individual render functions
  */
-function renderBody(state: AppState, settings: Settings): RenderedWithEvents {
-  switch (state.currentTab) {
+function renderBody(model: Model): HtmlNode<Update> {
+  switch (model.appState.currentTab) {
     case "JOURNAL": {
-      return renderJournal(state, settings);
+      return renderJournal(model);
     }
     case "IMPORT": {
-      return renderImport(state, settings);
+      return renderImport(model);
     }
     case "GRAPH": {
-      return renderGraph(state, settings);
+      return renderGraph(model);
     }
     case "SETTINGS": {
       let info: DebuggingInfo | null = getDebuggingInfo();
       if (!info) {
         info = { kind: "DebuggingInfo", eventLog: [] };
       }
-      return renderSettings(state, settings, info);
+      return renderSettings(model, info);
     }
   }
 }
 
-/**
- * This is the main render function - it is triggered from the service-worker.
- *
- * State and settings come from the service-worker (via indexeddb)
- *
- * After rendering, this function calls postRender.
- *
- * By default, it logs info on rendering + event attachment time
- */
-function render(state: AppState, settings: Settings): void {
-  const mainElement = document.getElementById("main");
-
-  console.group("Rendering info");
-
-  if (!mainElement) {
-    console.error("Could not find element with id 'main'");
-    return;
-  }
-
-  try {
-    let start = performance.now();
-    const body = renderBody(state, settings);
-    let end = performance.now();
-
-    console.info("Render time:", end - start);
-
-    mainElement.innerHTML = body.body;
-
-    start = performance.now();
-
-    for (const eventListener of body.eventListeners) {
-      const element = document.getElementById(eventListener.elementId);
-
-      if (element) {
-        element.addEventListener(
-          eventListener.eventName,
-          eventListener.callback
-        );
-      } else {
-        console.error(
-          "Could not find element with selector '#",
-          eventListener.elementId,
-          "'"
-        );
-      }
-    }
-
-    end = performance.now();
-
-    console.info("Added", body.eventListeners.length, "listeners");
-    console.info("Attachment time:", end - start);
-    console.groupEnd();
-
-    postRender(state, settings);
-  } catch (error) {
-    console.groupEnd();
-    if ((error as RenderError) === "NeedsToInitialize") {
-      sendUpdate({ kind: "InitializeDay" });
-    } else {
-      console.error(error);
-    }
-  }
+function render(model: Model): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [renderBody(model), renderTabNavigation(model.appState.currentTab)]
+  );
 }
 
 /**
@@ -123,21 +63,21 @@ function render(state: AppState, settings: Settings): void {
  *
  * Currently, it is only Chart.js integrations that require this mechanic.
  */
-function postRender(state: AppState, settings: Settings): void {
-  if (state.currentTab === "GRAPH") {
+function postRender(model: Model): void {
+  if (model.appState.currentTab === "GRAPH") {
     if (activeChart !== null) {
-      if (activeChart.graphName !== state.currentGraph) {
+      if (activeChart.graphName !== model.appState.currentGraph) {
         activeChart.chart.destroy();
         activeChart = null;
       }
     }
-    switch (state.currentGraph) {
+    switch (model.appState.currentGraph) {
       case "SPIDERWEB": {
-        showSpiderweb(state.day, state.journalEntries);
+        showSpiderweb(model.appState.day, model.appState.journalEntries);
         break;
       }
       case "LINE_OVERVIEW": {
-        showLineOverview(state.journalEntries);
+        showLineOverview(model.appState.journalEntries);
         break;
       }
       case "DAILY_BAR":
@@ -152,20 +92,6 @@ function postRender(state: AppState, settings: Settings): void {
   }
 }
 
-/**
- * The channel that the service-worker and the client communicate on.
- */
-const renderChannel = TypedBroadcastChannel<RenderBroadcast>("render");
-renderChannel.channel.addEventListener(
-  "message",
-  (event: MessageEvent<RenderBroadcast>) => {
-    if (event.data.kind === "rerender") {
-      storeDebuggingInfo(event.data.debuggingInfo);
-      render(event.data.state, event.data.settings);
-    }
-  }
-);
-
 async function tryToPersistStorage(): Promise<void> {
   return navigator.storage.persist().then((persistent) => {
     if (persistent) {
@@ -178,34 +104,8 @@ async function tryToPersistStorage(): Promise<void> {
   });
 }
 
-/**
- * Since most of the logic regarding state is handled in the service-worker, this
- * app currently requires a service-worker.
- */
-function attachServiceWorker(): Promise<void> {
-  return new Promise(async (resolve, reject) => {
-    if (navigator.storage && "persist" in navigator.storage) {
-      await tryToPersistStorage();
-    }
-
-    if (!("serviceWorker" in navigator)) {
-      console.error("Unable to register service worker");
-      reject("No such serviceWorker in navigator");
-      return;
-    }
-
-    // todo: bring back the service worker
-    resolve();
-  });
-}
-
 async function main() {
   console.log("Main: Starting script...");
-
-  console.log("Main: Attaching service worker...");
-  await attachServiceWorker();
-  console.log("Main: registering update handle");
-  await registerUpdateHandler();
 
   console.log("Main: changing document title...");
   document.title = "Mood tracker";
@@ -214,8 +114,41 @@ async function main() {
   if (!info) {
     info = { kind: "DebuggingInfo", eventLog: [] };
   }
-  sendUpdate({ kind: "SetDebuggingInfo", info });
-  sendUpdate({ kind: "ReadyToRender" });
+
+  const mainElement = document.getElementById("main");
+
+  if (!mainElement) {
+    console.error("Unable to find main element!");
+    return;
+  }
+  mainElement.innerHTML = "";
+
+  console.log("Main: registering update handle");
+  const model = await fetchModelFromStores();
+
+  const programConfig: Program<Model, Update> = {
+    initialModel: model,
+    view: render,
+    update: update,
+    root: mainElement,
+    postRender: postRender,
+  };
+
+  const runningProgram = program(programConfig);
+
+  runningProgram.send({ kind: "SetDebuggingInfo", info });
+
+  pushHistoryState(model.appState.currentTab);
+
+  await tryToPersistStorage();
+
+  window.addEventListener("popstate", (event) => {
+    console.log(
+      `location: ${document.location}, state: ${JSON.stringify(event.state)}`
+    );
+
+    runningProgram.send({ kind: "UpdateCurrentTab", tab: event.state.tab });
+  });
 }
 
 main();

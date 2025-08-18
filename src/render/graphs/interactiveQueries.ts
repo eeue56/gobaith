@@ -1,3 +1,19 @@
+import {
+  attribute,
+  booleanAttribute,
+  button,
+  class_,
+  div,
+  form,
+  HtmlNode,
+  input,
+  label,
+  on,
+  option,
+  select,
+  strong,
+  text,
+} from "@eeue56/coed";
 import { pathToKey, runDurationQuery, runQuery } from "../../logic/query";
 import {
   COMBINE_QUERIES,
@@ -22,175 +38,166 @@ import {
   MoodValue,
   Prompt,
   PROMPTS,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
   Settings,
+  Update,
 } from "../../types";
 import { dayToString } from "../../utils/dates";
-import { renderer } from "../../utils/render";
+import { iconDelete } from "../ui/icons";
 
 function renderComparisonChoice(
   comparison: Comparison,
   activeComparison: Comparison
-): string {
-  const selectedText =
-    comparison.kind === activeComparison.kind ? "selected" : "";
-  return `<option value="${comparison.kind}" ${selectedText}>${comparison.kind}</option>`;
+): HtmlNode<never> {
+  return option(
+    [],
+    [
+      attribute("value", comparison.kind),
+      booleanAttribute("selected", comparison.kind === activeComparison.kind),
+    ],
+    [text(comparison.kind)]
+  );
 }
 
 function renderMoodValueChoice(
   value: MoodValue,
   activeValue: MoodValue
-): string {
-  const selectedText = value === activeValue ? "selected" : "";
-  return `<option value="${value}" ${selectedText}>${moodStateFromValue(
-    value
-  )}</option>`;
+): HtmlNode<never> {
+  return option(
+    [],
+    [
+      attribute("value", value.toString()),
+      booleanAttribute("selected", value === activeValue),
+    ],
+    [text(moodStateFromValue(value))]
+  );
 }
 
-function renderPromptChoice(prompt: Prompt, activePrompt: Prompt): string {
-  const selectedText = prompt === activePrompt ? "selected" : "";
-  return `<option value="${prompt}" ${selectedText}>${prompt}</option>`;
+function renderPromptChoice(
+  prompt: Prompt,
+  activePrompt: Prompt
+): HtmlNode<never> {
+  return option(
+    [],
+    [
+      attribute("value", prompt),
+      booleanAttribute("selected", prompt === activePrompt),
+    ],
+    [text(prompt)]
+  );
 }
 
 function renderComparisonChoices(
   activeComparison: Comparison,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const choices = COMPARISONS.map((comparison) =>
     renderComparisonChoice(comparison, activeComparison)
-  ).join("\n");
+  );
 
-  const id = `${pathToKey(index, path)}-comparison-choice`;
-
-  return {
-    body: `
-      <div class="pure-g">
-          <div class="pure-u-1-5"></div>
-          <select class="pure-u-3-5" id='${id}'>
-              ${choices}
-          </select>
-          <div class="pure-u-1-5"></div>
-      </div>
-      `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "change",
-        callback: (event: Event): Sent => {
-          if (!event.target) {
-            return dontSend();
-          }
-          const value = (event.target as HTMLInputElement).value;
-          const comparison = { kind: value };
-          if (!isComparison(comparison)) {
-            console.error("Invalid comparison", value);
-            return dontSend();
-          }
-          return sendUpdate({
-            kind: "SetComparisonChoice",
-            index,
-            path,
-            comparison,
-          });
-        },
-      },
-    ],
-  };
+  return div(
+    [],
+    [],
+    [
+      select(
+        [
+          on("change", (event: Event): Update => {
+            if (!event.target) {
+              return dontSend();
+            }
+            const value = (event.target as HTMLInputElement).value;
+            const comparison = { kind: value };
+            if (!isComparison(comparison)) {
+              console.error("Invalid comparison", value);
+              return dontSend();
+            }
+            return {
+              kind: "SetComparisonChoice",
+              index,
+              path,
+              comparison,
+            };
+          }),
+        ],
+        [],
+        choices
+      ),
+    ]
+  );
 }
 
 function renderMoodValueChoices(
   activeMoodValue: MoodValue,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const choices = MOOD_VALUES.map((moodValue) =>
     renderMoodValueChoice(moodValue, activeMoodValue)
-  ).join("\n");
-
-  const id = `${pathToKey(index, path)}-mood-value-selection`;
-
-  return {
-    body: `
-        <div class="pure-g">
-            <div class="pure-u-1-5"></div>
-            <select class="pure-u-3-5" id='${id}'>
-                ${choices}
-            </select>
-            <div class="pure-u-1-5"></div>
-        </div>
-        `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "change",
-        callback: (event: Event): Sent => {
-          if (!event.target) {
-            return dontSend();
-          }
-          const value = parseInt((event.target as HTMLInputElement).value);
-          if (!isMoodValue(value)) {
-            console.error("Invalid mood value", value);
-            return dontSend();
-          }
-          return sendUpdate({
-            kind: "SetMoodValueChoice",
-            index,
-            path,
-            moodValue: value,
-          });
-        },
-      },
-    ],
-  };
+  );
+  return div(
+    [],
+    [],
+    [
+      select(
+        [
+          on("change", (event: Event): Update => {
+            if (!event.target) {
+              return dontSend();
+            }
+            const value = parseInt((event.target as HTMLInputElement).value);
+            if (!isMoodValue(value)) {
+              console.error("Invalid mood value", value);
+              return dontSend();
+            }
+            return {
+              kind: "SetMoodValueChoice",
+              index,
+              path,
+              moodValue: value,
+            };
+          }),
+        ],
+        [],
+        choices
+      ),
+    ]
+  );
 }
 
 function renderPromptChoices(
   activePrompt: Prompt,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
-  const choices = PROMPTS.map((key) =>
-    renderPromptChoice(key, activePrompt)
-  ).join("\n");
-
-  const id = `${pathToKey(index, path)}-prompt-selection`;
-
-  return {
-    body: `
-    <div class="pure-g">
-        <div class="pure-u-1-5"></div>
-        <select class="pure-u-3-5" id='${id}'>
-            ${choices}
-        </select>
-        <div class="pure-u-1-5"></div>
-    </div>
-    `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "change",
-        callback: (event: Event): Sent => {
-          if (!event.target) {
-            return dontSend();
-          }
-          const value = (event.target as HTMLInputElement).value;
-          if (!isPrompt(value)) {
-            console.error("Invalid prompt", value);
-            return dontSend();
-          }
-          return sendUpdate({
-            kind: "SetPromptChoice",
-            index,
-            path,
-            prompt: value,
-          });
-        },
-      },
-    ],
-  };
+): HtmlNode<Update> {
+  const choices = PROMPTS.map((key) => renderPromptChoice(key, activePrompt));
+  return div(
+    [],
+    [],
+    [
+      select(
+        [
+          on("change", (event: Event): Update => {
+            if (!event.target) {
+              return dontSend();
+            }
+            const value = (event.target as HTMLInputElement).value;
+            if (!isPrompt(value)) {
+              console.error("Invalid prompt", value);
+              return dontSend();
+            }
+            return {
+              kind: "SetPromptChoice",
+              index,
+              path,
+              prompt: value,
+            };
+          }),
+        ],
+        [],
+        choices
+      ),
+    ]
+  );
 }
 
 function isANestedQuery(query: Query): boolean {
@@ -210,190 +217,214 @@ function renderDurationDaySelector(
   days: number,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const id = `${pathToKey(index, path)}-duration-day-selector`;
-  return {
-    body: `
-<div class="pure-g day-selector">
-  <div class="pure-u-1-5"></div>
-  <form class="pure-u-3-5 day-selector-form" onsubmit="return false">
-    <div class="pure-g">
-      <input class="pure-u-4-5" id="${id}" type="number" name="days" value="${days.toString()}"/>
-      <label class="pure-u-1-5" for="${id}">Days</label>
-    </div>
-  </form>
-  <div class="pure-u-1-5"></div>
-</div>`,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "change",
-        callback: (event: Event): Sent => {
-          if (!event.target) {
-            return dontSend();
-          }
-          const value = parseInt((event.target as HTMLInputElement).value);
-          return sendUpdate({
-            kind: "SetQueryDuration",
-            index,
-            path,
-            duration: value,
-          });
-        },
-      },
-    ],
-  };
+  return div(
+    [],
+    [class_("day-selector")],
+    [
+      form(
+        [],
+        [class_("day-selector-form")],
+        [
+          input(
+            [
+              on("change", (event: Event): Update => {
+                if (!event.target) {
+                  return dontSend();
+                }
+                const value = parseInt(
+                  (event.target as HTMLInputElement).value
+                );
+                return {
+                  kind: "SetQueryDuration",
+                  index,
+                  path,
+                  duration: value,
+                };
+              }),
+            ],
+            [
+              attribute("id", id),
+              attribute("type", "number"),
+              attribute("name", "days"),
+              attribute("value", days.toString()),
+            ]
+          ),
+          label([], [attribute("for", id)], [text("Days")]),
+        ]
+      ),
+    ]
+  );
 }
 
 function renderRemoveQueryButton(
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
-  const id = `${pathToKey(index, path)}-remove-query-button`;
-  return {
-    body: `
-<div class="pure-u-3-5">
-  <div class="pure-u-1-3"></div>
-  <div class="pure-u-1-3">
-    <button id="${id}">Delete query</button>
-  </div>
-  <div class="pure-u-1-3"></div>
-</div>
-`,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "click",
-        callback: (): Sent => {
-          return sendUpdate({
-            kind: "DeleteQuery",
-            index,
-            path,
-          });
-        },
-      },
-    ],
-  };
+): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      button(
+        [
+          on("click", (): Update => {
+            return {
+              kind: "DeleteQuery",
+              index,
+              path,
+            };
+          }),
+        ],
+        [],
+        [text("Delete query"), iconDelete]
+      ),
+    ]
+  );
 }
 
 function renderFilterBuilder(
   query: Filter,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
-  return renderer`
-${renderPromptChoices(query.prompt, index, path)}
-${renderComparisonChoices(query.comparison, index, path)}
-${renderMoodValueChoices(query.value, index, path)}
-  `;
+): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      renderPromptChoices(query.prompt, index, path),
+      renderComparisonChoices(query.comparison, index, path),
+      renderMoodValueChoices(query.value, index, path),
+    ]
+  );
 }
 
 function renderDurationBuilder(
   query: Duration,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
-  return renderer`
-${renderComparisonChoices(query.comparison, index, path)}
-${renderDurationDaySelector(query.days, index, path)}
-${renderQueryBuilder(query.query, index, [...path, "DirectChild"])}
-  `;
+): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      renderComparisonChoices(query.comparison, index, path),
+      renderDurationDaySelector(query.days, index, path),
+      renderQueryBuilder(query.query, index, [...path, "DirectChild"]),
+    ]
+  );
 }
 
 function renderAndOrNotChoice(
   combineQuery: CombineQueryKind,
   activeCombineQuery: CombineQueryKind
-): string {
-  const selectedText = combineQuery === activeCombineQuery ? "selected" : "";
-  return `<option value="${combineQuery}" ${selectedText}>${combineQuery}</option>`;
+): HtmlNode<never> {
+  return option(
+    [],
+    [
+      attribute("value", combineQuery),
+      booleanAttribute("selected", combineQuery === activeCombineQuery),
+    ],
+    [text(combineQuery)]
+  );
 }
 
 function renderAndOrNotChoices(
   activeCombineQuery: CombineQueryKind,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const choices = COMBINE_QUERIES.map((combineQuery) =>
     renderAndOrNotChoice(combineQuery, activeCombineQuery)
-  ).join("\n");
+  );
 
-  const id = `${pathToKey(index, path)}-combine-query-choice`;
-
-  return {
-    body: `
-      <div class="pure-g">
-          <div class="pure-u-1-5"></div>
-          <select class="pure-u-3-5" id='${id}'>
-              ${choices}
-          </select>
-          <div class="pure-u-1-5"></div>
-      </div>
-      `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "change",
-        callback: (event: Event): Sent => {
-          if (!event.target) {
-            return dontSend();
-          }
-          const combineQuery = (event.target as HTMLInputElement).value;
-          if (!isCombineQueryKind(combineQuery)) {
-            console.error("Invalid combine query", combineQuery);
-            return dontSend();
-          }
-          return sendUpdate({
-            kind: "SetCombineQuery",
-            index,
-            path,
-            combineQueryKind: combineQuery,
-          });
-        },
-      },
-    ],
-  };
+  return div(
+    [],
+    [],
+    [
+      select(
+        [
+          on("change", (event: Event): Update => {
+            if (!event.target) {
+              return dontSend();
+            }
+            const combineQuery = (event.target as HTMLInputElement).value;
+            if (!isCombineQueryKind(combineQuery)) {
+              console.error("Invalid combine query", combineQuery);
+              return dontSend();
+            }
+            return {
+              kind: "SetCombineQuery",
+              index,
+              path,
+              combineQueryKind: combineQuery,
+            };
+          }),
+        ],
+        [],
+        choices
+      ),
+    ]
+  );
 }
 
 function renderQueryBuilder(
   query: Query | Duration,
   index: number,
   path: QueryPath[]
-): RenderedWithEvents {
+): HtmlNode<Update> {
   switch (query.kind) {
     case "And": {
-      return renderer`
-<div class="indent">${renderQueryBuilder(query.left, index, [
-        ...path,
-        "Left",
-      ])}</div>
-<div>${renderAndOrNotChoices("And", index, path)}</div>
-<div class="indent">${renderQueryBuilder(query.right, index, [
-        ...path,
-        "Right",
-      ])}</div>
-`;
+      return div(
+        [],
+        [],
+        [
+          div(
+            [],
+            [class_("indent")],
+            [renderQueryBuilder(query.left, index, [...path, "Left"])]
+          ),
+          div([], [], [renderAndOrNotChoices("And", index, path)]),
+          div(
+            [],
+            [class_("indent")],
+            [renderQueryBuilder(query.right, index, [...path, "Right"])]
+          ),
+        ]
+      );
     }
     case "Or": {
-      return renderer`
-<div class="indent">${renderQueryBuilder(query.left, index, [
-        ...path,
-        "Left",
-      ])}</div>
-<div>${renderAndOrNotChoices("Or", index, path)}</div>
-<div class="indent">${renderQueryBuilder(query.right, index, [
-        ...path,
-        "Right",
-      ])}</div>
-`;
+      return div(
+        [],
+        [],
+        [
+          div(
+            [],
+            [class_("indent")],
+            [renderQueryBuilder(query.left, index, [...path, "Left"])]
+          ),
+          div([], [], [renderAndOrNotChoices("Or", index, path)]),
+          div(
+            [],
+            [class_("indent")],
+            [renderQueryBuilder(query.right, index, [...path, "Right"])]
+          ),
+        ]
+      );
     }
     case "Not": {
-      return renderer`
-<div>${renderAndOrNotChoices("Not", index, path)}</div>
-<div class="indent">${renderQueryBuilder(query.query, index, [
-        ...path,
-        "DirectChild",
-      ])}</div>
-`;
+      return div(
+        [],
+        [],
+        [
+          div([], [], [renderAndOrNotChoices("Not", index, path)]),
+          div(
+            [],
+            [class_("indent")],
+            [renderQueryBuilder(query.query, index, [...path, "DirectChild"])]
+          ),
+        ]
+      );
     }
     case "Filter": {
       return renderFilterBuilder(query, index, path);
@@ -445,129 +476,147 @@ export function renderQueryExplaination(query: Query | Duration): string {
   }
 }
 
-function renderPeriod(entries: JournalEntry[]): string {
+function renderPeriod(entries: JournalEntry[]): HtmlNode<never> {
   const earliestDay = entries[0];
   const latestDay = entries[entries.length - 1];
-  return `<div>A period of ${entries.length} days, from ${dayToString(
-    earliestDay.day
-  )} to ${dayToString(latestDay.day)}</div>`;
+  return div(
+    [],
+    [],
+    [
+      text(
+        `A period of ${entries.length} days, from ${dayToString(
+          earliestDay.day
+        )} to ${dayToString(latestDay.day)}</div>`
+      ),
+    ]
+  );
 }
 
-function renderPeriods(periods: JournalEntry[][]): string {
+function renderPeriods(periods: JournalEntry[][]): HtmlNode<never> {
   if (periods.length === 0) {
-    return "No matching periods.";
+    return text("No matching periods.");
   }
-  return periods.map(renderPeriod).join("\n");
+  return div([], [], periods.map(renderPeriod));
 }
 
-function renderAddDurationQueryButton(): RenderedWithEvents {
-  const id = "add-duration-query";
-  return {
-    body: `
-<div class="pure-u-1-5">
-  <button id="${id}">Add new duration query</button>
-</div>
-    `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "click",
-        callback: (): Sent => {
-          return sendUpdate({
-            kind: "AddNewDurationQuery",
-          });
-        },
-      },
-    ],
-  };
+function renderAddDurationQueryButton(): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      button(
+        [
+          on("click", (): Update => {
+            return {
+              kind: "AddNewDurationQuery",
+            };
+          }),
+        ],
+        [attribute("id", "add-duration-query")],
+        [text("Add new duration query")]
+      ),
+    ]
+  );
 }
 
-function renderAddFilterQueryButton(): RenderedWithEvents {
-  const id = "add-filter-query";
-  return {
-    body: `
-<div class="pure-u-1-5">
-  <button id="${id}">Add new filter query</button>
-</div>
-    `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "click",
-        callback: (): Sent => {
-          return sendUpdate({
-            kind: "AddNewFilterQuery",
-          });
-        },
-      },
-    ],
-  };
+function renderAddFilterQueryButton(): HtmlNode<Update> {
+  return div(
+    [],
+    [],
+    [
+      button(
+        [
+          on("click", (): Update => {
+            return {
+              kind: "AddNewFilterQuery",
+            };
+          }),
+        ],
+        [attribute("id", "add-filter-query")],
+        [text("Add new filter query")]
+      ),
+    ]
+  );
 }
 
 function renderInteractiveFilterQuery(
   query: Query,
   index: number,
   state: AppState
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const path: QueryPath[] = [];
 
   const days = runQuery(query, state.journalEntries).length;
-  return renderer`
-<div class="filter-query">
-  <div>${renderQueryBuilder(query, index, [])}</div>
-  <div class="pure-g">
-    <div class="pure-u-1-5"></div>
-    <div class="pure-u-3-5 filter-query-result">A total of <strong>${days} days</strong></div>
-    <div class="pure-u-1-5"></div>
-  </div>
-  <div class="pure-g">
-    <div class="pure-u-1-5"></div>
-    ${renderRemoveQueryButton(index, path)}
-    <div class="pure-u-1-5"></div>
-  </div>
-</div>`;
+
+  return div(
+    [],
+    [class_("filter-query")],
+    [
+      div([], [], [renderQueryBuilder(query, index, [])]),
+      div(
+        [],
+        [],
+        [
+          div(
+            [],
+            [class_("filter-query-result")],
+            [
+              text("A total of "),
+              strong([], [], [text(days.toString())]),
+              text(" days"),
+            ]
+          ),
+        ]
+      ),
+      div([], [], [renderRemoveQueryButton(index, path)]),
+    ]
+  );
 }
 
 function renderInteractiveDuplicationQuery(
   query: Duration,
   index: number,
   state: AppState
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const path: QueryPath[] = [];
   const periods = renderPeriods(runDurationQuery(query, state.journalEntries));
 
-  return renderer`
-<div class="duration-query">
-  <div>${renderQueryBuilder(query, index, [])}</div>
-  <div class="pure-g">
-    <div class="pure-u-1-5"></div>
-    <div class="pure-u-3-5 duration-query-result">Matching periods: <strong> ${periods}</strong></div>
-    <div class="pure-u-1-5"></div>
-  </div>
-  <div class="pure-g">
-    <div class="pure-u-1-5"></div>
-    ${renderRemoveQueryButton(index, path)}
-    <div class="pure-u-1-5"></div>
-  </div>
-</div>`;
+  return div(
+    [],
+    [class_("duration-query")],
+    [
+      div([], [], [renderQueryBuilder(query, index, [])]),
+      div(
+        [],
+        [],
+        [
+          div(
+            [],
+            [class_("duration-query-result")],
+            [text("Matching periods: "), periods]
+          ),
+        ]
+      ),
+      div([], [], [renderRemoveQueryButton(index, path)]),
+    ]
+  );
 }
 
 export function renderInteractiveQueries(
   state: AppState,
   settings: Settings
-): RenderedWithEvents {
-  const results: RenderedWithEvents[] = [];
+): HtmlNode<Update> {
+  const results: HtmlNode<Update>[] = [];
 
   let index: number = 0;
 
-  results.push(renderer`
-<div class="pure-g add-query-buttons">
-  <div class="pure-u-1-5"></div>
-  ${renderAddFilterQueryButton()}
-  <div class="pure-u-1-5"></div>
-  ${renderAddDurationQueryButton()}
-  <div class="pure-u-1-5"></div>
-</div>`);
+  results.push(
+    div(
+      [],
+      [class_("add-query-buttons")],
+      [renderAddFilterQueryButton(), renderAddDurationQueryButton()]
+    )
+  );
 
   for (const query of settings.queries) {
     switch (query.kind) {
@@ -587,8 +636,5 @@ export function renderInteractiveQueries(
     index++;
   }
 
-  return {
-    body: results.map((result) => result.body).join(""),
-    eventListeners: results.map((result) => result.eventListeners).flat(),
-  };
+  return div([], [], results);
 }

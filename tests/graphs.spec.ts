@@ -1,9 +1,9 @@
 import { expect } from "@playwright/test";
 import { test } from "./fixtures";
-import { expectActiveTab } from "./helpers";
+import { changeTab, expectActiveTab } from "./helpers";
 
 test("the default graph is daily bar", async ({ context, page }) => {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
 
   await expect(await page.locator("#graph-selection")).toHaveValue("DAILY_BAR");
 
@@ -18,7 +18,7 @@ test("the user can click a daily bar to go to that day", async ({
   context,
   page,
 }) => {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
 
   await expect(await page.locator("#graph-selection")).toHaveValue("DAILY_BAR");
 
@@ -38,8 +38,7 @@ test("the user can click a daily bar to go to that day", async ({
 });
 
 test("the user sees some filter information", async ({ context, page }) => {
-  await page.locator('.tab:text("Graphs")').click();
-
+  await changeTab(page, "GRAPH");
   await expectActiveTab(page, "Graphs");
 
   await page.locator("#graph-selection").selectOption("Interactive queries");
@@ -54,7 +53,7 @@ test("the user sees some filter information", async ({ context, page }) => {
 });
 
 test("the user sees some duration information", async ({ context, page }) => {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
   await expectActiveTab(page, "Graphs");
 
   await page.locator("#graph-selection").selectOption("Interactive queries");

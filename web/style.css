@@ -1,3 +1,28 @@
+/* fallback */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 400;
+  src: url(fonts/MaterialSymbolsOutlined.woff2) format("woff2");
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
 :root {
   --mood-unfilled: gray;
   --mood-1: #c2fbc8;
@@ -12,73 +37,334 @@
   --pico-color-yellow-150: #e8d600;
   --pico-color-green-150: #77ef3d;
   --pico-color-red-500: #d93526;
+  --pico-background-color: #13171f;
+  --pico-transition: 0.2s ease-in-out;
+  --pico-form-element-spacing-vertical: 0.75rem;
+  --pico-form-element-spacing-horizontal: 1rem;
+  --text-color: white;
+
+  --pico-text-selection-color: rgba(1, 170, 255, 0.1875);
+  --pico-muted-color: #7b8495;
+  --pico-muted-border-color: #202632;
+  --pico-primary: #01aaff;
+  --pico-primary-background: #0172ad;
+  --pico-primary-border: var(--pico-primary-background);
+  --pico-primary-underline: rgba(1, 170, 255, 0.5);
+  --pico-primary-hover: #79c0ff;
+  --pico-primary-hover-background: #017fc0;
+  --pico-primary-hover-border: var(--pico-primary-hover-background);
+  --pico-primary-hover-underline: var(--pico-primary-hover);
+  --pico-primary-focus: rgba(1, 170, 255, 0.375);
+  --pico-primary-inverse: #fff;
+  --pico-secondary: #969eaf;
+  --pico-secondary-background: #525f7a;
+  --pico-secondary-border: var(--pico-secondary-background);
+  --pico-secondary-underline: rgba(150, 158, 175, 0.5);
+  --pico-secondary-hover: #b3b9c5;
+  --pico-secondary-hover-background: #5d6b89;
+  --pico-secondary-hover-border: var(--pico-secondary-hover-background);
+  --pico-secondary-hover-underline: var(--pico-secondary-hover);
+  --pico-secondary-focus: rgba(144, 158, 190, 0.25);
+  --pico-secondary-inverse: #fff;
+  --pico-contrast: #dfe3eb;
+  --pico-contrast-background: #eff1f4;
+  --pico-contrast-border: var(--pico-contrast-background);
+  --pico-contrast-underline: rgba(223, 227, 235, 0.5);
+  --pico-contrast-hover: #fff;
+  --pico-contrast-hover-background: #fff;
+  --pico-contrast-hover-border: var(--pico-contrast-hover-background);
+  --pico-contrast-hover-underline: var(--pico-contrast-hover);
+  --pico-contrast-focus: rgba(207, 213, 226, 0.25);
+  --pico-contrast-inverse: #000;
+  --pico-form-element-background-color: #1c212c;
+  --pico-form-element-selected-background-color: #2a3140;
+  --pico-form-element-border-color: #2a3140;
+  --pico-form-element-color: #e0e3e7;
+  --pico-form-element-placeholder-color: #8891a4;
+  --pico-form-element-active-background-color: #1a1f28;
+  --pico-form-element-active-border-color: var(--pico-primary-border);
+  --pico-form-element-focus-color: var(--pico-primary-border);
+  --pico-form-element-disabled-opacity: 0.5;
+  --pico-form-element-invalid-border-color: #964a50;
+  --pico-form-element-invalid-active-border-color: #b7403b;
+  --pico-form-element-invalid-focus-color: var(
+    --pico-form-element-invalid-active-border-color
+  );
+  --pico-form-element-valid-border-color: #2a7b6f;
+  --pico-form-element-valid-active-border-color: #16896a;
+  --pico-form-element-valid-focus-color: var(
+    --pico-form-element-valid-active-border-color
+  );
+  --pico-font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --pico-font-family-sans-serif: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif,
+    var(--pico-font-family-emoji);
+  --pico-font-family: var(--pico-font-family-sans-serif);
+  --pico-font-weight: 700;
+
+  --pico-h1-color: #f0f1f3;
+  --pico-h2-color: #e0e3e7;
+  --pico-h3-color: #c2c7d0;
+  --pico-h4-color: #b3b9c5;
+  --pico-h5-color: #a4acba;
+  --pico-h6-color: #8891a4;
+
+  --tab-navigation-z-index: 9000;
 }
 
-body {
-  margin-top: 5vh;
+.row {
+  display: flex;
+  flex-direction: row;
 }
 
-textarea {
-  field-sizing: content;
-  max-height: 500px;
-  padding: 5px;
+.date-controls {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-areas:
+    ". a ."
+    "b b b";
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+  row-gap: 20px;
 }
 
-canvas {
-  background-color: white;
+.back-to-today {
+  grid-area: a;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
 }
 
-.pure-g {
-  margin-top: 1vh;
-  margin-bottom: 1vh;
+.current-day-controls {
+  grid-area: b;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 1fr;
+  justify-items: center;
+  align-items: center;
+  column-gap: 30px;
+  justify-content: center;
 }
 
-.pure-button {
-  background-color: var(--pico-color-zinc-300);
-  color: black;
-  font-size: 2vh;
-  text-wrap: auto;
+.date-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 16px;
+  box-shadow: 0 0 0 5px grey;
 }
 
-.pure-button-active {
-  box-shadow: none;
-  font-weight: bold;
-}
-
-.pure-button:hover,
-.pure-button:active {
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5) inset;
-  background-image: none;
-  border-color: white;
+.date-arrow:active {
+  box-shadow: 1px 1px 0 2px grey;
 }
 
 .current-day {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 10px;
+}
+
+.hours-slept-last-night-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mood-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.prompt-button-container {
+  display: grid;
+  flex-direction: column;
+  height: 100px;
+}
+
+.prompt-button-container > label {
+  margin-top: auto;
+  text-align: center;
+}
+
+.circle-container {
+  display: inline-block;
+  height: 80px;
+  width: 80px;
+  cursor: pointer;
+}
+
+.svg-circle.circle-active > svg > .outer-circle {
+  stroke: white;
+  animation: bump 150ms ease-in;
+}
+
+.svg-circle.circle-active > svg > .inner-circle {
+  animation: inner-bump 150ms ease-in;
+}
+
+.svg-circle:hover > svg > .outer-circle {
+  stroke: rgba(255, 255, 255, 0.8);
+  animation: slight-bump 150ms ease-in;
+}
+
+.svg-circle.circle-active:hover > svg > .outer-circle {
+  stroke: white;
+  /* animation: slight-bump 150ms ease-in; */
+  animation: bump 150ms ease-in;
+}
+
+.svg-circle.circle-active > svg > .inner-circle {
+  animation: inner-bump 150ms ease-in;
+}
+
+@keyframes slight-bump {
+  0% {
+    r: 14;
+  }
+
+  5% {
+    r: 15;
+  }
+  100% {
+    r: 14;
+  }
+}
+
+@keyframes bump {
+  0% {
+    r: 14;
+  }
+
+  5% {
+    r: 12;
+  }
+  100% {
+    r: 14;
+  }
+}
+
+@keyframes inner-bump {
+  0% {
+    stroke-width: 0;
+  }
+
+  5% {
+    stroke-width: 1;
+  }
+  50% {
+    stroke-width: 2;
+  }
+  100% {
+    stroke-width: 0;
+  }
+}
+
+.circle-0 {
+  background-color: var(--mood-unfilled);
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: block !important;
+  padding: 0px;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
+  cursor: pointer;
+}
+
+.circle-1 {
+  background-color: var(--mood-1);
+  height: 20px;
+  width: 20px;
+  border: 0px;
+  border-radius: 50%;
+  display: block !important;
+  padding: 0px;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  cursor: pointer;
+}
+
+.circle-2 {
+  background-color: var(--mood-2);
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  z-index: 1;
+  border: 0px;
+
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  cursor: pointer;
+}
+
+.circle-3 {
+  background-color: var(--mood-3);
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  display: block !important;
+  z-index: 1;
+  border: 0px;
+
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  cursor: pointer;
+}
+
+.circle-4 {
+  background-color: var(--mood-4);
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  padding: 0px;
+  z-index: 1;
+  border: 0px;
+
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  padding: 5px;
+  cursor: pointer;
 }
 
 .mood-color-indicator-0 {
-  border-right: 5px solid var(--mood-unfilled);
-  height: 100%;
+  background-color: var(--mood-unfilled);
 }
 
 .mood-color-indicator-1 {
-  border-right: 5px solid var(--mood-1);
-  height: 100%;
+  background-color: var(--mood-1);
 }
 
 .mood-color-indicator-2 {
-  border-right: 5px solid var(--mood-2);
-  height: 100%;
+  background-color: var(--mood-2);
 }
 
 .mood-color-indicator-3 {
-  border-right: 5px solid var(--mood-3);
-  height: 100%;
+  background-color: var(--mood-3);
 }
 
 .mood-color-indicator-4 {
-  border-right: 5px solid var(--mood-4);
-  height: 100%;
+  background-color: var(--mood-4);
 }
 
 .mood-color-button-0 {
@@ -106,19 +392,38 @@ canvas {
 .tabs {
   position: fixed;
   bottom: 0;
+  left: 0;
   width: 100vw;
   margin-bottom: 0vh;
+  display: flex;
+  font-weight: bold;
+  z-index: var(--tab-navigation-z-index);
 }
 
-.tabs > .pure-g > .pure-button {
-  font-weight: bold;
+.tab {
+  font-family: sans-serif;
+  flex: 1;
+  background-color: var(--pico-color-zinc-300);
+  color: black;
+  font-size: 2vh;
+  text-wrap: auto;
+  letter-spacing: normal;
+  word-spacing: normal;
+  vertical-align: top;
+  text-rendering: auto;
+  padding: 0.5em 1em;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  border-width: 1px;
+  border-style: solid;
 }
 
 .active-tab {
-  border-color: var(--pico-color-sand-50);
   background-color: var(--pico-color-zinc-150);
-  border-width: 2px;
-  border-style: solid;
 }
 
 .slider {
@@ -189,26 +494,13 @@ canvas {
   cursor: pointer;
 }
 
-.daily-bar-row {
-  height: 100px;
-  padding-top: 30px;
-}
-
-.daily-bar-row.daily-bar-journal {
-  height: 50px;
-}
-
-.daily-bar-colors {
-  display: inline-block;
-}
-
 .daily-bar-prompt {
   padding-left: 30px;
   width: 200px;
   display: inline-block;
   overflow: auto;
   margin: 0;
-  padding-bottom: 40px;
+  text-align: center;
 }
 
 .daily-bar-detailed {
@@ -354,7 +646,7 @@ canvas {
 }
 
 .spacer {
-  height: 59.4923px;
+  height: 100%;
 }
 
 .export-data {
@@ -371,33 +663,37 @@ canvas {
 
 .tab-content {
   padding-bottom: 10vh;
-  min-height: 100vh;
-}
-
-.tabs > .pure-g {
-  margin-bottom: 0px;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .prompt > h4 {
   text-align: center;
 }
 
-.daily-bar-graph-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 70vh;
+.new-journal-entry-containter {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 5fr 1fr;
 }
 
 .save-log-entry-button {
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .event-log {
   max-height: 30vh;
   overflow: scroll;
-  border: 1px solid blue;
+  border: 1px solid var(--pico-form-element-valid-border-color);
+  padding: 20px;
+  font-size: 20px;
 }
 
 #download-settings,
@@ -407,21 +703,6 @@ canvas {
 
 #update-import-from-text {
   padding: 2px;
-}
-
-.day-selector-form > .pure-g {
-  flex-direction: row;
-  display: flex;
-  align-items: center;
-}
-
-.day-selector-form > .pure-g > input {
-  width: 80%;
-  margin-bottom: 0px;
-}
-
-.day-selector-form > .pure-g > label {
-  text-align: center;
 }
 
 .indent {
@@ -450,10 +731,6 @@ canvas {
     padding-left: 15vw;
     padding-right: 15vw;
   }
-
-  .tabs {
-    width: 70vw;
-  }
 }
 
 @media (max-width: 400px) {
@@ -472,13 +749,6 @@ canvas {
   .daily-bar-sleep,
   .daily-bar {
     width: 20px;
-  }
-
-  #previous-day,
-  #next-day,
-  .active-tab {
-    padding-left: 1px;
-    padding-right: 1px;
   }
 
   .daily-bar-prompt {

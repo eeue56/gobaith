@@ -7,9 +7,11 @@
     "@capacitor/android": "^7.4.2",
     "@capacitor/cli": "^7.4.2",
     "@capacitor/core": "^7.4.2",
+    "@eeue56/coed": "^0.4.0",
     "chart.js": "^4.5.0"
   },
   "devDependencies": {
+    "@eeue56/gweld": "^1.1.2",
     "@playwright/test": "^1.54.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.1.0",
@@ -17,18 +19,18 @@
     "electron": "^37.2.4",
     "esbuild": "^0.25.8",
     "express": "^5.1.0",
-    "typescript": "^5.8.3",
-    "@eeue56/gweld": "^1.0.1"
+    "typescript": "^5.8.3"
   },
   "scripts": {
     "serve-backend": "npm run build && ts-node server/host.ts",
     "serve-frontend": "npx @eeue56/gweld web/ 8000",
-    "build": "esbuild --bundle src/index.ts --outfile=web/out.js && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js",
+    "build": "esbuild --bundle src/index.ts --outfile=web/out.js --minify && esbuild --bundle src/service-worker.ts --outfile=web/service-worker.js --minify",
     "build-electron": "cd electron && npm run build",
     "test": "tsc --noEmit && npx playwright test",
     "test-electron": "IS_ELECTRON=true npx playwright test --workers=1",
     "test-android": "IS_ANDROID=true npx playwright test --workers=1 --project 'chromium - system time'",
-    "test-all": "npm run test && npm run test-electron && npm run test-android",
+    "test-web": "npm run test && npm run test-electron",
+    "test-everything": "npm run test-web && npm run test-android",
     "generate": "ts-node src/utils/data.ts",
     "generate-screenshots": "ts-node screenshots/generate_screenshots.ts"
   },

@@ -1,7 +1,7 @@
 import { cleanData } from "./cleaners";
 import { initIndexedDB, syncStateAndSettingsToDatabase } from "./database";
 import * as defaultObjects from "./defaultObjects";
-import { initializeEntryForDay } from "./logic/journal";
+import { importDataFromJson, initializeEntryForDay } from "./logic/journal";
 import { EqualTo } from "./logic/query/types";
 import {
   loadAppStateFromServer,
@@ -12,9 +12,8 @@ import {
   AppState,
   DebuggingInfo,
   LATEST_DATABASE_VERSION,
-  RenderBroadcast,
+  Model,
   Settings,
-  TypedBroadcastChannel,
   Update,
 } from "./types";
 import {
@@ -29,13 +28,9 @@ import {
   updateSleepValue,
 } from "./updaters";
 import { dateToDay, nextDay, previousDay } from "./utils/dates";
-
-const renderChannel: TypedBroadcastChannel<RenderBroadcast> =
-  TypedBroadcastChannel<RenderBroadcast>("render");
+import { storeDebuggingInfo } from "./utils/localstorage";
 
 export let hasBackend = false;
-export let appState = defaultObjects.appState;
-export let settings = defaultObjects.settings;
 export let debuggingInfo: DebuggingInfo = {
   kind: "DebuggingInfo",
   eventLog: [],
@@ -46,7 +41,9 @@ export let debuggingInfo: DebuggingInfo = {
  *
  * Limit healthcheck request to 50ms, so that it doesn't block for too long when the server is down.
  *
- * If the status code is anything other than 200, return false
+ * Return true if the response is 200 with a text body of `ok`
+ *
+ * If the status code is anything other than 200, return false.
  * If the server is unhealthy, then the server-worker won't try to read/write to the server
  */
 async function hasHeartbeat(): Promise<boolean> {
@@ -58,23 +55,16 @@ async function hasHeartbeat(): Promise<boolean> {
     if (healthcheck.status !== 200) {
       return false;
     }
+
+    if ((await healthcheck.text()) !== "ok") {
+      return false;
+    }
   } catch (error) {
     // no backend
     return false;
   }
 
   return true;
-}
-
-export function sendRerender(state: AppState, settings: Settings): number {
-  if (!renderChannel) return -1;
-  renderChannel.postMessage({
-    kind: "rerender",
-    state: state,
-    settings: settings,
-    debuggingInfo: debuggingInfo,
-  });
-  return 0;
 }
 
 async function syncStateAndSettings(
@@ -90,113 +80,34 @@ async function syncStateAndSettings(
   }
 }
 
-export async function update(event: MessageEvent<Update>): Promise<number> {
-  const data = event.data;
-  console.info("UpdateHandler: received event", data.kind);
+export async function update(message: Update, model: Model): Promise<Model> {
+  console.info("UpdateHandler: received event", message.kind);
 
   // just ignore debug info if it doesn't exist, to avoid breaking the update loop
   try {
-    debuggingInfo.eventLog.push(data.kind);
+    debuggingInfo.eventLog.push(message.kind);
+    storeDebuggingInfo(debuggingInfo);
   } catch (error) {
     console.error(
       "UpdateHandler: unable to add event",
-      data.kind,
+      message.kind,
       "to the event log due to",
       error
     );
   }
 
-  switch (data.kind) {
-    case "AddJournalEntry": {
-      appState = addJournalEntry(data.day, data.text, data.time, appState);
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "UpdatePromptValue": {
-      appState = updatePromptValue(
-        data.entry,
-        data.prompt,
-        data.newValue,
-        appState
-      );
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "RemoveSettings": {
-      settings = {
-        kind: "Settings",
-        currentPills: [],
-        queries: [...defaultObjects.DEFAULT_QUERIES],
-        databaseVersion: LATEST_DATABASE_VERSION,
-      };
-      console.log("UpdateHandler: Removed settings");
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "RemoveAppState": {
-      appState = {
-        kind: "AppState",
-        currentTab: "JOURNAL",
-        currentGraph: "DAILY_BAR",
-        journalEntries: [],
-        day: dateToDay(new Date()),
-        databaseVersion: LATEST_DATABASE_VERSION,
-      };
-      console.log("UpdateHandler: Removed state");
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "UpdateSleepValue": {
-      const entry = data.entry;
-      const value = data.value;
-      appState = updateSleepValue(entry, value, appState);
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "UpdateCurrentTab": {
-      appState = updateCurrentTab(data.tab, appState);
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "UpdateCurrentGraph": {
-      appState = updateCurrentGraph(data.graphName, appState);
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "AddPill": {
-      const modified = addPill(
-        data.pillName,
-        appState.journalEntries,
-        settings
-      );
-
-      appState.journalEntries = modified.entries;
-      settings = modified.settings;
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "ResetCurrentDay": {
-      appState.day = dateToDay(new Date());
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
-    }
-    case "UpdateCurrentDay": {
-      const direction = data.direction;
-
-      const day =
-        direction === "Next"
-          ? nextDay(appState.day)
-          : previousDay(appState.day);
-
+  switch (message.kind) {
+    case "SetModel": {
+      const day = model.appState.day;
       const initResult = initializeEntryForDay(
         day,
-        appState.journalEntries,
-        settings
+        message.model.appState.journalEntries,
+        message.model.settings
       );
 
       switch (initResult.kind) {
         case "CreatedNewEntry": {
-          appState.journalEntries.push(initResult.entry);
+          message.model.appState.journalEntries.push(initResult.entry);
           break;
         }
         case "AlreadyFound": {
@@ -204,28 +115,136 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
         }
       }
 
-      appState.day = day;
+      message.model.appState.day = day;
 
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      return { appState: message.model.appState, settings: model.settings };
+    }
+    case "AddJournalEntry": {
+      const appState = addJournalEntry(
+        message.day,
+        message.text,
+        message.time,
+        model.appState
+      );
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
+    }
+    case "UpdatePromptValue": {
+      const appState = updatePromptValue(
+        message.entry,
+        message.prompt,
+        message.newValue,
+        model.appState
+      );
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
+    }
+    case "RemoveSettings": {
+      const settings: Settings = {
+        kind: "Settings",
+        currentPills: [],
+        queries: [...defaultObjects.DEFAULT_QUERIES],
+        databaseVersion: LATEST_DATABASE_VERSION,
+      };
+      console.log("UpdateHandler: Removed settings");
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return { appState: model.appState, settings: settings };
+    }
+    case "RemoveAppState": {
+      const day = dateToDay(new Date());
+      const entries = initializeEntryForDay(day, [], model.settings);
+      const appState: AppState = {
+        kind: "AppState",
+        currentTab: "JOURNAL",
+        currentGraph: "DAILY_BAR",
+        journalEntries: [entries.entry],
+        day: day,
+        databaseVersion: LATEST_DATABASE_VERSION,
+      };
+      console.log("UpdateHandler: Removed state");
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
+    }
+    case "UpdateSleepValue": {
+      const entry = message.entry;
+      const value = message.value;
+      const appState = updateSleepValue(entry, value, model.appState);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
+    }
+    case "UpdateCurrentTab": {
+      const appState = updateCurrentTab(message.tab, model.appState);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
+    }
+    case "UpdateCurrentGraph": {
+      const appState = updateCurrentGraph(message.graphName, model.appState);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
+    }
+    case "AddPill": {
+      const modified = addPill(
+        message.pillName,
+        model.appState.journalEntries,
+        model.settings
+      );
+
+      model.appState.journalEntries = modified.entries;
+      model.settings = modified.settings;
+      await syncStateAndSettings(hasBackend, model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
+    }
+    case "ResetCurrentDay": {
+      model.appState.day = dateToDay(new Date());
+      await syncStateAndSettings(hasBackend, model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
+    }
+    case "UpdateCurrentDay": {
+      const direction = message.direction;
+
+      const day =
+        direction === "Next"
+          ? nextDay(model.appState.day)
+          : previousDay(model.appState.day);
+
+      const initResult = initializeEntryForDay(
+        day,
+        model.appState.journalEntries,
+        model.settings
+      );
+
+      switch (initResult.kind) {
+        case "CreatedNewEntry": {
+          model.appState.journalEntries.push(initResult.entry);
+          break;
+        }
+        case "AlreadyFound": {
+          break;
+        }
+      }
+
+      model.appState.day = day;
+
+      await syncStateAndSettings(hasBackend, model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "GoToSpecificDay": {
-      appState.day = data.entry.day;
-      appState.currentTab = data.tab;
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      model.appState.day = message.entry.day;
+      model.appState.currentTab = message.tab;
+      await syncStateAndSettings(hasBackend, model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "UpdateImportAppState": {
-      appState = cleanData(data.state) as AppState;
+      const appState = cleanData(message.state) as AppState;
       console.log(
         `Imported state with ${appState.journalEntries.length} journal entries`
       );
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
     }
     case "UpdateImportSettings": {
-      for (const pill of data.settings.currentPills) {
-        if (settings.currentPills.includes(pill)) {
+      for (const pill of message.settings.currentPills) {
+        if (model.settings.currentPills.includes(pill)) {
           console.log(
             "Skipping import of pill",
             pill,
@@ -233,118 +252,126 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
           );
           continue;
         }
-        const modified = addPill(pill, appState.journalEntries, settings);
+        const modified = addPill(
+          pill,
+          model.appState.journalEntries,
+          model.settings
+        );
 
-        appState.journalEntries = modified.entries;
-        settings = modified.settings;
+        model.appState.journalEntries = modified.entries;
+        model.settings = modified.settings;
 
         console.log("Imported pill:", pill);
       }
       console.log("Imported settings");
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      await syncStateAndSettings(hasBackend, model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "UpdatePillValue": {
-      appState = updatePillValue(
-        data.entry,
-        data.pillName,
-        data.direction,
-        appState
+      const appState = updatePillValue(
+        message.entry,
+        message.pillName,
+        message.direction,
+        model.appState
       );
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return { appState, settings: model.settings };
     }
     case "UpdatePillOrder": {
-      settings = updatePillOrder(settings, data.pillName, data.direction);
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      const settings = updatePillOrder(
+        model.settings,
+        message.pillName,
+        message.direction
+      );
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return { appState: model.appState, settings };
     }
     case "ReadyToRender": {
-      return sendRerender(appState, settings);
+      return model;
     }
     case "InitializeDay": {
       const initResult = initializeEntryForDay(
-        appState.day,
-        appState.journalEntries,
-        settings
+        model.appState.day,
+        model.appState.journalEntries,
+        model.settings
       );
 
       switch (initResult.kind) {
         case "CreatedNewEntry": {
-          appState.journalEntries.push(initResult.entry);
+          model.appState.journalEntries.push(initResult.entry);
           break;
         }
         case "AlreadyFound": {
           break;
         }
       }
-      return sendRerender(appState, settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "SetDebuggingInfo": {
-      debuggingInfo = data.info;
-      await syncStateAndSettings(hasBackend, appState, settings);
-      return sendRerender(appState, settings);
+      debuggingInfo = message.info;
+      await syncStateAndSettings(hasBackend, model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "SetQueryDuration": {
       const newQueries = updateQuery(
-        data.index,
-        data.path,
-        { kind: "Duration", duration: data.duration },
-        settings.queries
+        message.index,
+        message.path,
+        { kind: "Duration", duration: message.duration },
+        model.settings.queries
       );
-      settings.queries = newQueries;
-      await syncStateAndSettingsToDatabase(appState, settings);
-      return sendRerender(appState, settings);
+      model.settings.queries = newQueries;
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "SetPromptChoice": {
       const newQueries = updateQuery(
-        data.index,
-        data.path,
-        { kind: "Prompt", prompt: data.prompt },
-        settings.queries
+        message.index,
+        message.path,
+        { kind: "Prompt", prompt: message.prompt },
+        model.settings.queries
       );
-      settings.queries = newQueries;
-      await syncStateAndSettingsToDatabase(appState, settings);
-      return sendRerender(appState, settings);
+      model.settings.queries = newQueries;
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "SetComparisonChoice": {
       const newQueries = updateQuery(
-        data.index,
-        data.path,
-        { kind: "Comparison", comparison: data.comparison },
-        settings.queries
+        message.index,
+        message.path,
+        { kind: "Comparison", comparison: message.comparison },
+        model.settings.queries
       );
-      settings.queries = newQueries;
-      await syncStateAndSettingsToDatabase(appState, settings);
+      model.settings.queries = newQueries;
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
 
-      return sendRerender(appState, settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "SetMoodValueChoice": {
       const newQueries = updateQuery(
-        data.index,
-        data.path,
-        { kind: "MoodValue", moodValue: data.moodValue },
-        settings.queries
+        message.index,
+        message.path,
+        { kind: "MoodValue", moodValue: message.moodValue },
+        model.settings.queries
       );
-      settings.queries = newQueries;
-      await syncStateAndSettingsToDatabase(appState, settings);
+      model.settings.queries = newQueries;
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
 
-      return sendRerender(appState, settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "SetCombineQuery": {
       const newQueries = updateQuery(
-        data.index,
-        data.path,
-        { kind: "CombineQuery", combineQueryKind: data.combineQueryKind },
-        settings.queries
+        message.index,
+        message.path,
+        { kind: "CombineQuery", combineQueryKind: message.combineQueryKind },
+        model.settings.queries
       );
-      settings.queries = newQueries;
-      await syncStateAndSettingsToDatabase(appState, settings);
+      model.settings.queries = newQueries;
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
 
-      return sendRerender(appState, settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "AddNewDurationQuery": {
-      settings.queries.splice(0, 0, {
+      model.settings.queries.splice(0, 0, {
         kind: "Duration",
         comparison: EqualTo,
         days: 1,
@@ -355,28 +382,66 @@ export async function update(event: MessageEvent<Update>): Promise<number> {
           value: 1,
         },
       });
-      await syncStateAndSettingsToDatabase(appState, settings);
-      return sendRerender(appState, settings);
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "AddNewFilterQuery": {
-      settings.queries.splice(0, 0, {
+      model.settings.queries.splice(0, 0, {
         kind: "Filter",
         comparison: EqualTo,
         prompt: "Today's feelings of anxiety",
         value: 1,
       });
-      await syncStateAndSettingsToDatabase(appState, settings);
-      return sendRerender(appState, settings);
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
     }
     case "DeleteQuery": {
-      settings.queries.splice(data.index, 1);
-      await syncStateAndSettingsToDatabase(appState, settings);
-      return sendRerender(appState, settings);
+      model.settings.queries.splice(message.index, 1);
+      await syncStateAndSettingsToDatabase(model.appState, model.settings);
+      return { appState: model.appState, settings: model.settings };
+    }
+    case "Noop": {
+      return model;
+    }
+    case "ReadImportedFile": {
+      const imported = await updateImportFile(message.target);
+
+      if (imported === null || typeof imported === "string") {
+        return model;
+      }
+
+      switch (imported.kind) {
+        case "AppState": {
+          return { appState: imported, settings: model.settings };
+        }
+        case "Settings": {
+          return { appState: model.appState, settings: imported };
+        }
+      }
     }
   }
 }
 
-export async function registerUpdateHandler(): Promise<void> {
+async function updateImportFile(
+  target: HTMLInputElement
+): Promise<AppState | Settings | string | null> {
+  if (!target) {
+    return null;
+  }
+
+  if (target.files === null || target.files.length === 0) return null;
+
+  if (target.files[0].name.endsWith(".json")) {
+    const fileContents = await target.files[0].text();
+    return importDataFromJson(fileContents);
+  }
+
+  return null;
+}
+
+export async function fetchModelFromStores(): Promise<Model> {
+  let appState: AppState = defaultObjects.appState;
+  let settings: Settings = defaultObjects.settings;
   const maybeDatabaseRecords = await initIndexedDB();
 
   hasBackend = await hasHeartbeat();
@@ -429,8 +494,5 @@ export async function registerUpdateHandler(): Promise<void> {
     }
   }
 
-  renderChannel.channel.addEventListener("message", update);
-  renderChannel.channel.addEventListener("messageerror", (error) =>
-    console.error("CHANNEL ERROR:", error)
-  );
+  return { appState, settings };
 }

@@ -1,3 +1,4 @@
+import { attribute, canvas, div, HtmlNode } from "@eeue56/coed";
 import {
   Chart,
   Colors,
@@ -11,9 +12,8 @@ import {
   Tooltip,
 } from "chart.js";
 import { getDataPerPrompt } from ".";
-import { JournalEntry, RenderedWithEvents } from "../../types";
+import { JournalEntry } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
-import { renderer } from "../../utils/render";
 
 Chart.register(
   Colors,
@@ -27,16 +27,28 @@ Chart.register(
   Legend
 );
 
-export function renderLineOverview(): RenderedWithEvents {
-  return renderer`
-<div class="pure-g">
-    <div class="pure-u-1-24"></div>
-    <div class="pure-u-22-24">
-        <canvas id="line-overview" width="600" height="800"></canvas>
-    </div>
-     <div class="pure-u-1-24"></div>
-</div>
-`;
+export function renderLineOverview(): HtmlNode<never> {
+  return div(
+    [],
+    [],
+    [
+      div(
+        [],
+        [attribute("height", "500")],
+        [
+          canvas(
+            [],
+            [
+              attribute("id", "line-overview"),
+              attribute("width", "600"),
+              attribute("height", "800"),
+            ],
+            []
+          ),
+        ]
+      ),
+    ]
+  );
 }
 
 export function showLineOverview(

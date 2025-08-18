@@ -1,19 +1,24 @@
 import {
-  Day,
-  Direction,
-  EventHandler,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
-} from "../types";
+  attribute,
+  button,
+  class_,
+  div,
+  HtmlNode,
+  on,
+  small,
+  span,
+  text,
+} from "@eeue56/coed";
+import { Day, Direction, Update } from "../types";
 import {
   dateToDay,
   dayToString,
   isSameDay,
   numberOfDaysBetween,
 } from "../utils/dates";
+import { iconBack, iconForward, iconToday } from "./ui/icons";
 
-export function renderDate(today: Day): RenderedWithEvents {
+export function renderDate(today: Day): HtmlNode<Update> {
   const daysDiff = numberOfDaysBetween(today, dateToDay(new Date()));
   const isToday = isSameDay(dateToDay(new Date()), today);
 
@@ -24,69 +29,67 @@ export function renderDate(today: Day): RenderedWithEvents {
     ? `${-daysDiff} ${daysOrDay} ago`
     : `${daysDiff} ${daysOrDay} ahead`;
 
-  const dayMessage = `<span class="thick">${fancyDateExplainer}</span><br/><small>${dayToString(
-    today
-  )}</small>`;
+  const dayMessage: HtmlNode<never> = div(
+    [],
+    [class_("current-day")],
+    [
+      span([], [class_("thick")], [text(fancyDateExplainer)]),
+      small([], [], [text(dayToString(today))]),
+    ]
+  );
 
-  const backToToday = isToday
-    ? `<div class="pure-u-1-3 spacer"></div>`
-    : `<button title="Return to today's entry" class="pure-button pure-u-1-3" id="reset-day">Back to today</button>`;
+  const backToToday: HtmlNode<Update> = isToday
+    ? div([], [class_("spacer")], [])
+    : button(
+        [on("click", () => resetCurrentDay())],
+        [
+          attribute("title", "Return to today's entry"),
+          attribute("id", "reset-day"),
+          class_("back-to-today"),
+        ],
+        [text("Back to today"), iconToday]
+      );
 
-  const optionalListeners: EventHandler[] = isToday
-    ? []
-    : [
-        {
-          elementId: "reset-day",
-          eventName: "click",
-          callback: () => resetCurrentDay(),
-        },
-      ];
-
-  return {
-    body: `
-<div class="pure-g">
-    <div class="pure-u-1-3"></div>
-    ${backToToday}
-    <div class="pure-u-1-3"></div>
-</div>
-<div class="pure-g">
-    <div class="pure-u-1-3">
-        <div class="pure-g">
-            <div class="pure-u-1-4"></div>
-            <button title="Go to the previous day" class="pure-button pure-u-1-2" id="previous-day">Prev</button>
-            <div class="pure-u-1-4"></div>
-        </div>
-    </div>
-    <p class="pure-u-1-3 current-day">${dayMessage}</p>
-    <div class="pure-u-1-3">
-        <div class="pure-g">
-            <div class="pure-u-1-4"></div>
-            <button title="Go to the next day" class="pure-button pure-u-1-2" id="next-day">Next</button>
-            <div class="pure-u-1-4"></div>
-        </div>
-    </div>
-</div>
-`,
-    eventListeners: [
-      {
-        elementId: "previous-day",
-        eventName: "click",
-        callback: () => updateCurrentDay("Previous"),
-      },
-      {
-        elementId: "next-day",
-        eventName: "click",
-        callback: () => updateCurrentDay("Next"),
-      },
-      ...optionalListeners,
-    ],
-  };
+  return div(
+    [],
+    [attribute("id", "date-containter"), class_("date-controls")],
+    [
+      backToToday,
+      div(
+        [],
+        [class_("current-day-controls")],
+        [
+          button(
+            [on("click", () => updateCurrentDay("Previous"))],
+            [
+              attribute("title", "Go to previous day"),
+              attribute("id", "previous-day"),
+              attribute("name", "previous"),
+              class_("date-arrow"),
+            ],
+            [iconBack]
+          ),
+          dayMessage,
+          button(
+            [on("click", () => updateCurrentDay("Next"))],
+            [
+              attribute("title", "Go to the next day"),
+              attribute("id", "next-day"),
+              attribute("name", "next"),
+              class_("date-arrow"),
+            ],
+            [iconForward]
+          ),
+        ]
+      ),
+    ]
+  );
 }
 
-function resetCurrentDay(): Sent {
-  return sendUpdate({ kind: "ResetCurrentDay" });
+function resetCurrentDay(): Update {
+  return { kind: "ResetCurrentDay" };
 }
 
-function updateCurrentDay(direction: Direction): Sent {
-  return sendUpdate({ kind: "UpdateCurrentDay", direction: direction });
+function updateCurrentDay(direction: Direction): Update {
+  return { kind: "UpdateCurrentDay", direction: direction };
 }

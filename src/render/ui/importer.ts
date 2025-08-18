@@ -1,55 +1,76 @@
-import { importDataFromJson } from "../../logic/journal";
 import {
-  AppState,
-  dontSend,
-  EventHandler,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
-  Settings,
-} from "../../types";
+  attribute,
+  button,
+  class_,
+  div,
+  fieldset,
+  form,
+  h3,
+  HtmlNode,
+  input,
+  label,
+  on,
+  p,
+  text,
+  textarea,
+} from "@eeue56/coed";
+import { importDataFromJson } from "../../logic/journal";
+import { AppState, dontSend, Settings, Update } from "../../types";
 
-export function renderEnterTextToImport(): RenderedWithEvents {
-  const ids: string[] = ["update-import-from-text", "import-from-file"];
-  const eventHandlers: EventHandler[] = [
-    {
-      elementId: ids[0],
-      eventName: "click",
-      callback: () => updateImport(),
-    },
-    {
-      elementId: ids[1],
-      eventName: "change",
-      callback: async (event) => await updateImportFile(event),
-    },
-  ];
+export function renderEnterTextToImport(): HtmlNode<Update> {
+  return form(
+    [],
+    [],
+    [
+      fieldset(
+        [],
+        [],
+        [
+          textarea(
+            [],
+            [
+              attribute("id", "import-text"),
+              class_("import-field"),
+              attribute("placeholder", "Paste JSON here to import it..."),
+            ],
+            []
+          ),
+          button(
+            [on("click", () => updateImport())],
+            [
+              attribute("id", "update-import-from-text"),
+              attribute(
+                "title",
+                "Import JSON. Check the developer console to see success/errors"
+              ),
+            ],
+            [text("Import")]
+          ),
+        ]
+      ),
+      label([], [], [text("Chose a json file to import")]),
+      input<Update>(
+        [
+          on("change", (event) => {
+            if (!event.target) {
+              return dontSend();
+            }
 
-  return {
-    body: `
-<div class="pure-g"/>
-    <div class="pure-u-1-24"></div>
-    <form class="pure-form pure-u-22-24" onsubmit="event.preventDefault(); return false">
-        <fieldset class="pure-g">
-            <textarea id="import-text" class="pure-u-4-5 import-field" placeholder="Paste JSON here to import it..."></textarea>
-            <button title="Import JSON. Check the developer console to see success/errors" class="pure-button pure-button-primary pure-u-1-5" id="${ids[0]}">Import</button>
-          </fieldset>
-          <label for="${ids[1]}">Choose a json file to import</label>
-          <input type="file" id="${ids[1]}" accept=".json"></input>
-    </form>
-    <div class="pure-u-1-24"></div>
-</div>
+            return {
+              kind: "ReadImportedFile",
+              target: event.target as HTMLInputElement,
+            };
+          }),
+        ],
+        [attribute("type", "file"), attribute("accept", ".json")]
+      ),
 
-<div class="pure-g">
-    <div class="pure-u-1-3"></div>
-    <p class="pure-u-1-3" id="import-status"></p>
-    <div class="pure-u-1-3"></div>
-</div>
-`,
-    eventListeners: eventHandlers,
-  };
+      div([], [], [p([], [attribute("id", "import-status")], [])]),
+    ]
+  );
 }
 
-function importer(imported: string | AppState | Settings): Sent {
+function importer(imported: string | AppState | Settings): Update {
   if (typeof imported === "string") {
     console.error("Failed to import", imported);
     return dontSend();
@@ -57,21 +78,21 @@ function importer(imported: string | AppState | Settings): Sent {
 
   switch (imported.kind) {
     case "AppState": {
-      return sendUpdate({
+      return {
         kind: "UpdateImportAppState",
         state: imported,
-      });
+      };
     }
     case "Settings": {
-      return sendUpdate({
+      return {
         kind: "UpdateImportSettings",
         settings: imported,
-      });
+      };
     }
   }
 }
 
-function updateImport(): Sent {
+function updateImport(): Update {
   const textToImport =
     (
       document.getElementById("import-text") as HTMLTextAreaElement
@@ -80,7 +101,7 @@ function updateImport(): Sent {
 
   if (!isJson) {
     console.error("Did not get json in importer");
-    return dontSend();
+    return { kind: "Noop" };
   }
 
   const imported = importDataFromJson(textToImport);
@@ -88,52 +109,34 @@ function updateImport(): Sent {
   return importer(imported);
 }
 
-async function updateImportFile(event: Event): Promise<Sent> {
-  if (!event.target) {
-    return dontSend();
-  }
-  const context = event.target as HTMLInputElement;
-  if (context.files === null || context.files.length === 0) return dontSend();
-
-  if (context.files[0].name.endsWith(".json")) {
-    const fileContents = await context.files[0].text();
-    const imported = importDataFromJson(fileContents);
-    return importer(imported);
-  }
-
-  return dontSend();
-}
-
 function renderExported(
   title: string,
   downloadText: string,
   id: string,
   data: AppState | Settings
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const stringData = JSON.stringify(data);
-  return {
-    body: `
-  <div class="pure-g"/>
-    <div class="pure-u-1-5"></div>
-    <div class="pure-form pure-u-3-5">
-        <h3>${title}</h3>
-        <textarea id="textarea-${id}" class="pure-u-1 export-data">${stringData}</textarea>
-        <button class="pure-button" id="${id}">${downloadText}</button>
-    </div>
-    <div class="pure-u-1-5"></div>
-  </div>
-  `,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "click",
-        callback: (): Sent => downloadJson(data),
-      },
-    ],
-  };
+
+  return div(
+    [],
+    [],
+    [
+      h3([], [], [text(title)]),
+      textarea(
+        [],
+        [attribute("id", `textarea-${id}`), class_("export-data")],
+        [text(stringData)]
+      ),
+      button(
+        [on("click", () => downloadJson(data))],
+        [attribute("id", id)],
+        [text(downloadText)]
+      ),
+    ]
+  );
 }
 
-export function renderExportedSettings(settings: Settings): RenderedWithEvents {
+export function renderExportedSettings(settings: Settings): HtmlNode<Update> {
   const id = "download-settings";
   return renderExported(
     "Exported settings (including pills)",
@@ -143,7 +146,7 @@ export function renderExportedSettings(settings: Settings): RenderedWithEvents {
   );
 }
 
-export function renderExportedState(state: AppState): RenderedWithEvents {
+export function renderExportedState(state: AppState): HtmlNode<Update> {
   const id = "download-state";
   return renderExported(
     "Exported state (including journal entries)",
@@ -153,7 +156,7 @@ export function renderExportedState(state: AppState): RenderedWithEvents {
   );
 }
 
-function downloadJson(object: AppState | Settings): Sent {
+function downloadJson(object: AppState | Settings): Update {
   let fileName;
   switch (object.kind) {
     case "AppState": {

@@ -1,11 +1,12 @@
+import { class_, div, h2, HtmlNode, text } from "@eeue56/coed";
 import {
   AppState,
   depression,
   elevation,
   JournalEntry,
   psychosis,
-  RenderedWithEvents,
   Settings,
+  Update,
 } from "../../types";
 import { dayToString } from "../../utils/dates";
 import {
@@ -19,19 +20,25 @@ import {
 export function renderPeriod(
   evaluator: (entry: JournalEntry) => number,
   period: JournalEntry[]
-): string {
+): HtmlNode<never> {
   const beginning = dayToString(period[0].day);
   const end = dayToString(period[period.length - 1].day);
   const average = averageOfPeriod(period, evaluator);
-  return `
-<div class="pure-u-1-1">${period.length} days from ${beginning} to ${end}, average of ${average}</div>
-    `;
+  return div(
+    [],
+    [],
+    [
+      text(
+        `${period.length} days from ${beginning} to ${end}, average of ${average}`
+      ),
+    ]
+  );
 }
 
 export function renderBipolarPeriods(
   state: AppState,
   settings: Settings
-): RenderedWithEvents {
+): HtmlNode<Update> {
   const numberOfDays = state.journalEntries.length;
 
   const elevatedPeriods = getElevatedPeriods(state.journalEntries);
@@ -52,32 +59,38 @@ export function renderBipolarPeriods(
   );
   const totalAmountPsychotic = sumPeriod(psychoticPeriods);
 
-  return {
-    body: `
-<div class="bipolar-periods">
-    <div class="pure-g">
-        <h2 class="pure-u-1-1">${numberOfDays} days of tracking.</h2>
-    </div>
-    <div class="pure-g">
-        <h2 class="pure-u-1-1">Elevated periods</h2>
-        <div class="pure-u-1-1">A total of ${totalAmountElevated} days.</div>
-        ${renderedElevatedPeriods.join("")}
-    </div>
-
-    <div class="pure-g">
-        <h2 class="pure-u-1-1">Depressed periods</h2>
-        <div class="pure-u-1-1">A total of ${totalAmountDepressed} days.</div>
-        ${renderedDepressedPeriods.join("")}
-    </div>
-
-    <div class="pure-g">
-        <h2 class="pure-u-1-1">Psychotic periods</h2>
-        <div class="pure-u-1-1">A total of ${totalAmountPsychotic} days.</div>
-        ${renderedPsychoticPeriods.join("")}
-    </div>
-
-</div>
-`,
-    eventListeners: [],
-  };
+  return div(
+    [],
+    [class_("bipolar-periods")],
+    [
+      div([], [], [text(`${numberOfDays} days of tracking.`)]),
+      div(
+        [],
+        [],
+        [
+          h2([], [], [text("Elevated periods")]),
+          div([], [], [text(`A total of ${totalAmountElevated} days.`)]),
+          ...renderedElevatedPeriods,
+        ]
+      ),
+      div(
+        [],
+        [],
+        [
+          h2([], [], [text("Depressed periods")]),
+          div([], [], [text(`A total of ${totalAmountDepressed} days.`)]),
+          ...renderedDepressedPeriods,
+        ]
+      ),
+      div(
+        [],
+        [],
+        [
+          h2([], [], [text("Psychotic periods")]),
+          div([], [], [text(`A total of ${totalAmountPsychotic} days.`)]),
+          ...renderedPsychoticPeriods,
+        ]
+      ),
+    ]
+  );
 }

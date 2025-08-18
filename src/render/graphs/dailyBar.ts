@@ -1,172 +1,165 @@
+import { attribute, class_, div, HtmlNode, on, span, text } from "@eeue56/coed";
 import { daysBeforeToday as entriesBeforeToday } from "../../logic/journal";
 import {
   AppState,
-  EventHandler,
   JournalEntry,
   Prompt,
   PROMPTS,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
   Settings,
   SHORT_PROMPTS,
+  Update,
 } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
-import { idHash, renderer } from "../../utils/render";
 
-function renderSleepRow(entries: JournalEntry[]): RenderedWithEvents {
-  const bodies: string[] = [];
-  const callbacks: EventHandler[] = [];
+function renderSleepRow(entries: JournalEntry[]): HtmlNode<Update> {
+  const bodies: HtmlNode<Update>[] = [];
 
   for (const entry of entries) {
-    const id = `daily-bar-sleep-goto-${idHash(dayToString(entry.day))}`;
-    callbacks.push({
-      elementId: id,
-      eventName: "click",
-      callback: (): Sent => {
-        return sendUpdate({
-          kind: "GoToSpecificDay",
-          entry: entry,
-          tab: "JOURNAL",
-        });
-      },
-    });
-
     const dayValue = entry.hoursSlept;
 
     bodies.push(
-      `<div title="${dayToString(
-        entry.day
-      )}" class="daily-bar-sleep" style="height: ${
-        (dayValue / 24) * 100
-      }px" id="${id}"></div>`
+      div(
+        [
+          on("click", (): Update => {
+            return {
+              kind: "GoToSpecificDay",
+              entry: entry,
+              tab: "JOURNAL",
+            };
+          }),
+        ],
+        [
+          attribute("title", dayToString(entry.day)),
+          class_("daily-bar-sleep"),
+          attribute("style", `height: ${(dayValue / 24) * 100}px`),
+        ],
+        []
+      )
     );
   }
 
-  return {
-    body: `
-<div class="daily-bar-colors">
-  ${bodies.join("\n")}
-</div>`,
-    eventListeners: callbacks,
-  };
+  return div([], [class_("daily-bar-colors")], bodies);
 }
 
 function renderRowBars(
   prompt: Prompt,
   entries: JournalEntry[]
-): RenderedWithEvents {
-  const bodies: string[] = [];
-  const callbacks: EventHandler[] = [];
+): HtmlNode<Update> {
+  const bodies: HtmlNode<Update>[] = [];
 
   for (const entry of entries) {
-    const id = `daily-bar-prompt-${idHash(prompt)}-goto-${idHash(
-      dayToString(entry.day)
-    )}`;
-    callbacks.push({
-      elementId: id,
-      eventName: "click",
-      callback: (): Sent => {
-        return sendUpdate({
-          kind: "GoToSpecificDay",
-          entry: entry,
-          tab: "JOURNAL",
-        });
-      },
-    });
-
     const dayValue = entry.promptResponses[prompt];
     const title = dayToString(entry.day);
 
     bodies.push(
-      `<div title="${title}" class="daily-bar daily-bar-${dayValue}" id="${id}"></div>`
+      div(
+        [
+          on("click", (): Update => {
+            return {
+              kind: "GoToSpecificDay",
+              entry: entry,
+              tab: "JOURNAL",
+            };
+          }),
+        ],
+        [
+          attribute("title", title),
+          class_("daily-bar"),
+          class_(`daily-bar-${dayValue}`),
+        ],
+        []
+      )
     );
   }
 
-  return {
-    body: `
-<div class="daily-bar-colors">
-  ${bodies.join("\n")}
-</div>`,
-    eventListeners: callbacks,
-  };
+  return div([], [class_("daily-bar-colors")], bodies);
 }
 
-function renderPromptShortName(prompt: Prompt): string {
-  return `<span class="daily-bar-prompt">${SHORT_PROMPTS[prompt]}</span>`;
+function renderPromptShortName(prompt: Prompt): HtmlNode<never> {
+  return span([], [class_("daily-bar-prompt")], [text(SHORT_PROMPTS[prompt])]);
 }
 
 export function renderDailyBar(
   state: AppState,
   settings: Settings
-): RenderedWithEvents {
+): HtmlNode<Update> {
   let entries = entriesBeforeToday(state.day, state.journalEntries);
 
   entries.sort(sortEntriesByDate);
   entries = entries.slice(Math.max(entries.length - 60, 0));
 
-  const promptBodies: string[] = [];
-  let eventListeners: EventHandler[] = [];
+  const promptBodies: HtmlNode<Update>[] = [];
 
   for (const prompt of PROMPTS) {
     const renderedShortName = renderPromptShortName(prompt);
     const rowBars = renderRowBars(prompt, entries);
-    const row = renderer`<div class="daily-bar-row">${renderedShortName}${rowBars}</div>`;
-    promptBodies.push(row.body);
-    eventListeners = eventListeners.concat(row.eventListeners);
+    const row = div(
+      [],
+      [class_("daily-bar-row")],
+      [renderedShortName, rowBars]
+    );
+    promptBodies.push(row);
   }
 
   const sleepRow = renderSleepRow(entries);
-  const sleepParts = renderer`<div class="daily-bar-row">
-    <span class="daily-bar-prompt">Sleep</span>
-    ${sleepRow}
-</div>`;
+  const sleepParts: HtmlNode<Update> = div(
+    [],
+    [class_("daily-bar-row")],
+    [span([], [class_("daily-bar-prompt")], [text("Sleep")]), sleepRow]
+  );
 
-  eventListeners = eventListeners.concat(sleepParts.eventListeners);
-
-  return {
-    body: `<div class="daily-bar-graph-container">${sleepParts.body}
-  ${promptBodies.join("\n")}</div>`,
-    eventListeners: eventListeners,
-  };
+  return div(
+    [],
+    [class_("daily-bar-graph-container")],
+    [sleepParts, ...promptBodies]
+  );
 }
 
 export function renderTotaledDailyBar(
   state: AppState,
   settings: Settings
-): RenderedWithEvents {
+): HtmlNode<Update> {
   let entries = entriesBeforeToday(state.day, state.journalEntries);
   entries.sort(sortEntriesByDate);
 
-  const dailyBars: string[] = [];
+  const dailyBars: HtmlNode<never>[] = [];
   for (const entry of entries) {
-    const innerPromptRendered = [];
+    const innerPromptRendered: HtmlNode<never>[] = [];
     for (const prompt of PROMPTS) {
       const dayValue = entry.promptResponses[prompt];
       const promptClass = `daily-bar-total-${SHORT_PROMPTS[prompt]}`;
 
       const height = ((dayValue - 1) / 4) * 70;
 
-      innerPromptRendered.push(`
-<div style="height: ${height}px;" class="daily-bar-total ${promptClass}"></div>
-`);
+      innerPromptRendered.push(
+        div(
+          [],
+          [
+            class_("daily-bar-total"),
+            class_(promptClass),
+            attribute("style", `height: ${height}px`),
+          ],
+          []
+        )
+      );
     }
 
     const title = dayToString(entry.day);
-    const content = innerPromptRendered.join("");
     dailyBars.push(
-      `<div title="${title}" class="daily-bar-total-bar">${content}</div>`
+      div(
+        [],
+        [attribute("title", title), class_("daily-bar-total-bar")],
+        innerPromptRendered
+      )
     );
   }
 
-  return {
-    body: `
-<div class="daily-bar-total-row">
-    <span class="daily-bar-total-prompt"> Extremeness </span>
-    <div class="daily-bar-total-colors">
-        ${dailyBars.join("\n")}
-    </div>
-</div>`,
-    eventListeners: [],
-  };
+  return div(
+    [],
+    [class_("daily-bar-total-row")],
+    [
+      span([], [class_("daily-bar-total-prompt")], [text("Extremeness")]),
+      div([], [class_("daily-bar-total-colors")], dailyBars),
+    ]
+  );
 }

@@ -1,0 +1,102 @@
+.import-tab-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
+  height: 60vh;
+}
+
+.import-tab-content > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: normal;
+  width: 100%;
+}
+
+.settings-tab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 10px;
+}
+
+.pill-entry-container {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  grid-template-rows: 1fr;
+  justify-content: center;
+  align-items: center;
+}
+
+.daily-bar-graph-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 70vh;
+}
+
+.daily-bar-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding-top: 30px;
+  vertical-align: middle;
+}
+
+.daily-bar-row.daily-bar-journal {
+  height: 50px;
+}
+
+.daily-bar-colors {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  justify-content: center;
+  column-gap: 10px;
+}
+
+#graph-selection {
+  align-self: center;
+
+  --pico-outline-width: 0.0625rem;
+  --pico-background-color: var(--pico-form-element-background-color);
+  --pico-border-color: var(--pico-form-element-border-color);
+  --pico-color: var(--pico-form-element-color);
+  --pico-box-shadow: none;
+  border: var(--pico-border-width) solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  outline: 0;
+  background-color: var(--pico-background-color);
+  box-shadow: var(--pico-box-shadow);
+  color: var(--pico-color);
+  font-weight: 400;
+  transition: background-color var(--pico-transition),
+    border-color var(--pico-transition), color var(--pico-transition),
+    box-shadow var(--pico-transition);
+  padding-right: calc(var(--pico-form-element-spacing-horizontal) + 1.5rem);
+  padding-left: var(--pico-form-element-spacing-horizontal);
+  padding-inline-start: var(--pico-form-element-spacing-horizontal);
+  padding-inline-end: calc(
+    var(--pico-form-element-spacing-horizontal) + 1.5rem
+  );
+  background-image: var(--pico-icon-chevron);
+  background-position: center right 0.75rem;
+  background-size: 1rem auto;
+  background-repeat: no-repeat;
+  letter-spacing: normal;
+  word-spacing: normal;
+  vertical-align: top;
+  text-rendering: auto;
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  padding: var(--pico-form-element-spacing-vertical)
+    var(--pico-form-element-spacing-horizontal);
+}

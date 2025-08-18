@@ -11,10 +11,10 @@ import {
 } from "../src/types";
 import { dateToDay } from "../src/utils/dates";
 import { test } from "./fixtures";
-import { awaitForTitleToChange } from "./helpers";
+import { awaitForTitleToChange, changeTab } from "./helpers";
 
 test("the importer can import state", async ({ context, page }) => {
-  await page.locator('.tab:text("Importer")').click();
+  await changeTab(page, "IMPORT");
 
   const responses = PromptResponses(1, 2, 3, 4, 1);
   const logEntry: LogEntry = { time: new Date(), text: "Imported stuff" };
@@ -49,7 +49,7 @@ test("the importer can import state", async ({ context, page }) => {
     new RegExp(logEntry.text)
   );
 
-  await page.locator('.tab:text("Journal")').click();
+  await changeTab(page, "JOURNAL");
 
   await expect(await page.locator("#hours-slept").innerText()).toContain(
     `${journalEntry.hoursSlept}`
@@ -69,7 +69,7 @@ test("the importer can import state", async ({ context, page }) => {
 
     const promptValue = responses[promptTitle];
     const moodValue = await promptGroup
-      .locator(".pure-button-active")
+      .locator(".prompt-answer.active")
       .getAttribute("data-mood-value");
 
     await expect(moodValue).toEqual(`${promptValue}`);
@@ -77,7 +77,7 @@ test("the importer can import state", async ({ context, page }) => {
 });
 
 test("the importer can import settings", async ({ context, page }) => {
-  await page.locator('.tab:text("Importer")').click();
+  await changeTab(page, "IMPORT");
 
   const settings: Settings = {
     kind: "Settings",

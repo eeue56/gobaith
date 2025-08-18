@@ -1,76 +1,52 @@
-import {
-  AppState,
-  EventHandler,
-  JournalEntry,
-  PROMPTS,
-  RenderedWithEvents,
-  Settings,
-} from "../types";
+import { class_, div, HtmlNode } from "@eeue56/coed";
+import { initializeEntryForDay } from "../logic/journal";
+import { JournalEntry, Model, PROMPTS, Update } from "../types";
 import { isSameDay } from "../utils/dates";
 import { renderDate } from "./date";
 import { renderEnterTimestampMessage, renderLogs } from "./ui/logs";
 import { renderButtonSet } from "./ui/mood";
 import { renderPill } from "./ui/pills";
 import { renderSleepSlider } from "./ui/sleep";
-import { renderTabNavigation } from "./ui/tabs";
 
-export function renderJournal(
-  state: AppState,
-  settings: Settings
-): RenderedWithEvents {
+export function renderJournal(model: Model): HtmlNode<Update> {
   let todaysEntry: JournalEntry | null = null;
   // the last entry is usually the one you're looking at (i.e the current day)
   // so start at the back, then loop downwards to the find the right one
   // It would probably be a better optimization to index elements through day-as-a-key
-  for (let i = state.journalEntries.length - 1; i >= 0; i--) {
-    const entry = state.journalEntries[i];
-    if (isSameDay(state.day, entry.day)) {
+  for (let i = model.appState.journalEntries.length - 1; i >= 0; i--) {
+    const entry = model.appState.journalEntries[i];
+    if (isSameDay(model.appState.day, entry.day)) {
       todaysEntry = entry;
       break;
     }
   }
 
   if (!todaysEntry) {
-    throw "NeedsToInitialize";
+    todaysEntry = initializeEntryForDay(
+      model.appState.day,
+      model.appState.journalEntries,
+      model.settings
+    ).entry;
   }
 
-  const bodies: string[] = [];
-  let eventHandlers: EventHandler[] = [];
-
-  /**
-   * Just a helper to handle body/eventListeners from the rendered content
-   */
-  function pushBodiesAndEventHandlers(renderer: RenderedWithEvents): void {
-    bodies.push(renderer.body);
-    // concat is faster than push(...)
-    eventHandlers = eventHandlers.concat(renderer.eventListeners);
-  }
-
-  pushBodiesAndEventHandlers(renderDate(state.day));
-  pushBodiesAndEventHandlers(renderEnterTimestampMessage(state.day));
-  pushBodiesAndEventHandlers(renderLogs(todaysEntry));
-  pushBodiesAndEventHandlers(renderSleepSlider(todaysEntry));
-
-  for (const prompt of PROMPTS) {
-    pushBodiesAndEventHandlers(renderButtonSet(todaysEntry, prompt));
-  }
-
-  for (const pill of settings.currentPills) {
-    pushBodiesAndEventHandlers(renderPill(todaysEntry, pill));
-  }
-
-  const tabs = renderTabNavigation(state.currentTab);
-  eventHandlers.push(...tabs.eventListeners);
-
-  return {
-    body: `
-<div class="tab-content">
-  <div class="selections">
-      ${bodies.join("\n")}
-  </div>
-</div>
-${tabs.body}
-`,
-    eventListeners: eventHandlers,
-  };
+  return div(
+    [],
+    [class_("tab-content")],
+    [
+      div(
+        [],
+        [class_("selections")],
+        [
+          renderDate(model.appState.day),
+          renderEnterTimestampMessage(model.appState.day),
+          renderLogs(todaysEntry),
+          renderSleepSlider(todaysEntry),
+          ...PROMPTS.map((prompt) => renderButtonSet(todaysEntry, prompt)),
+          ...model.settings.currentPills.map((pill) =>
+            renderPill(todaysEntry, pill)
+          ),
+        ]
+      ),
+    ]
+  );
 }

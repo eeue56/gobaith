@@ -82,8 +82,13 @@ export function updatePillValue(
   return { ...state, journalEntries: state.journalEntries };
 }
 
+export function pushHistoryState(tab: TabName) {
+  window.history.pushState({ tab: tab }, "");
+}
+
 export function updateCurrentTab(tab: TabName, state: AppState): AppState {
   state.currentTab = tab;
+  pushHistoryState(tab);
   return state;
 }
 

@@ -1,51 +1,31 @@
-import { RenderedWithEvents, sendUpdate, Sent } from "../../types";
+import { attribute, button, HtmlNode, on, text } from "@eeue56/coed";
+import { Update } from "../../types";
+import { iconDelete } from "./icons";
 
-export function renderRemoveSettings(): RenderedWithEvents {
-  return {
-    body: `
-<div class="pure-g">
-    <div class="pure-u-1-3"></div>
-    <button class="pure-button pure-u-1-3" id="remove-all-settings"> Remove settings (including pills) data </button>
-    <div class="pure-u-1-3"></div>
-</div>
-`,
-    eventListeners: [
-      {
-        elementId: "remove-all-settings",
-        eventName: "click",
-        callback: updateRemoveSettings,
-      },
-    ],
-  };
+export function renderRemoveSettings(): HtmlNode<Update> {
+  return button(
+    [on("click", updateRemoveSettings)],
+    [attribute("id", "remove-all-settings")],
+    [text("Remove settings (including pills) data"), iconDelete]
+  );
 }
 
-function updateRemoveSettings(): Sent {
-  return sendUpdate({
+function updateRemoveSettings(): Update {
+  return {
     kind: "RemoveSettings",
-  });
-}
-
-export function renderRemoveAppState(): RenderedWithEvents {
-  return {
-    body: `
-<div class="pure-g">
-    <div class="pure-u-1-3"></div>
-    <button class="pure-button pure-u-1-3" id="remove-app-state"> Remove app state (including journal entries) data </button>
-    <div class="pure-u-1-3"></div>
-</div>
-`,
-    eventListeners: [
-      {
-        elementId: "remove-app-state",
-        eventName: "click",
-        callback: updateRemoveAppState,
-      },
-    ],
   };
 }
 
-function updateRemoveAppState(): Sent {
-  return sendUpdate({
+export function renderRemoveAppState(): HtmlNode<Update> {
+  return button(
+    [on("click", updateRemoveAppState)],
+    [attribute("id", "remove-app-state")],
+    [text("Remove app state (including journal entries) data"), iconDelete]
+  );
+}
+
+function updateRemoveAppState(): Update {
+  return {
     kind: "RemoveAppState",
-  });
+  };
 }

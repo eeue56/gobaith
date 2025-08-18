@@ -1,20 +1,22 @@
+import { class_, div, h3, h4, HtmlNode, text } from "@eeue56/coed";
 import { DebuggingInfo, Update } from "../../types";
 
-function renderEventLogEntry(entry: Update["kind"]): string {
-  return `
-<div class="pure-g">
-    <div class="pure-u-1-6"></div>
-        <div class="pure-u-4-6">${entry}</div>
-    <div class="pure-u-1-6"></div>
-</div>`;
+function row<a>(children: HtmlNode<a>[]): HtmlNode<a> {
+  return div([], [class_("row")], children);
 }
 
-export function renderDebuggingInfo(info: DebuggingInfo): string {
-  return `
-<h3>Debugging info</h3>
-<h4>Event log:</h4>
-<div class="event-log">
-    ${info.eventLog.map(renderEventLogEntry).join("\n")}
-</div>
-    `;
+function renderEventLogEntry(entry: Update["kind"]): HtmlNode<never> {
+  return row([div([], [], [text(entry)])]);
+}
+
+export function renderDebuggingInfo(info: DebuggingInfo): HtmlNode<never> {
+  return div(
+    [],
+    [],
+    [
+      h3([], [], [text("Debugging info")]),
+      h4([], [], [text("Event log")]),
+      div([], [class_("event-log")], info.eventLog.map(renderEventLogEntry)),
+    ]
+  );
 }

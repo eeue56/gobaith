@@ -1,3 +1,4 @@
+import { HtmlNode } from "@eeue56/coed";
 import {
   CombineQueryKind,
   Comparison,
@@ -186,6 +187,11 @@ export function isSettings(object: unknown): object is Settings {
   return false;
 }
 
+export type Model = {
+  settings: Settings;
+  appState: AppState;
+};
+
 export type JournalEntry = {
   day: Day;
   pills: Record<string, number>;
@@ -227,7 +233,7 @@ export type GraphName = (typeof GRAPH_NAMES)[number];
 export type GraphRenderer = (
   state: AppState,
   settings: Settings
-) => RenderedWithEvents;
+) => HtmlNode<Update>;
 
 export function isGraphName(str: string): str is GraphName {
   return GRAPH_NAMES.includes(str as GraphName);
@@ -262,6 +268,8 @@ export type RenderedWithEvents = {
  * As a principle: pass as little info to the backend as possible
  */
 export type Update =
+  | { kind: "Noop" }
+  | { kind: "SetModel"; model: Model }
   | {
       kind: "AddJournalEntry";
       time: Date;
@@ -283,6 +291,7 @@ export type Update =
   | { kind: "ResetCurrentDay" }
   | { kind: "UpdateCurrentDay"; direction: Direction }
   | { kind: "GoToSpecificDay"; tab: TabName; entry: JournalEntry }
+  | { kind: "ReadImportedFile"; target: HTMLInputElement }
   | { kind: "UpdateImportAppState"; state: AppState }
   | { kind: "UpdateImportSettings"; settings: Settings }
   | {
@@ -340,16 +349,8 @@ type SentConstructors = "Sent" | "Noop";
 
 export type Sent = SentConstructors | Promise<SentConstructors>;
 
-export function dontSend(): Sent {
-  return "Noop";
-}
-
-export function sendUpdate(update: Update): Sent {
-  navigator.serviceWorker.startMessages();
-  const renderChannel = TypedBroadcastChannel<Update>("render");
-  renderChannel.postMessage(update);
-
-  return "Sent";
+export function dontSend(): Update {
+  return { kind: "Noop" };
 }
 
 export type Direction = "Next" | "Previous";

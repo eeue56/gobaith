@@ -1,14 +1,14 @@
 import { expect } from "@playwright/test";
 import { test } from "./fixtures";
-import { expectActiveTab } from "./helpers";
+import { changeTab, expectActiveTab } from "./helpers";
 
 test("the user adds a pill", async ({ context, page }) => {
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
 
   await page.locator("#new-pill-entry").fill("Paracetamol 100mg");
   await page.locator("#add-pill").click();
 
-  await page.locator('.tab:text("Journal")').click();
+  await changeTab(page, "JOURNAL");
   await expect(await page.locator(".journal-pill")).toHaveCount(1);
   await expect(await page.locator(".journal-pill").first()).toContainText(
     "Paracetamol 100mg"
@@ -19,18 +19,18 @@ test("the user removes settings (including pills)", async ({
   context,
   page,
 }) => {
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
 
   await page.locator("#new-pill-entry").fill("Paracetamol 100mg");
   await page.locator("#add-pill").click();
 
-  await page.locator('.tab:text("Journal")').click();
+  await changeTab(page, "JOURNAL");
   await expect(await page.locator(".journal-pill")).toHaveCount(1);
 
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
   await page.locator("#remove-all-settings").click();
 
-  await page.locator('.tab:text("Journal")').click();
+  await changeTab(page, "JOURNAL");
   await expect(await page.locator(".journal-pill")).toHaveCount(0);
 });
 
@@ -38,12 +38,12 @@ test("the user removes app state (including journals)", async ({
   context,
   page,
 }) => {
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
 
   await page.locator("#remove-app-state").click();
 
   await expectActiveTab(page, "Journal");
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
 
   // there should only be one day's worth of bars (today's)
   await expect(await page.locator(".daily-bar")).toHaveCount(5);
@@ -53,13 +53,13 @@ test("the user removes app state (including journals)", async ({
 });
 
 test("the debug log contains events triggered", async ({ context, page }) => {
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
 
   await expect(await page.locator(".event-log").innerText()).toEqual(
-    "ReadyToRender\nUpdateCurrentTab"
+    "UpdateCurrentTab"
   );
 
-  await page.locator('.tab:text("Journal")').click();
+  await changeTab(page, "JOURNAL");
 
   {
     // Go back one day
@@ -73,14 +73,13 @@ test("the debug log contains events triggered", async ({ context, page }) => {
   for (const group of promptGroups) {
     const responseButton = await group.locator(".prompt-answer").nth(2);
     responseButton.click();
-    await expect(responseButton).toHaveClass(/pure-button-active/);
+    await expect(responseButton).toHaveClass(/active/);
   }
 
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
 
   await expect(await page.locator(".event-log").innerText()).toEqual(
     `
-ReadyToRender
 UpdateCurrentTab
 UpdateCurrentTab
 UpdateCurrentDay

@@ -56,8 +56,8 @@ export const test = base.extend<Page, BrowserContext>({
 
     if (baseURL?.endsWith("8013")) {
       const BACKEND_STORE_DIRECTORY = "backend-state";
-      await rm(`${BACKEND_STORE_DIRECTORY}/state.json`);
-      await rm(`${BACKEND_STORE_DIRECTORY}/settings.json`);
+      await rm(`${BACKEND_STORE_DIRECTORY}/state.json`, { force: true });
+      await rm(`${BACKEND_STORE_DIRECTORY}/settings.json`, { force: true });
     }
     await page.goto(baseURL || "");
     await awaitForTitleToChange(page);

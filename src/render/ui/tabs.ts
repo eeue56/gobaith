@@ -1,14 +1,21 @@
 import {
-  AppState,
-  DebuggingInfo,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
-  Settings,
-  TabName,
-} from "../../types";
-import { renderer } from "../../utils/render";
+  attribute,
+  button,
+  class_,
+  div,
+  h2,
+  HtmlNode,
+  on,
+  text,
+} from "@eeue56/coed";
+import { DebuggingInfo, Model, TabName, Update } from "../../types";
 import { renderDebuggingInfo } from "./debugger";
+import {
+  iconAnalytics,
+  iconSettings,
+  iconTrackChanges,
+  iconUpload,
+} from "./icons";
 import {
   renderEnterTextToImport,
   renderExportedSettings,
@@ -17,100 +24,92 @@ import {
 import { renderAddPill, renderPillOrder } from "./pills";
 import { renderRemoveAppState, renderRemoveSettings } from "./settings";
 
-function renderTabTitle(title: string): string {
-  return `
-<div class="pure-g">
-  <div class="pure-u-1-3"></div>
-  <div class="pure-u-1-3"><h2 class="tab-title">${title}</h2></div>
-  <div class="pure-u-1-3"></div>
-</div>
-  `;
+function renderTabTitle(title: string): HtmlNode<never> {
+  return div([], [], [h2([], [class_("tab-title")], [text(title)])]);
+}
+
+export function getTabButtonId(tabName: TabName): string {
+  switch (tabName) {
+    case "JOURNAL": {
+      return "journal-tab-button";
+    }
+    case "IMPORT": {
+      return "import-tab-button";
+    }
+    case "GRAPH": {
+      return "graph-tab-button";
+    }
+    case "SETTINGS": {
+      return "settings-tab-button";
+    }
+  }
 }
 
 function renderTabChoice(
   currentTab: TabName,
   choice: TabName,
-  label: string
-): RenderedWithEvents {
-  if (choice === currentTab) {
-    return {
-      body: `
-<button class="pure-button active-tab pure-u-1-4 tab">${label}</button>
-`,
-      eventListeners: [],
-    };
-  }
-  const id = `tab-button-${label}`;
-  return {
-    body: `
-<button class="pure-button pure-u-1-4 tab" id="${id}">${label}</button>
-`,
-    eventListeners: [
-      {
-        elementId: id,
-        eventName: "click",
-        callback: () => updateCurrentTab(choice),
-      },
+  label: string,
+  icon: HtmlNode<never>
+): HtmlNode<Update> {
+  return button(
+    [on("click", () => updateCurrentTab(choice))],
+    [
+      ...(choice === currentTab ? [class_("active-tab")] : []),
+      class_("tab"),
+      attribute("id", getTabButtonId(choice)),
     ],
-  };
+    [text(label), icon]
+  );
 }
 
-export function renderTabNavigation(currentTab: TabName): RenderedWithEvents {
+export function renderTabNavigation(currentTab: TabName): HtmlNode<Update> {
   const tabs = [
-    renderTabChoice(currentTab, "JOURNAL", "Journal"),
-    renderTabChoice(currentTab, "GRAPH", "Graphs"),
-    renderTabChoice(currentTab, "IMPORT", "Importer"),
-    renderTabChoice(currentTab, "SETTINGS", "Settings"),
+    renderTabChoice(currentTab, "JOURNAL", "Journal", iconTrackChanges),
+    renderTabChoice(currentTab, "GRAPH", "Graphs", iconAnalytics),
+    renderTabChoice(currentTab, "IMPORT", "Importer", iconUpload),
+    renderTabChoice(currentTab, "SETTINGS", "Settings", iconSettings),
   ];
 
-  const tabViews = tabs.map((tab) => tab.body);
-  const eventListeners = tabs.map((tab) => tab.eventListeners).flat();
-
-  return {
-    body: `
-<div class="tabs">
-    <div class="pure-g">
-      ${tabViews.join("\n")}
-    </div>
-</div>
-`,
-    eventListeners: eventListeners,
-  };
+  return div([], [class_("tabs")], tabs);
 }
 
-export function renderImport(
-  state: AppState,
-  settings: Settings
-): RenderedWithEvents {
-  return renderer`
-<div class="tab-content">
-  ${renderTabTitle("Import and export data")}
-  ${renderEnterTextToImport()}
-  ${renderExportedSettings(settings)}
-  ${renderExportedState(state)}
-</div>
-${renderTabNavigation(state.currentTab)}
-`;
+export function renderImport(model: Model): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("tab-content")],
+    [
+      div(
+        [],
+        [class_("import-tab-content")],
+        [
+          renderTabTitle("Import and export data"),
+          renderEnterTextToImport(),
+          renderExportedSettings(model.settings),
+          renderExportedState(model.appState),
+        ]
+      ),
+    ]
+  );
 }
 
 export function renderSettings(
-  state: AppState,
-  settings: Settings,
+  model: Model,
   info: DebuggingInfo
-): RenderedWithEvents {
-  return renderer`
-<div class="tab-content">
-  ${renderTabTitle("Settings")}
-  ${renderRemoveSettings()}
-  ${renderRemoveAppState()}
-  ${renderPillOrder(settings)}
-  ${renderAddPill()}
-  ${renderDebuggingInfo(info)}
-</div>
-${renderTabNavigation(state.currentTab)}
-`;
+): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("tab-content"), class_("settings-tab-content")],
+    [
+      renderTabTitle("Settings"),
+      renderRemoveSettings(),
+      renderRemoveAppState(),
+      renderPillOrder(model.settings),
+      renderAddPill(),
+      renderDebuggingInfo(info),
+    ]
+  );
 }
 
-function updateCurrentTab(tab: TabName): Sent {
-  return sendUpdate({ kind: "UpdateCurrentTab", tab: tab });
+function updateCurrentTab(tab: TabName): Update {
+  return { kind: "UpdateCurrentTab", tab: tab };
 }

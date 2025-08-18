@@ -1,15 +1,23 @@
 import {
+  attribute,
+  class_,
+  div,
+  h4,
+  HtmlNode,
+  label,
+  on,
+  text,
+} from "@eeue56/coed";
+import {
   JournalEntry,
   MOOD_VALUES,
   moodStateFromValue,
   MoodValue,
   Prompt,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
+  Update,
 } from "../../types";
-import { dayToString } from "../../utils/dates";
 import { idHash } from "../../utils/render";
+import { getCircleMoodIcon } from "./icons";
 
 function hoverText(moodValue: MoodValue): string {
   switch (moodValue) {
@@ -24,83 +32,79 @@ function hoverText(moodValue: MoodValue): string {
   }
 }
 
+function renderMoodState(
+  moodValue: MoodValue,
+  activeNumber: MoodValue,
+  entry: JournalEntry,
+  prompt: Prompt
+): HtmlNode<Update> {
+  const moodText = moodStateFromValue(moodValue);
+  const isActive = activeNumber === moodValue;
+  const activeClass = isActive ? `circle-active` : "";
+
+  const elementId = idHash(
+    encodeURI(`update-prompt-value-${prompt}-${moodValue}`)
+  );
+
+  const hover = hoverText(moodValue);
+  const icon = getCircleMoodIcon(moodValue);
+
+  return div(
+    [],
+    [class_("prompt-button-container"), class_(isActive ? "active" : "")],
+    [
+      div(
+        [
+          on("click", () => {
+            return updateMoodState(entry, prompt, moodValue);
+          }),
+        ],
+        [
+          class_("circle-container"),
+          class_(isActive ? "active" : ""),
+          class_(activeClass),
+          attribute("id", elementId),
+          attribute("title", hover),
+          attribute("data-mood-value", moodValue.toString()),
+          class_("prompt-answer"),
+          class_("svg-circle"),
+        ],
+        [icon]
+      ),
+      label([], [attribute("for", elementId)], [text(moodText)]),
+    ]
+  );
+}
+
 export function renderButtonSet(
   entry: JournalEntry,
   prompt: Prompt
-): RenderedWithEvents {
-  const uniquePromptGroupId = idHash(
-    dayToString(entry.day) + encodeURI(prompt)
-  );
+): HtmlNode<Update> {
   const activeNumber = entry.promptResponses[prompt];
 
-  function renderMoodState(number: MoodValue): RenderedWithEvents {
-    const text = moodStateFromValue(number);
-    const isActive = activeNumber === number;
-    const activeClass = isActive
-      ? `pure-button-active mood-color-button-${number}`
-      : "";
+  const moodStates = MOOD_VALUES.map((x) =>
+    renderMoodState(x, activeNumber, entry, prompt)
+  );
 
-    const elementId = idHash(
-      encodeURI(`update-prompt-value-${prompt}-${number}`)
-    );
-
-    const hover = hoverText(number);
-
-    return {
-      body: `
-<button title="${hover}" data-mood-value="${number}" class="pure-button pure-u-5-24 prompt-answer ${activeClass}" id="${elementId}">${text}</button>
-`,
-      eventListeners: [
-        {
-          elementId: elementId,
-          eventName: "click",
-          callback: () => {
-            console.log("DEBUG: calling update mode state", {
-              entry,
-              prompt,
-              number,
-            });
-            return updateMoodState(entry, prompt, number);
-          },
-        },
-      ],
-    };
-  }
-
-  const moodStates = MOOD_VALUES.map((x) => renderMoodState(x));
-  const moodStateViews = moodStates.map(({ body }) => body);
-  const moodStateEventListners = moodStates
-    .map(({ eventListeners }) => eventListeners)
-    .flat();
-
-  return {
-    body: `
-<div id="${uniquePromptGroupId}" class="prompt-group">
-    <div class="pure-g">
-        <div class="pure-u-1-5"></div>
-        <div class="pure-u-3-5 prompt"><h4>${prompt}</h4></div>
-        <div class="pure-u-1-5"></div>
-    </div>
-    <div class="pure-button-group" role="group" aria-label="...">
-        <div class="pure-u-2-24 prompt-side"><div class="mood-color-indicator-${activeNumber}"></div></div>
-        ${moodStateViews.join("\n")}
-        <div class="pure-u-2-24 prompt-side"></div>
-    </div>
-</div>
-    `,
-    eventListeners: moodStateEventListners,
-  };
+  return div(
+    [],
+    [class_("prompt-group")],
+    [
+      div([], [class_("prompt")], [h4([], [], [text(prompt)])]),
+      div([], [class_("mood-group")], moodStates),
+    ]
+  );
 }
 
 function updateMoodState(
   entry: JournalEntry,
   prompt: Prompt,
   value: MoodValue
-): Sent {
-  return sendUpdate({
+): Update {
+  return {
     kind: "UpdatePromptValue",
     entry,
     prompt,
     newValue: value,
-  });
+  };
 }

@@ -1,45 +1,43 @@
 import {
+  attribute,
+  booleanAttribute,
+  HtmlNode,
+  on,
+  option,
+  select,
+  text,
+} from "@eeue56/coed";
+import {
   AppState,
   dontSend,
   GRAPH_NAMES,
   GraphName,
   isGraphName,
-  RenderedWithEvents,
-  sendUpdate,
-  Sent,
+  Update,
 } from "../../types";
 
-function renderChoice(graphKey: GraphName, state: AppState): string {
-  const selectedText = graphKey === state.currentGraph ? "selected" : "";
-  return `
-<option value="${graphKey}" ${selectedText}>${graphKey}</option>
-`;
-}
-
-export function renderGraphChoices(state: AppState): RenderedWithEvents {
-  const choices = GRAPH_NAMES.map((key) => renderChoice(key, state)).join("\n");
-
-  return {
-    body: `
-<div class="pure-g">
-    <div class="pure-u-1-5"></div>
-    <select class="pure-u-3-5" id='graph-selection'>
-        ${choices}
-    </select>
-    <div class="pure-u-1-5"></div>
-</div>
-`,
-    eventListeners: [
-      {
-        eventName: "change",
-        elementId: "graph-selection",
-        callback: (event: Event) => updateCurrentGraph(event),
-      },
+function renderChoice(graphKey: GraphName, state: AppState): HtmlNode<never> {
+  return option(
+    [],
+    [
+      attribute("value", graphKey),
+      booleanAttribute("selected", graphKey === state.currentGraph),
     ],
-  };
+    [text(graphKey)]
+  );
 }
 
-function updateCurrentGraph(event: Event): Sent {
+export function renderGraphChoices(state: AppState): HtmlNode<Update> {
+  const choices = GRAPH_NAMES.map((key) => renderChoice(key, state));
+
+  return select(
+    [on("change", updateCurrentGraph)],
+    [attribute("id", "graph-selection")],
+    choices
+  );
+}
+
+function updateCurrentGraph(event: Event): Update {
   if (!event.target) {
     return dontSend();
   }
@@ -49,8 +47,8 @@ function updateCurrentGraph(event: Event): Sent {
     return dontSend();
   }
 
-  return sendUpdate({
+  return {
     kind: "UpdateCurrentGraph",
     graphName: selectedGraph as GraphName,
-  });
+  };
 }
