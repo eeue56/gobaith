@@ -4,7 +4,7 @@ A flexible mental health tracker for developers.
 
 Many other trackers exist. This is mine. I have used it for a long time (multiple years) and have open sourced it for others to use and adapt as they need.
 
-*Non-developers probably should look at other existing tracker apps, rather than using this one. There's lots on the app stores.* This tracker comes with flexiblity at a cost in terms of how easy it is to use.
+_Non-developers probably should look at other existing tracker apps, rather than using this one. There's lots on the app stores._ This tracker comes with flexiblity at a cost in terms of how easy it is to use.
 
 You are expected to modify the tracking to adapt to your needs. The default tracking is suitable for those with mood disorders, or psychotic disorders.
 
@@ -14,19 +14,26 @@ Some screenshots based on generated data (no real human's tracking, see the [gen
 
 <details open>
 
-| Page | Screenshot |
-|------|------------|
-| The daily tracker | ![](./screenshots/images/daily_tracker.png) |
-| A summary of mood periods | ![](./screenshots/images/graph_bipolar_periods.png) |
-| Daily bar overview, with clickable indicators | ![](./screenshots/images/graph_daily_bar.png) |
-| An interactive line chart of moods | ![](./screenshots/images/graph_line_overview.png) |
-| Spiderweb graph to compare moods | ![](./screenshots/images/graph_spiderweb.png) |
-| A combined representation of the extremes of all moods | ![](./screenshots/images/graph_totaled_bar.png) |
-| Interactive query builder for personalised data | ![](./screenshots/images/graph_interactive_queries.png) |
-| Importer | ![](./screenshots/images/importer.png) |
-| Settings | ![](./screenshots/images/settings.png) |
+| Page                                                   | Screenshot                                              |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| The daily tracker                                      | ![](./screenshots/images/daily_tracker.png)             |
+| A summary of mood periods                              | ![](./screenshots/images/graph_bipolar_periods.png)     |
+| Daily bar overview, with clickable indicators          | ![](./screenshots/images/graph_daily_bar.png)           |
+| An interactive line chart of moods                     | ![](./screenshots/images/graph_line_overview.png)       |
+| Spiderweb graph to compare moods                       | ![](./screenshots/images/graph_spiderweb.png)           |
+| A combined representation of the extremes of all moods | ![](./screenshots/images/graph_totaled_bar.png)         |
+| Interactive query builder for personalised data        | ![](./screenshots/images/graph_interactive_queries.png) |
+| Importer                                               | ![](./screenshots/images/importer.png)                  |
+| Settings                                               | ![](./screenshots/images/settings.png)                  |
 
 </details>
+
+## Changelog
+
+| Version | Changes                                                                                                      |
+| ------- | ------------------------------------------------------------------------------------------------------------ |
+| 1.0.0   | Initial public release                                                                                       |
+| 2.0.0   | Rewrite html to use [coed](https://github.com/eeue56/coed) rather than innerHTML magic. Adds Android support |
 
 ## Design principles
 
@@ -58,7 +65,7 @@ Many apps provide notifications specifically for a tracker app. I instead built 
 
 ### Avoid dependencies
 
-A core tool that you use every day should not need constant maintenance to keep running. Therefore this app uses minimal dependencies. The frontend itself only uses Chart.js, and two CSS frameworks (Pico and Pure.css). The backend only uses Express.
+A core tool that you use every day should not need constant maintenance to keep running. Therefore this app uses minimal dependencies. The frontend itself only uses Chart.js, and two CSS frameworks (Pico and Pure.css). The backend only uses Express. Electron and Capacitor are optional dependencies for native desktop and Android apps.
 
 ## Install
 
@@ -70,6 +77,7 @@ npm install
 ## Run
 
 You can run it either:
+
 - Without a backend (which then uses IndexedDB for storage)
 - With a backend (that stores json on-device, and uses IndexedDB in the client for caching)
 - In Electron without a backend (using IndexedDB for storage)
@@ -79,14 +87,13 @@ You can run it either:
 
 ```
 npm run build
-cd web
-python3 -m http.server
+npm run serve-frontend
 ```
 
 ### With a backend
 
 ```
-npm run serve
+npm run serve-backend
 ```
 
 ### Electron without a backend
@@ -97,6 +104,24 @@ npm start
 ```
 
 The big benefit of using Electron is that IndexedDB has persistant storage through Electron. It does not when self hosting outside of Electron on localhost without a certification.
+
+### Android
+
+Android support has been added through [capacitorjs](https://capacitorjs.com/).
+
+To build:
+
+```
+npm run prepare-android
+```
+
+To run:
+
+```
+npm run run-android
+```
+
+The test suite also supports Android via Playwright (`npm run test-android`).
 
 ## Tests
 
@@ -157,7 +182,7 @@ I cannot help you with your mental health, but I can help you to help yourself. 
 
 I've licensed this as AGPL, as I hope to help other developers who have had similar experiences. Changes made for your own purposes do not need to be open, but any changes towards end-users (i.e beyond your personal needs) must be openly distributed.
 
-All code in this repo was written by me, a human, except for Pure.css and Pico.css. They have been vendored with their licensing intact. I originally wrote this around 6 years ago, and updated it to TypeScript while preserving the same functionality.
+All code in this repo was written by me, a human, except for those in `android/` which have been generated by Capacitor. They have been vendored with their licensing intact. I originally wrote this around 6 years ago, and updated it to TypeScript while preserving the same functionality.
 
 Any similarities in UI to other products are superficial, either through inspiration or coincidence, and no code or logic has been taken from any other sources.
 

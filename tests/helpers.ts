@@ -27,11 +27,29 @@ export async function getActiveTab(page: Page): Promise<string> {
   return await page.locator(".active-tab").first().innerText();
 }
 
+function matchTabNameToText(tabName: TabName): string {
+  switch (tabName) {
+    case "JOURNAL": {
+      return "Journal";
+    }
+    case "IMPORT": {
+      return "Importer";
+    }
+    case "GRAPH": {
+      return "Graphs";
+    }
+    case "SETTINGS": {
+      return "Settings";
+    }
+  }
+}
+
 export async function expectActiveTab(
   page: Page,
-  tabName: string
+  tabName: TabName
 ): Promise<void> {
+  const tabText = matchTabNameToText(tabName);
   await expect(await page.locator(".active-tab")).toHaveText(
-    new RegExp(tabName)
+    new RegExp(tabText)
   );
 }

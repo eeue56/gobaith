@@ -33,13 +33,13 @@ test("the user can click a daily bar to go to that day", async ({
 
   await barToClick.click();
 
-  await expectActiveTab(page, "Journal");
+  await expectActiveTab(page, "JOURNAL");
   await expect(await page.locator(".current-day").first()).toContainText(title);
 });
 
 test("the user sees some filter information", async ({ context, page }) => {
   await changeTab(page, "GRAPH");
-  await expectActiveTab(page, "Graphs");
+  await expectActiveTab(page, "GRAPH");
 
   await page.locator("#graph-selection").selectOption("Interactive queries");
 
@@ -54,7 +54,7 @@ test("the user sees some filter information", async ({ context, page }) => {
 
 test("the user sees some duration information", async ({ context, page }) => {
   await changeTab(page, "GRAPH");
-  await expectActiveTab(page, "Graphs");
+  await expectActiveTab(page, "GRAPH");
 
   await page.locator("#graph-selection").selectOption("Interactive queries");
 

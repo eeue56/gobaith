@@ -547,25 +547,20 @@ function renderInteractiveFilterQuery(
   const path: QueryPath[] = [];
 
   const days = runQuery(query, state.journalEntries).length;
+  const id = `${pathToKey(index, path)}-interactive-filter`;
 
   return div(
     [],
-    [class_("filter-query")],
+    [class_("filter-query"), attribute("id", id)],
     [
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
-        [],
+        [class_("filter-query-result")],
         [
-          div(
-            [],
-            [class_("filter-query-result")],
-            [
-              text("A total of "),
-              strong([], [], [text(days.toString())]),
-              text(" days"),
-            ]
-          ),
+          text("A total of "),
+          strong([], [], [text(days.toString())]),
+          text(" days"),
         ]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
@@ -581,21 +576,17 @@ function renderInteractiveDuplicationQuery(
   const path: QueryPath[] = [];
   const periods = renderPeriods(runDurationQuery(query, state.journalEntries));
 
+  const id = `${pathToKey(index, path)}-interactive-duplication`;
+
   return div(
     [],
-    [class_("duration-query")],
+    [class_("duration-query"), attribute("id", id)],
     [
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
-        [],
-        [
-          div(
-            [],
-            [class_("duration-query-result")],
-            [text("Matching periods: "), periods]
-          ),
-        ]
+        [class_("duration-query-result")],
+        [text("Matching periods: "), periods]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
     ]

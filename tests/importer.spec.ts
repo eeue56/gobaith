@@ -11,7 +11,7 @@ import {
 } from "../src/types";
 import { dateToDay } from "../src/utils/dates";
 import { test } from "./fixtures";
-import { awaitForTitleToChange, changeTab } from "./helpers";
+import { awaitForTitleToChange, changeTab, expectActiveTab } from "./helpers";
 
 test("the importer can import state", async ({ context, page }) => {
   await changeTab(page, "IMPORT");
@@ -103,6 +103,8 @@ test("the importer can import settings", async ({ context, page }) => {
   await page.reload();
 
   await awaitForTitleToChange(page);
+
+  await expectActiveTab(page, "IMPORT");
 
   await expect(await page.locator("#textarea-download-settings")).toHaveValue(
     /Ibux 200mg/

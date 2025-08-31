@@ -42,7 +42,7 @@ test("the user removes app state (including journals)", async ({
 
   await page.locator("#remove-app-state").click();
 
-  await expectActiveTab(page, "Journal");
+  await expectActiveTab(page, "JOURNAL");
   await changeTab(page, "GRAPH");
 
   // there should only be one day's worth of bars (today's)

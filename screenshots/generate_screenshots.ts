@@ -1,12 +1,14 @@
 import {
   _electron as electron,
   ElectronApplication,
+  expect,
   Page,
 } from "@playwright/test";
 import { mkdtemp } from "fs/promises";
 import { generateRandomMoodValue, isPrompt, Prompt } from "../src/types";
 import { generateData } from "../src/utils/data";
 import { dateToDay } from "../src/utils/dates";
+import { changeTab } from "../tests/helpers";
 
 async function launchElectron(): Promise<{
   electronApp: ElectronApplication;
@@ -54,7 +56,7 @@ export async function addLogEntryForScreenshot(
 }
 
 async function screenshotDailyTracker(page: Page) {
-  await page.locator('.tab:text("Journal")').click();
+  await changeTab(page, "JOURNAL");
 
   const promptGroups = await page.locator(".prompt-group").all();
 
@@ -83,7 +85,7 @@ async function screenshotDailyTracker(page: Page) {
 }
 
 async function screenshotImporter(page: Page) {
-  await page.locator('.tab:text("Importer")').click();
+  await changeTab(page, "IMPORT");
 
   await page.screenshot({
     path: "./screenshots/images/importer.png",
@@ -91,7 +93,7 @@ async function screenshotImporter(page: Page) {
 }
 
 async function screenshotGraphDailyBar(page: Page) {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
 
   await page.screenshot({
     path: "./screenshots/images/graph_daily_bar.png",
@@ -99,7 +101,7 @@ async function screenshotGraphDailyBar(page: Page) {
 }
 
 async function screenshotGraphSpiderweb(page: Page) {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("SPIDERWEB");
 
   // pause so that the animation can finish
@@ -111,7 +113,7 @@ async function screenshotGraphSpiderweb(page: Page) {
 }
 
 async function screenshotGraphLineOverview(page: Page) {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("LINE_OVERVIEW");
 
   // pause so that the animation can finish
@@ -123,7 +125,7 @@ async function screenshotGraphLineOverview(page: Page) {
 }
 
 async function screenshotGraphBipolarPeriods(page: Page) {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("BIPOLAR_PERIODS");
 
   await page.screenshot({
@@ -132,7 +134,7 @@ async function screenshotGraphBipolarPeriods(page: Page) {
 }
 
 async function screenshotGraphTotaledBar(page: Page) {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("TOTALED_DAILY_BAR");
 
   await page.screenshot({
@@ -141,8 +143,12 @@ async function screenshotGraphTotaledBar(page: Page) {
 }
 
 async function screenshotGraphInteractiveQueries(page: Page) {
-  await page.locator('.tab:text("Graphs")').click();
+  await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("Interactive queries");
+
+  await expect(page.locator("#add-filter-query")).toBeVisible();
+  // pause so that the animation can finish
+  await page.waitForTimeout(500);
 
   await page.screenshot({
     path: "./screenshots/images/graph_interactive_queries.png",
@@ -150,7 +156,7 @@ async function screenshotGraphInteractiveQueries(page: Page) {
 }
 
 async function screenshotSettings(page: Page) {
-  await page.locator('.tab:text("Settings")').click();
+  await changeTab(page, "SETTINGS");
 
   await page.screenshot({
     path: "./screenshots/images/settings.png",

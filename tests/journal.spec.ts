@@ -12,7 +12,7 @@ test("it starts on daily page", async ({ context, page }) => {
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");
 
-  await expectActiveTab(page, "Journal");
+  await expectActiveTab(page, "JOURNAL");
 });
 
 test("the user can choose answers to prompts", async ({
@@ -55,10 +55,10 @@ test("the user can choose answers to prompts", async ({
     await page.goto(baseURL || "");
   } else {
     await page.locator('.tab:text("Graphs")').click();
-    await expectActiveTab(page, "Graphs");
+    await expectActiveTab(page, "GRAPH");
 
     await page.locator('.tab:text("Journal")').click();
-    await expectActiveTab(page, "Journal");
+    await expectActiveTab(page, "JOURNAL");
   }
 
   await expect(page).toHaveTitle("Mood tracker");
