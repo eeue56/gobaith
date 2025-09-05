@@ -133,6 +133,8 @@
 }
 
 .back-to-today {
+  --pico-form-element-spacing-vertical: 8px;
+  --pico-form-element-spacing-horizontal: 5px;
   grid-area: a;
   display: flex;
   flex-direction: row;
@@ -647,6 +649,7 @@
 
 .spacer {
   height: 100%;
+  grid-area: a;
 }
 
 .export-data {
