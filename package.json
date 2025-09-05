@@ -33,6 +33,7 @@
     "test-everything": "npm run test-web && npm run test-android",
     "generate": "ts-node src/utils/data.ts",
     "generate-screenshots": "ts-node screenshots/generate_screenshots.ts",
+    "generate-android-screenshots": "IS_ANDROID=true ts-node screenshots/generate_screenshots.ts",
     "prepare-android": "npm run build && npx cap copy android",
     "run-android": "npx cap run android",
     "run-electron": "cd electron && npm start"
