@@ -794,3 +794,44 @@
     margin-left: 20px;
   }
 }
+
+@media (max-width: 450px) {
+  .daily-bar-prompt {
+    padding-left: 5px;
+    width: 80px;
+    font-size: 0.85rem;
+  }
+
+  .daily-bar-row {
+    height: 80px;
+    padding-top: 20px;
+  }
+
+  .daily-bar-colors {
+    column-gap: 5px;
+  }
+
+  .daily-bar-sleep,
+  .daily-bar {
+    width: 8px;
+  }
+
+  .daily-bar-total-prompt {
+    font-size: 16px;
+    padding-left: 10px;
+    padding-bottom: 20px;
+  }
+
+  .daily-bar-total-colors {
+    transform: rotate(-90deg) translate(-100%) translateY(30%);
+    max-width: 80vw;
+  }
+
+  .daily-bar-total {
+    width: 4px;
+  }
+
+  .daily-bar-total-bar {
+    margin: 0 2px;
+  }
+}
