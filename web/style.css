@@ -396,12 +396,10 @@
   bottom: 0;
   left: 0;
   width: 100vw;
-  height: 8vh;
   margin-bottom: 0vh;
   display: flex;
   font-weight: bold;
   z-index: var(--tab-navigation-z-index);
-  pointer-events: none;
 }
 
 .tab {
@@ -410,7 +408,6 @@
   background-color: var(--pico-color-zinc-300);
   color: black;
   font-size: 2vh;
-  pointer-events: auto !important;
   text-wrap: auto;
   letter-spacing: normal;
   word-spacing: normal;
@@ -800,6 +797,8 @@
 @media (max-width: 450px) {
   .tab-content {
     overflow-y: auto;
+    padding-bottom: 20vh;
+    min-height: calc(100dvh - 20vh);
   }
 
   .daily-bar-prompt {
