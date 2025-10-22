@@ -665,10 +665,12 @@
 }
 
 .tab-content {
-  padding-bottom: 15vh;
-  min-height: calc(100dvh - 8vh);
+  padding-bottom: 12vh;
+  max-height: 100dvh;
+  min-height: calc(100dvh - 12vh);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .prompt > h4 {

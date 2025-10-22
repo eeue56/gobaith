@@ -36,8 +36,8 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: 70vh;
-  max-height: calc(100dvh - 20vh);
+  height: 60vh;
+  max-height: calc(100dvh - 25vh);
 }
 
 .daily-bar-row {
