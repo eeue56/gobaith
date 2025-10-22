@@ -665,8 +665,8 @@
 }
 
 .tab-content {
-  padding-bottom: 10vh;
-  min-height: 100dvh;
+  padding-bottom: 15vh;
+  min-height: calc(100dvh - 8vh);
   display: flex;
   flex-direction: column;
 }
