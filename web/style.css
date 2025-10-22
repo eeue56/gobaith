@@ -797,6 +797,7 @@
 @media (max-width: 450px) {
   .tab-content {
     overflow-y: auto;
+    padding-bottom: 20vh;
   }
 
   .daily-bar-prompt {
