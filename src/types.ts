@@ -34,6 +34,20 @@ export function generateRandomMoodValue(): MoodValue {
   return MOOD_VALUES[Math.floor(Math.random() * MOOD_VALUES.length)];
 }
 
+export function generateRandomMoodValueInRange(
+  lower: MoodValue,
+  upper: MoodValue
+): MoodValue {
+  const index = Math.floor(Math.random() * (upper - lower + 1) + lower) - 1;
+  const value = MOOD_VALUES[index];
+
+  if (!isMoodValue(value)) {
+    throw Error(`Value not in range[${lower}, ${upper}] - ${value}`);
+  }
+
+  return value;
+}
+
 /**
  * These are the prompts you'll want to answer each day.
  *
