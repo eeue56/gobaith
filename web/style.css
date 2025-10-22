@@ -723,6 +723,8 @@
 .filter-query-result,
 .duration-query-result {
   text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .add-query-buttons {
@@ -735,6 +737,7 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .filter-builder > div,
