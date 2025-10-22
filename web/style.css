@@ -723,10 +723,27 @@
 .filter-query-result,
 .duration-query-result {
   text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .add-query-buttons {
   margin-top: 50px;
+}
+
+.filter-builder,
+.duration-builder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-builder > div,
+.duration-builder > div {
+  flex: 1 1 auto;
+  min-width: 150px;
 }
 
 @media (min-width: 1000px) {
@@ -757,5 +774,21 @@
   .daily-bar-prompt {
     padding-left: 10px;
     width: 120px;
+  }
+
+  .filter-builder > div,
+  .duration-builder > div {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .filter-query,
+  .duration-query {
+    margin: 20px 10px;
+    padding: 10px;
+  }
+
+  .indent {
+    margin-left: 20px;
   }
 }
