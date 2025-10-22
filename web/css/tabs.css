@@ -37,6 +37,7 @@
   justify-content: space-between;
   align-items: center;
   height: 70vh;
+  max-height: calc(100vh - 150px);
 }
 
 .daily-bar-row {
