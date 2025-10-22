@@ -29,7 +29,7 @@ function renderActiveGraph(
 export function renderGraph(model: Model): HtmlNode<Update> {
   return div(
     [],
-    [class_("tab-content")],
+    [class_("tab-content graphs-tab-content")],
     [
       renderGraphChoices(model.appState),
       renderActiveGraph(model.appState, model.settings),

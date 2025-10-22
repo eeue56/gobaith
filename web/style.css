@@ -795,7 +795,7 @@
 }
 
 @media (max-width: 450px) {
-  .tab-content {
+  .graphs-tab-content {
     overflow-y: auto;
     padding-bottom: 20vh;
     min-height: calc(100dvh - 20vh);
