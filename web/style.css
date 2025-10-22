@@ -396,6 +396,7 @@
   bottom: 0;
   left: 0;
   width: 100vw;
+  height: 8vh;
   margin-bottom: 0vh;
   display: flex;
   font-weight: bold;
@@ -409,7 +410,7 @@
   background-color: var(--pico-color-zinc-300);
   color: black;
   font-size: 2vh;
-  pointer-events: auto;
+  pointer-events: auto !important;
   text-wrap: auto;
   letter-spacing: normal;
   word-spacing: normal;
