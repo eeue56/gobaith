@@ -53,7 +53,7 @@ You, your doctors, and your support network are the only ones who understand you
 
 AI can be used to discuss medical issues, however the person you should really be talking to are licensed professionals. As a result, I have not build AI into this project. It would be trivial to do so if you wanted to, but again, if you are having serious symptoms you should talk to a medical professional.
 
-Additionally, all code in this repo was written by me, a human.
+Additionally, most code in this repo was written by me, a human. In some cases, I've used Github's Copilot Agent mode to fix small styling issues - which are all available to see in the pull request tab. No AI was used for development otherwise.
 
 ### Data ownership
 
