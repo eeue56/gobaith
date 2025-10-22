@@ -795,6 +795,10 @@
 }
 
 @media (max-width: 450px) {
+  .tab-content {
+    overflow-y: auto;
+  }
+
   .daily-bar-prompt {
     padding-left: 5px;
     padding-right: 5px;
