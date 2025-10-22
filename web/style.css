@@ -670,7 +670,6 @@
   min-height: calc(100dvh - 12vh);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .prompt > h4 {
