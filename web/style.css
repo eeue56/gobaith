@@ -798,8 +798,11 @@
 @media (max-width: 450px) {
   .daily-bar-prompt {
     padding-left: 5px;
-    width: 80px;
-    font-size: 0.85rem;
+    padding-right: 5px;
+    width: 90px;
+    font-size: 0.8rem;
+    overflow: visible;
+    word-wrap: break-word;
   }
 
   .daily-bar-row {
@@ -809,6 +812,7 @@
 
   .daily-bar-colors {
     column-gap: 5px;
+    flex: 1;
   }
 
   .daily-bar-sleep,
