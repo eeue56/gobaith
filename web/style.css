@@ -729,6 +729,20 @@
   margin-top: 50px;
 }
 
+.filter-builder,
+.duration-builder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.filter-builder > div,
+.duration-builder > div {
+  flex: 1 1 auto;
+  min-width: 150px;
+}
+
 @media (min-width: 1000px) {
   body {
     padding-left: 15vw;
@@ -757,5 +771,17 @@
   .daily-bar-prompt {
     padding-left: 10px;
     width: 120px;
+  }
+
+  .filter-builder > div,
+  .duration-builder > div {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .filter-query,
+  .duration-query {
+    margin: 20px 10px;
+    padding: 10px;
   }
 }

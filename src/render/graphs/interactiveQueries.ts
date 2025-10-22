@@ -290,7 +290,7 @@ function renderFilterBuilder(
 ): HtmlNode<Update> {
   return div(
     [],
-    [],
+    [class_("filter-builder")],
     [
       renderPromptChoices(query.prompt, index, path),
       renderComparisonChoices(query.comparison, index, path),
@@ -306,7 +306,7 @@ function renderDurationBuilder(
 ): HtmlNode<Update> {
   return div(
     [],
-    [],
+    [class_("duration-builder")],
     [
       renderComparisonChoices(query.comparison, index, path),
       renderDurationDaySelector(query.days, index, path),
