@@ -13,6 +13,9 @@ import { div, HtmlNode, Program, program } from "@eeue56/coed";
 import { fetchModelFromStores, update } from "./update";
 import { pushHistoryState } from "./updaters";
 
+/**
+ * Call the individual render functions
+ */
 function renderBody(model: Model): HtmlNode<Update> {
   switch (model.appState.currentTab) {
     case "JOURNAL": {
