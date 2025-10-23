@@ -1,9 +1,7 @@
-import { showLineOverview } from "./render/graphs/lineOverview";
 import { renderJournal } from "./render/journal";
-import { DebuggingInfo, GraphName, Model, Update } from "./types";
+import { DebuggingInfo, Model, Update } from "./types";
 
 import { renderGraph } from "./render/graphs/index";
-import { showSpiderweb } from "./render/graphs/spiderweb";
 import {
   renderImport,
   renderSettings,
@@ -14,12 +12,6 @@ import { getDebuggingInfo } from "./utils/localstorage";
 import { div, HtmlNode, Program, program } from "@eeue56/coed";
 import { fetchModelFromStores, update } from "./update";
 import { pushHistoryState } from "./updaters";
-
-type ActiveChart = {
-  graphName: GraphName;
-};
-
-let activeChart: ActiveChart | null = null;
 
 function renderBody(model: Model): HtmlNode<Update> {
   switch (model.appState.currentTab) {
@@ -48,33 +40,6 @@ function render(model: Model): HtmlNode<Update> {
     [],
     [renderBody(model), renderTabNavigation(model.appState.currentTab)]
   );
-}
-
-function postRender(model: Model): void {
-  if (model.appState.currentTab === "GRAPH") {
-    if (activeChart !== null) {
-      if (activeChart.graphName !== model.appState.currentGraph) {
-        activeChart = null;
-      }
-    }
-    switch (model.appState.currentGraph) {
-      case "SPIDERWEB": {
-        showSpiderweb(model.appState.day, model.appState.journalEntries);
-        break;
-      }
-      case "LINE_OVERVIEW": {
-        showLineOverview(model.appState.journalEntries);
-        break;
-      }
-      case "DAILY_BAR":
-      case "BIPOLAR_PERIODS":
-      case "TOTALED_DAILY_BAR":
-    }
-  } else {
-    if (activeChart !== null) {
-      activeChart = null;
-    }
-  }
 }
 
 async function tryToPersistStorage(): Promise<void> {
@@ -116,7 +81,6 @@ async function main() {
     view: render,
     update: update,
     root: mainElement,
-    postRender: postRender,
   };
 
   const runningProgram = program(programConfig);

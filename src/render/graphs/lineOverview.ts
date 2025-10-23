@@ -1,4 +1,12 @@
-import { attribute, class_, div, HtmlNode } from "@eeue56/coed";
+import { attribute, class_, div, HtmlNode, text } from "@eeue56/coed";
+import {
+  circle,
+  line,
+  path,
+  rect,
+  svg,
+  text as svgText,
+} from "@eeue56/coed/svg";
 import { getDataPerPrompt } from ".";
 import { JournalEntry } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
@@ -10,7 +18,7 @@ function createLineChartSvg(
     borderColor: string;
   }>,
   labels: string[]
-): string {
+): HtmlNode<never> {
   const width = 1200;
   const height = 600;
   const padding = { top: 60, right: 200, bottom: 60, left: 60 };
@@ -23,15 +31,33 @@ function createLineChartSvg(
 
   const xStep = chartWidth / Math.max(labels.length - 1, 1);
 
-  let gridLines = "";
+  const gridLines: HtmlNode<never>[] = [];
   for (let i = minY; i <= maxY; i++) {
     const y = padding.top + chartHeight - ((i - minY) / yRange) * chartHeight;
-    gridLines += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#e0e0e0" stroke-width="1"/>`;
-    gridLines += `<text x="${padding.left - 10}" y="${y + 5}" text-anchor="end" font-size="14" fill="#666">${i}</text>`;
+    gridLines.push(
+      line([], [
+        attribute("x1", String(padding.left)),
+        attribute("y1", String(y)),
+        attribute("x2", String(width - padding.right)),
+        attribute("y2", String(y)),
+        attribute("stroke", "#e0e0e0"),
+        attribute("stroke-width", "1"),
+      ])
+    );
+    gridLines.push(
+      svgText([], [
+        attribute("x", String(padding.left - 10)),
+        attribute("y", String(y + 5)),
+        attribute("text-anchor", "end"),
+        attribute("font-size", "14"),
+        attribute("fill", "#666"),
+        attribute("textContent", String(i)),
+      ])
+    );
   }
 
-  let paths = "";
-  let legends = "";
+  const paths: HtmlNode<never>[] = [];
+  const legends: HtmlNode<never>[] = [];
   datasets.forEach((dataset, datasetIndex) => {
     const points = dataset.data.map((point, i) => {
       const x = padding.left + i * xStep;
@@ -43,38 +69,119 @@ function createLineChartSvg(
       .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`)
       .join(" ");
 
-    paths += `<path d="${pathData}" fill="none" stroke="${dataset.borderColor}" stroke-width="2"/>`;
+    paths.push(
+      path([], [
+        attribute("d", pathData),
+        attribute("fill", "none"),
+        attribute("stroke", dataset.borderColor),
+        attribute("stroke-width", "2"),
+      ])
+    );
+
     points.forEach(p => {
-      paths += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="${dataset.borderColor}"/>`;
+      paths.push(
+        circle([], [
+          attribute("cx", String(p.x)),
+          attribute("cy", String(p.y)),
+          attribute("r", "3"),
+          attribute("fill", dataset.borderColor),
+        ])
+      );
     });
 
     const legendY = padding.top + datasetIndex * 25;
-    legends += `<rect x="${width - padding.right + 10}" y="${legendY - 10}" width="15" height="15" fill="${dataset.borderColor}"/>`;
-    legends += `<text x="${width - padding.right + 30}" y="${legendY}" font-size="14" fill="#333">${dataset.label}</text>`;
+    legends.push(
+      rect([], [
+        attribute("x", String(width - padding.right + 10)),
+        attribute("y", String(legendY - 10)),
+        attribute("width", "15"),
+        attribute("height", "15"),
+        attribute("fill", dataset.borderColor),
+      ])
+    );
+    legends.push(
+      svgText([], [
+        attribute("x", String(width - padding.right + 30)),
+        attribute("y", String(legendY)),
+        attribute("font-size", "14"),
+        attribute("fill", "#333"),
+        attribute("textContent", dataset.label),
+      ])
+    );
   });
 
-  let xLabels = "";
+  const xLabels: HtmlNode<never>[] = [];
   const labelStep = Math.max(Math.floor(labels.length / 10), 1);
   labels.forEach((label, i) => {
     if (i % labelStep === 0 || i === labels.length - 1) {
       const x = padding.left + i * xStep;
-      xLabels += `<text x="${x}" y="${height - padding.bottom + 20}" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-45, ${x}, ${height - padding.bottom + 20})">${label}</text>`;
+      xLabels.push(
+        svgText([], [
+          attribute("x", String(x)),
+          attribute("y", String(height - padding.bottom + 20)),
+          attribute("text-anchor", "middle"),
+          attribute("font-size", "12"),
+          attribute("fill", "#666"),
+          attribute("transform", `rotate(-45, ${x}, ${height - padding.bottom + 20})`),
+          attribute("textContent", label),
+        ])
+      );
     }
   });
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%">
-    <rect width="${width}" height="${height}" fill="white"/>
-    <text x="${width / 2}" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">Mood Overview Over Time</text>
-    ${gridLines}
-    <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="#333" stroke-width="2"/>
-    <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="#333" stroke-width="2"/>
-    ${paths}
-    ${xLabels}
-    ${legends}
-  </svg>`;
+  return svg(
+    [],
+    [
+      attribute("xmlns", "http://www.w3.org/2000/svg"),
+      attribute("viewBox", `0 0 ${width} ${height}`),
+      attribute("width", "100%"),
+      attribute("height", "100%"),
+    ],
+    [
+      rect([], [attribute("width", String(width)), attribute("height", String(height)), attribute("fill", "white")]),
+      svgText([], [
+        attribute("x", String(width / 2)),
+        attribute("y", "30"),
+        attribute("text-anchor", "middle"),
+        attribute("font-size", "20"),
+        attribute("font-weight", "bold"),
+        attribute("fill", "#333"),
+        attribute("textContent", "Mood Overview Over Time"),
+      ]),
+      ...gridLines,
+      line([], [
+        attribute("x1", String(padding.left)),
+        attribute("y1", String(padding.top)),
+        attribute("x2", String(padding.left)),
+        attribute("y2", String(height - padding.bottom)),
+        attribute("stroke", "#333"),
+        attribute("stroke-width", "2"),
+      ]),
+      line([], [
+        attribute("x1", String(padding.left)),
+        attribute("y1", String(height - padding.bottom)),
+        attribute("x2", String(width - padding.right)),
+        attribute("y2", String(height - padding.bottom)),
+        attribute("stroke", "#333"),
+        attribute("stroke-width", "2"),
+      ]),
+      ...paths,
+      ...xLabels,
+      ...legends,
+    ]
+  );
 }
 
-export function renderLineOverview(): HtmlNode<never> {
+export function renderLineOverview(
+  entries: JournalEntry[]
+): HtmlNode<never> {
+  const datasets = getDataPerPrompt(entries);
+  const days = entries
+    .sort(sortEntriesByDate)
+    .map((entry) => dayToString(entry.day));
+
+  const chart = createLineChartSvg(datasets, days);
+
   return div(
     [],
     [class_("line-overview-container")],
@@ -82,26 +189,8 @@ export function renderLineOverview(): HtmlNode<never> {
       div(
         [],
         [attribute("id", "line-overview")],
-        []
+        [chart]
       ),
     ]
   );
-}
-
-export function showLineOverview(
-  entries: JournalEntry[]
-): void {
-  const element = document.getElementById("line-overview");
-  if (!element) {
-    console.error("Unable to find line-overview element");
-    return;
-  }
-
-  const datasets = getDataPerPrompt(entries);
-  const days = entries
-    .sort(sortEntriesByDate)
-    .map((entry) => dayToString(entry.day));
-
-  const svgContent = createLineChartSvg(datasets, days);
-  element.innerHTML = svgContent;
 }

@@ -62,7 +62,7 @@ export function getDataPerPrompt(entries: JournalEntry[]): PromptRenderData[] {
 
 export const GRAPHS: Record<GraphName, GraphRenderer> = {
   SPIDERWEB: renderSpiderweb,
-  LINE_OVERVIEW: renderLineOverview,
+  LINE_OVERVIEW: (state: AppState, settings: Settings) => renderLineOverview(state.journalEntries),
   DAILY_BAR: renderDailyBar,
   BIPOLAR_PERIODS: renderBipolarPeriods,
   TOTALED_DAILY_BAR: renderTotaledDailyBar,
