@@ -36,7 +36,8 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: 70vh;
+  height: 60vh;
+  max-height: calc(100dvh - 25vh);
 }
 
 .daily-bar-row {
@@ -63,6 +64,9 @@
 
 #graph-selection {
   align-self: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
   --pico-outline-width: 0.0625rem;
   --pico-background-color: var(--pico-form-element-background-color);

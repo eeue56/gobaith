@@ -66,3 +66,23 @@ test("the user sees some duration information", async ({ context, page }) => {
   await page.locator("#add-duration-query").click();
   await expect(page.locator(".duration-query-result")).toHaveCount(6);
 });
+
+test("DAILY_BAR row labels are visible on desktop", async ({ context, page }) => {
+  // Set desktop viewport size
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  // Ensure DAILY_BAR is selected
+  await expect(await page.locator("#graph-selection")).toHaveValue("DAILY_BAR");
+
+  // Check that all expected row labels are visible
+  const expectedLabels = ["Sleep", "Depression", "Anxiety", "Elevation", "Irrability", "Psychotic"];
+  
+  for (const label of expectedLabels) {
+    const labelElement = page.locator(".daily-bar-prompt").filter({ hasText: label });
+    await expect(labelElement).toBeVisible();
+  }
+});
+

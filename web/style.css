@@ -791,4 +791,14 @@
   .indent {
     margin-left: 20px;
   }
+
+  .graphs-tab-content {
+    overflow-y: auto;
+  }
+}
+
+#graph-selection {
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }

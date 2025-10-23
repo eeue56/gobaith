@@ -8,6 +8,9 @@
     "chart.js": "^4.5.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
     "@eeue56/gweld": "^1.1.2",
     "@playwright/test": "^1.54.1",
     "@types/express": "^5.0.3",
@@ -16,10 +19,8 @@
     "electron": "^37.2.4",
     "esbuild": "^0.25.8",
     "express": "^5.1.0",
-    "typescript": "^5.8.3",
-    "@capacitor/android": "^7.4.2",
-    "@capacitor/cli": "^7.4.2",
-    "@capacitor/core": "^7.4.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "scripts": {
     "serve-backend": "npm run build && ts-node server/host.ts",
