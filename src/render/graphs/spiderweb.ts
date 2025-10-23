@@ -1,11 +1,10 @@
-import { attribute, class_, div, HtmlNode, text } from "@eeue56/coed";
+import { attribute, class_, div, HtmlNode, nodeNS, text } from "@eeue56/coed";
 import {
   circle,
   line,
   path,
   rect,
   svg,
-  text as svgText,
 } from "@eeue56/coed/svg";
 import { getDataOnlyForToday } from "../../logic/journal";
 import {
@@ -18,6 +17,16 @@ import {
 } from "../../types";
 import { dayToString } from "../../utils/dates";
 import { renderDate } from "../date";
+
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+function svgText<Msg>(
+  events: any[],
+  attributes: any[],
+  children: HtmlNode<Msg>[]
+): HtmlNode<Msg> {
+  return nodeNS("text" as any, SVG_NAMESPACE, events, attributes, children);
+}
 
 function createRadarChartSvg(
   labels: readonly string[],
@@ -73,8 +82,7 @@ function createRadarChartSvg(
         attribute("y", String(center - levelRadius + 5)),
         attribute("font-size", "16"),
         attribute("fill", "#666"),
-        attribute("textContent", String(level)),
-      ])
+      ], [text(String(level))])
     );
   }
 
@@ -108,8 +116,7 @@ function createRadarChartSvg(
         attribute("font-size", "18"),
         attribute("fill", "#333"),
         attribute("dominant-baseline", "middle"),
-        attribute("textContent", labels[i]),
-      ])
+      ], [text(labels[i])])
     );
   }
 
@@ -139,8 +146,7 @@ function createRadarChartSvg(
         attribute("font-size", "28"),
         attribute("font-weight", "bold"),
         attribute("fill", "#333"),
-        attribute("textContent", title),
-      ]),
+      ], [text(title)]),
       ...gridLines,
       ...axisLines,
       path([], [

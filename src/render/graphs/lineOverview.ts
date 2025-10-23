@@ -1,15 +1,24 @@
-import { attribute, class_, div, HtmlNode, text } from "@eeue56/coed";
+import { attribute, class_, div, HtmlNode, nodeNS, text } from "@eeue56/coed";
 import {
   circle,
   line,
   path,
   rect,
   svg,
-  text as svgText,
 } from "@eeue56/coed/svg";
 import { getDataPerPrompt } from ".";
 import { JournalEntry } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
+
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+function svgText<Msg>(
+  events: any[],
+  attributes: any[],
+  children: HtmlNode<Msg>[]
+): HtmlNode<Msg> {
+  return nodeNS("text" as any, SVG_NAMESPACE, events, attributes, children);
+}
 
 function createLineChartSvg(
   datasets: Array<{
@@ -51,8 +60,7 @@ function createLineChartSvg(
         attribute("text-anchor", "end"),
         attribute("font-size", "14"),
         attribute("fill", "#666"),
-        attribute("textContent", String(i)),
-      ])
+      ], [text(String(i))])
     );
   }
 
@@ -105,8 +113,7 @@ function createLineChartSvg(
         attribute("y", String(legendY)),
         attribute("font-size", "14"),
         attribute("fill", "#333"),
-        attribute("textContent", dataset.label),
-      ])
+      ], [text(dataset.label)])
     );
   });
 
@@ -123,8 +130,7 @@ function createLineChartSvg(
           attribute("font-size", "12"),
           attribute("fill", "#666"),
           attribute("transform", `rotate(-45, ${x}, ${height - padding.bottom + 20})`),
-          attribute("textContent", label),
-        ])
+        ], [text(label)])
       );
     }
   });
@@ -146,8 +152,7 @@ function createLineChartSvg(
         attribute("font-size", "20"),
         attribute("font-weight", "bold"),
         attribute("fill", "#333"),
-        attribute("textContent", "Mood Overview Over Time"),
-      ]),
+      ], [text("Mood Overview Over Time")]),
       ...gridLines,
       line([], [
         attribute("x1", String(padding.left)),
