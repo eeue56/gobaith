@@ -86,3 +86,69 @@ test("DAILY_BAR row labels are visible on desktop", async ({ context, page }) =>
   }
 });
 
+test("SPIDERWEB graph displays SVG content", async ({ context, page }) => {
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "SPIDERWEB");
+  await page.waitForTimeout(500);
+
+  const spiderwebElement = await page.locator("#spiderweb");
+  await expect(spiderwebElement).toBeVisible();
+
+  const svgContent = await spiderwebElement.locator("svg");
+  await expect(svgContent).toBeVisible();
+
+  const svgText = await svgContent.innerHTML();
+  expect(svgText).toContain("Mood breakdown on");
+});
+
+test("SPIDERWEB graph is responsive on mobile", async ({ context, page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "SPIDERWEB");
+  await page.waitForTimeout(500);
+
+  const spiderwebContainer = await page.locator(".spiderweb-container");
+  await expect(spiderwebContainer).toBeVisible();
+
+  const svgElement = await spiderwebContainer.locator("svg");
+  await expect(svgElement).toBeVisible();
+});
+
+test("LINE_OVERVIEW graph displays SVG content", async ({ context, page }) => {
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "LINE_OVERVIEW");
+  await page.waitForTimeout(500);
+
+  const lineElement = await page.locator("#line-overview");
+  await expect(lineElement).toBeVisible();
+
+  const svgContent = await lineElement.locator("svg");
+  await expect(svgContent).toBeVisible();
+
+  const svgText = await svgContent.innerHTML();
+  expect(svgText).toContain("Mood Overview Over Time");
+});
+
+test("LINE_OVERVIEW graph is responsive on mobile", async ({ context, page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "LINE_OVERVIEW");
+  await page.waitForTimeout(500);
+
+  const lineContainer = await page.locator(".line-overview-container");
+  await expect(lineContainer).toBeVisible();
+
+  const svgElement = await lineContainer.locator("svg");
+  await expect(svgElement).toBeVisible();
+});
+

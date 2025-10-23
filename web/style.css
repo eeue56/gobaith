@@ -802,3 +802,24 @@
   top: 0;
   z-index: 100;
 }
+
+.spiderweb-container,
+.line-overview-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.spiderweb-container svg,
+.line-overview-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 600px) {
+  .spiderweb-container,
+  .line-overview-container {
+    padding: 10px;
+  }
+}

@@ -131,6 +131,7 @@ dist
 
 web/out.js
 web/service-worker.js
+meta.json
 /test-results/
 /playwright-report/
 /blob-report/
