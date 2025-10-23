@@ -4,8 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "@eeue56/coed": "^0.4.0",
-    "chart.js": "^4.5.0"
+    "@eeue56/coed": "^0.4.0"
   },
   "devDependencies": {
     "@capacitor/android": "^7.4.2",

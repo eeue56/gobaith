@@ -2,7 +2,6 @@ import { showLineOverview } from "./render/graphs/lineOverview";
 import { renderJournal } from "./render/journal";
 import { DebuggingInfo, GraphName, Model, Update } from "./types";
 
-import type { Chart } from "chart.js";
 import { renderGraph } from "./render/graphs/index";
 import { showSpiderweb } from "./render/graphs/spiderweb";
 import {
@@ -18,17 +17,10 @@ import { pushHistoryState } from "./updaters";
 
 type ActiveChart = {
   graphName: GraphName;
-  chart: Chart<any, any>;
 };
 
-/**
- * Track the active chart so we can call destroy on it when tabs change
- */
 let activeChart: ActiveChart | null = null;
 
-/**
- * Call the individual render functions
- */
 function renderBody(model: Model): HtmlNode<Update> {
   switch (model.appState.currentTab) {
     case "JOURNAL": {
@@ -58,16 +50,10 @@ function render(model: Model): HtmlNode<Update> {
   );
 }
 
-/**
- * This function runs functions that require basic rendering of the DOM first.
- *
- * Currently, it is only Chart.js integrations that require this mechanic.
- */
 function postRender(model: Model): void {
   if (model.appState.currentTab === "GRAPH") {
     if (activeChart !== null) {
       if (activeChart.graphName !== model.appState.currentGraph) {
-        activeChart.chart.destroy();
         activeChart = null;
       }
     }
@@ -86,7 +72,6 @@ function postRender(model: Model): void {
     }
   } else {
     if (activeChart !== null) {
-      activeChart.chart.destroy();
       activeChart = null;
     }
   }
