@@ -825,4 +825,8 @@
   .graphs-tab-content {
     overflow-y: auto;
   }
+
+  .prompt-group {
+    margin-bottom: 30px;
+  }
 }
