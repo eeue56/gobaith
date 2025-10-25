@@ -12,20 +12,20 @@ export function migrateHoursSleptToSleepQuality(data: unknown): unknown {
           delete entry.hoursSlept;
           
           if (hoursSlept < 5) {
-            entry.sleepQuality = 1;
+            entry.sleepQuality = 1; // Poor quality: significantly below recommended sleep
           } else if (hoursSlept < 7) {
-            entry.sleepQuality = 2;
+            entry.sleepQuality = 2; // Below average: below recommended range
           } else if (hoursSlept < 9) {
-            entry.sleepQuality = 3;
+            entry.sleepQuality = 3; // Good: within recommended 7-9 hours
           } else {
-            entry.sleepQuality = 4;
+            entry.sleepQuality = 4; // Excellent: at or above recommended range
           }
         }
         
         if (!("sleepQuality" in entry)) {
-          entry.sleepQuality = 3;
+          entry.sleepQuality = 3; // Default to "good" if missing
         } else if (!isMoodValue(entry.sleepQuality)) {
-          entry.sleepQuality = 3;
+          entry.sleepQuality = 3; // Reset to "good" if invalid value
         }
       }
     }
