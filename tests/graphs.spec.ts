@@ -11,7 +11,7 @@ test("the default graph is daily bar", async ({ context, page }) => {
     (
       await page.locator(".daily-bar").all()
     ).length
-  ).toBeGreaterThanOrEqual(5);
+  ).toBeGreaterThanOrEqual(6);
 });
 
 test("the user can click a daily bar to go to that day", async ({
@@ -26,7 +26,7 @@ test("the user can click a daily bar to go to that day", async ({
     (
       await page.locator(".daily-bar").all()
     ).length
-  ).toBeGreaterThanOrEqual(5);
+  ).toBeGreaterThanOrEqual(6);
 
   const barToClick = await page.locator(".daily-bar").first();
   const title = (await barToClick.getAttribute("title")) || "ERROR";
