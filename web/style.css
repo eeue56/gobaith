@@ -751,6 +751,51 @@
     margin-bottom: 0;
   }
 
+  .prompt-button-container {
+    height: 60px;
+  }
+
+  .circle-container {
+    height: 50px;
+    width: 50px;
+  }
+
+  .prompt-button-container > label {
+    font-size: 0.8rem;
+  }
+
+  .prompt > h4 {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .circle-0 {
+    height: 6px;
+    width: 6px;
+  }
+
+  .circle-1 {
+    height: 12px;
+    width: 12px;
+  }
+
+  .circle-2 {
+    height: 18px;
+    width: 18px;
+  }
+
+  .circle-3 {
+    height: 24px;
+    width: 24px;
+  }
+
+  .circle-4 {
+    height: 30px;
+    width: 30px;
+    padding: 3px;
+  }
+
   .daily-bar-sleep,
   .daily-bar {
     width: 20px;
@@ -779,5 +824,9 @@
 
   .graphs-tab-content {
     overflow-y: auto;
+  }
+
+  .prompt-group {
+    margin-bottom: 30px;
   }
 }
