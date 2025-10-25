@@ -67,7 +67,7 @@ test("the importer can import state", async ({ context, page }) => {
     }
   }
   
-  await expect(foundSleepQuality).toBe(true);
+  expect(foundSleepQuality).toBe(true);
 
   const promptGroups = await page.locator(".prompt-group").all();
 
