@@ -55,7 +55,7 @@ test("the importer can import state", async ({ context, page }) => {
   
   let foundSleepQuality = false;
   for (const promptGroup of sleepPromptGroups) {
-    const prompt = await promptGroup.locator(".prompt");
+    const prompt = await promptGroup.locator(".prompt h4");
     const promptTitle = await prompt.innerText();
     
     if (promptTitle === "Sleep quality") {
@@ -72,7 +72,7 @@ test("the importer can import state", async ({ context, page }) => {
   const promptGroups = await page.locator(".prompt-group").all();
 
   for (const promptGroup of promptGroups) {
-    const prompt = await promptGroup.locator(".prompt");
+    const prompt = await promptGroup.locator(".prompt h4");
     const promptTitle = await prompt.innerText();
 
     if (!isPrompt(promptTitle) && promptTitle !== "Sleep quality") {
