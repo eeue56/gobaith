@@ -51,23 +51,19 @@ test("the importer can import state", async ({ context, page }) => {
 
   await changeTab(page, "JOURNAL");
 
-  const sleepPromptGroups = await page.locator(".prompt-group").all();
+  // Find the sleep quality prompt group specifically
+  const sleepPromptGroup = page.locator(".prompt-group").filter({
+    has: page.locator('.prompt h4:text("Sleep quality")')
+  });
   
-  let foundSleepQuality = false;
-  for (const promptGroup of sleepPromptGroups) {
-    const prompt = await promptGroup.locator(".prompt h4");
-    const promptTitle = await prompt.innerText();
-    
-    if (promptTitle === "Sleep quality") {
-      foundSleepQuality = true;
-      const moodValue = await promptGroup
-        .locator(".prompt-answer.active")
-        .getAttribute("data-mood-value");
-      await expect(moodValue).toEqual(`${journalEntry.sleepQuality}`);
-    }
-  }
+  // Verify the sleep quality prompt exists
+  await expect(sleepPromptGroup).toHaveCount(1);
   
-  expect(foundSleepQuality).toBe(true);
+  // Check the active mood value for sleep quality
+  const sleepMoodValue = await sleepPromptGroup
+    .locator(".prompt-answer.active")
+    .getAttribute("data-mood-value");
+  expect(sleepMoodValue).toEqual(`${journalEntry.sleepQuality}`);
 
   const promptGroups = await page.locator(".prompt-group").all();
 
