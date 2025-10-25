@@ -35,3 +35,11 @@ export function migrateHoursSleptToSleepQuality(data: unknown): unknown {
   }
   return data;
 }
+
+export function updateSettingsToDatabaseVersion6(data: unknown): unknown {
+  if (typeof data === "object") {
+    markDatabaseVersion(data, 6);
+    return data;
+  }
+  return data;
+}
