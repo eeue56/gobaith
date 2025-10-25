@@ -20,7 +20,7 @@ test("the user can choose answers to prompts", async ({
   page,
   baseURL,
 }) => {
-  const numberOfPrompts = Object.keys(PROMPTS).length;
+  const numberOfPrompts = PROMPTS.length + 1;
   await expect(await page.locator(".prompt-group")).toHaveCount(
     numberOfPrompts
   );
