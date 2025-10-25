@@ -1,0 +1,39 @@
+:root {
+  --legend-font-size: 30px;
+}
+
+.legend-color-icon {
+  cursor: pointer;
+  width: var(--legend-font-size);
+  height: var(--legend-font-size);
+}
+
+.legend-text {
+  cursor: pointer;
+  font-size: var(--legend-font-size);
+}
+
+.graph-overview-date-label {
+  font-size: 20px;
+  font-weight: strong;
+  fill: #333;
+}
+
+.spiderweb-container,
+.line-overview-container {
+  width: 100%;
+  margin: auto auto;
+  padding: 10px;
+}
+
+.spiderweb-container svg,
+.line-overview-container svg {
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .spiderweb-container,
+  .line-overview-container {
+    padding: 10px;
+  }
+}

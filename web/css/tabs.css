@@ -64,8 +64,7 @@
 
 #graph-selection {
   align-self: center;
-  position: sticky;
-  top: 0;
+  margin-top: 30px;
   z-index: 100;
 
   --pico-outline-width: 0.0625rem;
@@ -100,7 +99,15 @@
   font-family: inherit;
   font-size: 100%;
   line-height: 1.15;
-  margin: 0;
   padding: var(--pico-form-element-spacing-vertical)
     var(--pico-form-element-spacing-horizontal);
+}
+
+@media (min-width: 1000px) {
+  .import-tab-content,
+  .settings-tab-content,
+  .journal-tab-content {
+    padding-left: 15vw;
+    padding-right: 15vw;
+  }
 }
