@@ -33,6 +33,7 @@ import {
   isMoodValue,
   isPrompt,
   JournalEntry,
+  LocalState,
   MOOD_VALUES,
   moodStateFromValue,
   MoodValue,
@@ -595,7 +596,8 @@ function renderInteractiveDuplicationQuery(
 
 export function renderInteractiveQueries(
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  localState: LocalState
 ): HtmlNode<Update> {
   const results: HtmlNode<Update>[] = [];
 

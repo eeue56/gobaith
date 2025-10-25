@@ -5,8 +5,10 @@ import {
   GraphName,
   GraphRenderer,
   JournalEntry,
+  LocalState,
   Model,
   Prompt,
+  PromptRenderData,
   PROMPTS,
   Settings,
   Update,
@@ -21,9 +23,10 @@ import { renderSpiderweb } from "./spiderweb";
 
 function renderActiveGraph(
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  localState: LocalState
 ): HtmlNode<Update> {
-  return GRAPHS[state.currentGraph](state, settings);
+  return GRAPHS[state.currentGraph](state, settings, localState);
 }
 
 export function renderGraph(model: Model): HtmlNode<Update> {
@@ -32,7 +35,7 @@ export function renderGraph(model: Model): HtmlNode<Update> {
     [class_("tab-content graphs-tab-content")],
     [
       renderGraphChoices(model.appState),
-      renderActiveGraph(model.appState, model.settings),
+      renderActiveGraph(model.appState, model.settings, model.localState),
     ]
   );
 }
@@ -49,7 +52,7 @@ export function getDataPerPrompt(entries: JournalEntry[]): PromptRenderData[] {
     });
 
     data.push({
-      label: prompt,
+      prompt: prompt,
       data: promptData,
       borderColor: getColorForPrompt(prompt),
       borderWidth: 2,
@@ -62,7 +65,7 @@ export function getDataPerPrompt(entries: JournalEntry[]): PromptRenderData[] {
 
 export const GRAPHS: Record<GraphName, GraphRenderer> = {
   SPIDERWEB: renderSpiderweb,
-  LINE_OVERVIEW: (state: AppState, settings: Settings) => renderLineOverview(state.journalEntries),
+  LINE_OVERVIEW: renderLineOverview,
   DAILY_BAR: renderDailyBar,
   BIPOLAR_PERIODS: renderBipolarPeriods,
   TOTALED_DAILY_BAR: renderTotaledDailyBar,
@@ -83,11 +86,3 @@ const COLOR_INDEX: string[] = [
 function getColorForPrompt(prompt: Prompt): string {
   return COLOR_INDEX[PROMPTS.indexOf(prompt)];
 }
-
-type PromptRenderData = {
-  label: Prompt;
-  data: { x: Date; y: number }[];
-  borderColor: string;
-  borderWidth: number;
-  fill: boolean;
-};

@@ -1,6 +1,12 @@
 import { BUILT_IN_QUERIES } from "./logic/query";
 import type { Queryable } from "./logic/query/types";
-import { AppState, LATEST_DATABASE_VERSION, Settings } from "./types";
+import {
+  AppState,
+  LATEST_DATABASE_VERSION,
+  LocalState,
+  PROMPTS,
+  Settings,
+} from "./types";
 import { dateToDay } from "./utils/dates";
 
 export const appState: AppState = {
@@ -18,4 +24,13 @@ export const settings: Settings = {
   currentPills: [],
   queries: [...DEFAULT_QUERIES],
   databaseVersion: LATEST_DATABASE_VERSION,
+};
+
+export const localState: LocalState = {
+  kind: "LocalState",
+  Graphs: {
+    LineOverview: {
+      nonFilteredPrompts: new Set(PROMPTS),
+    },
+  },
 };

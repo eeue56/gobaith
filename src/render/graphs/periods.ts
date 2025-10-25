@@ -4,6 +4,7 @@ import {
   depression,
   elevation,
   JournalEntry,
+  LocalState,
   psychosis,
   Settings,
   Update,
@@ -37,7 +38,8 @@ export function renderPeriod(
 
 export function renderBipolarPeriods(
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  localState: LocalState
 ): HtmlNode<Update> {
   const numberOfDays = state.journalEntries.length;
 
