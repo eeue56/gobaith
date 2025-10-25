@@ -3,6 +3,7 @@ import { daysBeforeToday as entriesBeforeToday } from "../../logic/journal";
 import {
   AppState,
   JournalEntry,
+  LocalState,
   Prompt,
   PROMPTS,
   Settings,
@@ -81,7 +82,8 @@ function renderPromptShortName(prompt: Prompt): HtmlNode<never> {
 
 export function renderDailyBar(
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  localState: LocalState
 ): HtmlNode<Update> {
   let entries = entriesBeforeToday(state.day, state.journalEntries);
 
@@ -117,7 +119,8 @@ export function renderDailyBar(
 
 export function renderTotaledDailyBar(
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  localState: LocalState
 ): HtmlNode<Update> {
   let entries = entriesBeforeToday(state.day, state.journalEntries);
   entries.sort(sortEntriesByDate);

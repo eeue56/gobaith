@@ -12,6 +12,7 @@ import {
   AppState,
   DebuggingInfo,
   LATEST_DATABASE_VERSION,
+  LocalState,
   Model,
   Settings,
   Update,
@@ -117,7 +118,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
 
       message.model.appState.day = day;
 
-      return { appState: message.model.appState, settings: model.settings };
+      return {
+        appState: message.model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "AddJournalEntry": {
       const appState = addJournalEntry(
@@ -127,7 +132,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
         model.appState
       );
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdatePromptValue": {
       const appState = updatePromptValue(
@@ -137,7 +146,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
         model.appState
       );
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "RemoveSettings": {
       const settings: Settings = {
@@ -148,7 +161,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
       console.log("UpdateHandler: Removed settings");
       await syncStateAndSettings(hasBackend, model.appState, settings);
-      return { appState: model.appState, settings: settings };
+      return {
+        appState: model.appState,
+        settings: settings,
+        localState: model.localState,
+      };
     }
     case "RemoveAppState": {
       const day = dateToDay(new Date());
@@ -163,24 +180,40 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
       console.log("UpdateHandler: Removed state");
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdateSleepValue": {
       const entry = message.entry;
       const value = message.value;
       const appState = updateSleepValue(entry, value, model.appState);
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdateCurrentTab": {
       const appState = updateCurrentTab(message.tab, model.appState);
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdateCurrentGraph": {
       const appState = updateCurrentGraph(message.graphName, model.appState);
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "AddPill": {
       const modified = addPill(
@@ -192,12 +225,20 @@ export async function update(message: Update, model: Model): Promise<Model> {
       model.appState.journalEntries = modified.entries;
       model.settings = modified.settings;
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "ResetCurrentDay": {
       model.appState.day = dateToDay(new Date());
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdateCurrentDay": {
       const direction = message.direction;
@@ -226,13 +267,21 @@ export async function update(message: Update, model: Model): Promise<Model> {
       model.appState.day = day;
 
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "GoToSpecificDay": {
       model.appState.day = message.entry.day;
       model.appState.currentTab = message.tab;
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdateImportAppState": {
       const appState = cleanData(message.state) as AppState;
@@ -240,7 +289,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
         `Imported state with ${appState.journalEntries.length} journal entries`
       );
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdateImportSettings": {
       for (const pill of message.settings.currentPills) {
@@ -265,7 +318,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       }
       console.log("Imported settings");
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdatePillValue": {
       const appState = updatePillValue(
@@ -275,7 +332,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
         model.appState
       );
       await syncStateAndSettings(hasBackend, appState, model.settings);
-      return { appState, settings: model.settings };
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "UpdatePillOrder": {
       const settings = updatePillOrder(
@@ -284,7 +345,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
         message.direction
       );
       await syncStateAndSettings(hasBackend, model.appState, settings);
-      return { appState: model.appState, settings };
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
     }
     case "ReadyToRender": {
       return model;
@@ -305,12 +370,20 @@ export async function update(message: Update, model: Model): Promise<Model> {
           break;
         }
       }
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "SetDebuggingInfo": {
       debuggingInfo = message.info;
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "SetQueryDuration": {
       const newQueries = updateQuery(
@@ -321,7 +394,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       );
       model.settings.queries = newQueries;
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "SetPromptChoice": {
       const newQueries = updateQuery(
@@ -332,7 +409,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       );
       model.settings.queries = newQueries;
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "SetComparisonChoice": {
       const newQueries = updateQuery(
@@ -344,7 +425,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       model.settings.queries = newQueries;
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
 
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "SetMoodValueChoice": {
       const newQueries = updateQuery(
@@ -356,7 +441,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       model.settings.queries = newQueries;
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
 
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "SetCombineQuery": {
       const newQueries = updateQuery(
@@ -368,7 +457,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
       model.settings.queries = newQueries;
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
 
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "AddNewDurationQuery": {
       model.settings.queries.splice(0, 0, {
@@ -383,7 +476,11 @@ export async function update(message: Update, model: Model): Promise<Model> {
         },
       });
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "AddNewFilterQuery": {
       model.settings.queries.splice(0, 0, {
@@ -393,12 +490,20 @@ export async function update(message: Update, model: Model): Promise<Model> {
         value: 1,
       });
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "DeleteQuery": {
       model.settings.queries.splice(message.index, 1);
       await syncStateAndSettingsToDatabase(model.appState, model.settings);
-      return { appState: model.appState, settings: model.settings };
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
     case "Noop": {
       return model;
@@ -412,12 +517,40 @@ export async function update(message: Update, model: Model): Promise<Model> {
 
       switch (imported.kind) {
         case "AppState": {
-          return { appState: imported, settings: model.settings };
+          return {
+            appState: imported,
+            settings: model.settings,
+            localState: model.localState,
+          };
         }
         case "Settings": {
-          return { appState: model.appState, settings: imported };
+          return {
+            appState: model.appState,
+            settings: imported,
+            localState: model.localState,
+          };
         }
       }
+    }
+    case "ToggleFilterLineGraphView": {
+      const currentNonFilteredPrompts =
+        model.localState.Graphs.LineOverview.nonFilteredPrompts;
+
+      if (currentNonFilteredPrompts.has(message.prompt)) {
+        model.localState.Graphs.LineOverview.nonFilteredPrompts.delete(
+          message.prompt
+        );
+      } else {
+        model.localState.Graphs.LineOverview.nonFilteredPrompts.add(
+          message.prompt
+        );
+      }
+
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
     }
   }
 }
@@ -442,6 +575,7 @@ async function updateImportFile(
 export async function fetchModelFromStores(): Promise<Model> {
   let appState: AppState = defaultObjects.appState;
   let settings: Settings = defaultObjects.settings;
+  const localState: LocalState = defaultObjects.localState;
   const maybeDatabaseRecords = await initIndexedDB();
 
   hasBackend = await hasHeartbeat();
@@ -494,5 +628,5 @@ export async function fetchModelFromStores(): Promise<Model> {
     }
   }
 
-  return { appState, settings };
+  return { appState, settings, localState };
 }

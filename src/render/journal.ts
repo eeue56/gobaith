@@ -31,7 +31,7 @@ export function renderJournal(model: Model): HtmlNode<Update> {
 
   return div(
     [],
-    [class_("tab-content")],
+    [class_("tab-content"), class_("journal-tab-content")],
     [
       div(
         [],

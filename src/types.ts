@@ -165,6 +165,17 @@ export type AppState = {
   databaseVersion: DatabaseVersion;
 };
 
+/**
+ * State for UI elements which don't need to saved to local storage
+ *
+ * Structure of keys:
+ * ${tabName}_${feature}_${field}
+ */
+export type LocalState = {
+  kind: "LocalState";
+  Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt> } };
+};
+
 export function isAppState(object: unknown): object is AppState {
   if (typeof object === "undefined" || typeof object !== "object") {
     return false;
@@ -204,6 +215,7 @@ export function isSettings(object: unknown): object is Settings {
 export type Model = {
   settings: Settings;
   appState: AppState;
+  localState: LocalState;
 };
 
 export type JournalEntry = {
@@ -246,7 +258,8 @@ export type GraphName = (typeof GRAPH_NAMES)[number];
  */
 export type GraphRenderer = (
   state: AppState,
-  settings: Settings
+  settings: Settings,
+  localState: LocalState
 ) => HtmlNode<Update>;
 
 export function isGraphName(str: string): str is GraphName {
@@ -354,7 +367,11 @@ export type Update =
     }
   | { kind: "AddNewDurationQuery" }
   | { kind: "AddNewFilterQuery" }
-  | { kind: "DeleteQuery"; index: number; path: QueryPath[] };
+  | { kind: "DeleteQuery"; index: number; path: QueryPath[] }
+  | {
+      kind: "ToggleFilterLineGraphView";
+      prompt: Prompt;
+    };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel
@@ -438,3 +455,10 @@ export function IncorrectPayload(): IncorrectPayload {
     kind: "IncorrectPayload",
   };
 }
+export type PromptRenderData = {
+  prompt: Prompt;
+  data: { x: Date; y: number }[];
+  borderColor: string;
+  borderWidth: number;
+  fill: boolean;
+};

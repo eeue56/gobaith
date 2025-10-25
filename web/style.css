@@ -639,14 +639,6 @@
   padding-right: 5px;
 }
 
-#spiderweb {
-  aspect-ratio: 1 / 2;
-}
-
-#line-overview {
-  aspect-ratio: 1;
-}
-
 .spacer {
   height: 100%;
   grid-area: a;
@@ -746,13 +738,6 @@
   min-width: 150px;
 }
 
-@media (min-width: 1000px) {
-  body {
-    padding-left: 15vw;
-    padding-right: 15vw;
-  }
-}
-
 @media (max-width: 400px) {
   body {
     padding-bottom: 3vh;
@@ -795,10 +780,4 @@
   .graphs-tab-content {
     overflow-y: auto;
   }
-}
-
-#graph-selection {
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }

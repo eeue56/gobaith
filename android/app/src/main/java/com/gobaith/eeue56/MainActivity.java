@@ -16,7 +16,7 @@ public class MainActivity extends BridgeActivity {
             if (rootView != null) {
                 rootView.setOnApplyWindowInsetsListener((v, insets) -> {
                         int bottom = insets.getSystemWindowInsetBottom();
-                        int top = 0;
+                        int top = insets.getSystemWindowInsetTop();
                         int left = insets.getSystemWindowInsetLeft();
                         int right = insets.getSystemWindowInsetRight();
 
