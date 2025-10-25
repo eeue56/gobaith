@@ -142,3 +142,4 @@ settings.json
 state.json
 backend-state
 electron/main.js
+tmp/
