@@ -59,7 +59,7 @@ function viewRadarChartSvg(
   for (let level = 1; level <= maxValue; level++) {
     const normalizedLevel = (level - minValue) / (maxValue - minValue);
     const levelRadius = normalizedLevel * maxRadius;
-    const levelPoints: { x: number; y: number }[] = [];
+    const levelPoints: Point[] = [];
 
     for (let i = 0; i < numPoints; i++) {
       const angle = i * angleStep - Math.PI / 2;
