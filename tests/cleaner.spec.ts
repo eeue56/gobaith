@@ -41,6 +41,10 @@ test("version 0, 1, 2 AppState gets successfully converted to the current versio
     ]
   ).toEqual(undefined);
 
+  // hoursSlept should be converted to sleepQuality
+  expect((cleanedData as any)["journalEntries"][0]).toHaveProperty("sleepQuality");
+  expect((cleanedData as any)["journalEntries"][0]).not.toHaveProperty("hoursSlept");
+
   // databaseVersion should be added
   expect(cleanedData).toHaveProperty(
     "databaseVersion",
@@ -48,7 +52,7 @@ test("version 0, 1, 2 AppState gets successfully converted to the current versio
   );
 });
 
-test("version 5 AppState is untouched", () => {
+test("version 6 AppState is untouched", () => {
   const exampleData = {
     kind: "AppState",
     day: dateToDay(new Date()),
@@ -65,11 +69,11 @@ test("version 5 AppState is untouched", () => {
           "Today's feelings of irritableness": 3,
           "Today's psychotic symptoms": 1,
         },
-        hoursSlept: 10,
+        sleepQuality: 3,
         logs: [],
       },
     ],
-    databaseVersion: 4,
+    databaseVersion: 6,
   };
   const cleanedData = cleanData(exampleData);
 

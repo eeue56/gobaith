@@ -16,7 +16,7 @@ function renderSleepRow(entries: JournalEntry[]): HtmlNode<Update> {
   const bodies: HtmlNode<Update>[] = [];
 
   for (const entry of entries) {
-    const dayValue = entry.hoursSlept;
+    const dayValue = entry.sleepQuality;
 
     bodies.push(
       div(
@@ -32,7 +32,7 @@ function renderSleepRow(entries: JournalEntry[]): HtmlNode<Update> {
         [
           attribute("title", dayToString(entry.day)),
           class_("daily-bar-sleep"),
-          attribute("style", `height: ${(dayValue / 24) * 100}px`),
+          attribute("style", `height: ${((dayValue - 1) / 3) * 100}px`),
         ],
         []
       )

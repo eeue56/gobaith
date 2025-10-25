@@ -22,7 +22,7 @@ test("the importer can import state", async ({ context, page }) => {
     dateToDay(new Date()),
     {},
     responses,
-    13.5,
+    3,
     [logEntry]
   );
 
@@ -51,9 +51,23 @@ test("the importer can import state", async ({ context, page }) => {
 
   await changeTab(page, "JOURNAL");
 
-  await expect(await page.locator("#hours-slept").innerText()).toContain(
-    `${journalEntry.hoursSlept}`
-  );
+  const sleepPromptGroups = await page.locator(".prompt-group").all();
+  
+  let foundSleepQuality = false;
+  for (const promptGroup of sleepPromptGroups) {
+    const prompt = await promptGroup.locator(".prompt");
+    const promptTitle = await prompt.innerText();
+    
+    if (promptTitle === "Sleep quality") {
+      foundSleepQuality = true;
+      const moodValue = await promptGroup
+        .locator(".prompt-answer.active")
+        .getAttribute("data-mood-value");
+      await expect(moodValue).toEqual(`${journalEntry.sleepQuality}`);
+    }
+  }
+  
+  await expect(foundSleepQuality).toBe(true);
 
   const promptGroups = await page.locator(".prompt-group").all();
 
@@ -61,18 +75,20 @@ test("the importer can import state", async ({ context, page }) => {
     const prompt = await promptGroup.locator(".prompt");
     const promptTitle = await prompt.innerText();
 
-    if (!isPrompt(promptTitle)) {
+    if (!isPrompt(promptTitle) && promptTitle !== "Sleep quality") {
       console.error("Expected prompt, got", promptTitle);
       await expect(promptTitle).toEqual("Invalid prompt!");
       break;
     }
 
-    const promptValue = responses[promptTitle];
-    const moodValue = await promptGroup
-      .locator(".prompt-answer.active")
-      .getAttribute("data-mood-value");
+    if (isPrompt(promptTitle)) {
+      const promptValue = responses[promptTitle];
+      const moodValue = await promptGroup
+        .locator(".prompt-answer.active")
+        .getAttribute("data-mood-value");
 
-    await expect(moodValue).toEqual(`${promptValue}`);
+      await expect(moodValue).toEqual(`${promptValue}`);
+    }
   }
 });
 

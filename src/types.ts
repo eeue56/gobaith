@@ -138,7 +138,7 @@ export type LogEntry = {
   text: string;
 };
 
-export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5] as const;
+export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5, 6] as const;
 
 export type DatabaseVersion = (typeof DATABASE_VERSIONS)[number];
 
@@ -151,7 +151,7 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
  * any migrations needed in between the current db version
  * and the latest db version will be run
  */
-export const LATEST_DATABASE_VERSION: DatabaseVersion = 5;
+export const LATEST_DATABASE_VERSION: DatabaseVersion = 6;
 
 /**
  * AppState includes UI state and data (journal entries)
@@ -222,7 +222,7 @@ export type JournalEntry = {
   day: Day;
   pills: Record<string, number>;
   promptResponses: PromptResponses;
-  hoursSlept: number;
+  sleepQuality: MoodValue;
   logs: LogEntry[];
 };
 
@@ -230,14 +230,14 @@ export function JournalEntry(
   day: Day,
   pills: Record<string, number>,
   promptResponses: PromptResponses,
-  hoursSlept: number,
+  sleepQuality: MoodValue,
   logs: LogEntry[]
 ): JournalEntry {
   return {
     day,
     pills,
     promptResponses,
-    hoursSlept,
+    sleepQuality,
     logs,
   };
 }
@@ -311,7 +311,7 @@ export type Update =
     }
   | { kind: "RemoveSettings" }
   | { kind: "RemoveAppState" }
-  | { kind: "UpdateSleepValue"; entry: JournalEntry; value: number }
+  | { kind: "UpdateSleepQuality"; entry: JournalEntry; value: MoodValue }
   | { kind: "UpdateCurrentTab"; tab: TabName }
   | { kind: "UpdateCurrentGraph"; graphName: GraphName }
   | { kind: "AddPill"; pillName: string }

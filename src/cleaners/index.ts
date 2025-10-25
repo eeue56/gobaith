@@ -5,6 +5,7 @@ import {
   addDatabaseVersionToAppState,
   addQueriesToSettings,
 } from "./database_5";
+import { migrateHoursSleptToSleepQuality } from "./database_6";
 import { renameField } from "./rename_fields";
 
 /**
@@ -54,7 +55,10 @@ function cleanAppState(data: unknown): unknown {
     return dataWithDatabaseVersion;
   }
 
-  // here database version specific cleaning will be added
+  if (dataWithDatabaseVersion.databaseVersion < 6) {
+    data = migrateHoursSleptToSleepQuality(dataWithDatabaseVersion);
+    console.log("Cleaner: migrated hoursSlept to sleepQuality");
+  }
 
   addDatabaseVersionToAppState(dataWithDatabaseVersion);
 

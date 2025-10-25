@@ -2,88 +2,102 @@ import {
   attribute,
   class_,
   div,
+  h4,
   HtmlNode,
-  input,
+  label,
   on,
-  p,
-  span,
   text,
 } from "@eeue56/coed";
-import { dontSend, JournalEntry, Update } from "../../types";
+import {
+  JournalEntry,
+  MOOD_VALUES,
+  moodStateFromValue,
+  MoodValue,
+  Update,
+} from "../../types";
+import { idHash } from "../../utils/render";
+import { getCircleMoodIcon } from "./icons";
 
-const MAX_SLEEPING_30_MINUTE_SLOTS = 48;
-
-function sliderFillStyle(percentFilled: number): string {
-  return `linear-gradient(to right, var(--pico-range-thumb-color) ${percentFilled}%, var(--pico-background-color) ${percentFilled}%`;
+function sleepHoverText(moodValue: MoodValue): string {
+  switch (moodValue) {
+    case 1:
+      return "Poor sleep quality";
+    case 2:
+      return "Below average sleep quality";
+    case 3:
+      return "Good sleep quality";
+    case 4:
+      return "Excellent sleep quality";
+  }
 }
 
-function renderHoursSleptMessage(hoursSlept: number): HtmlNode<never> {
-  return p(
-    [],
-    [class_("hours-slept-last-night-message")],
-    [
-      text(`Hours slept last night:`),
-      span(
-        [],
-        [attribute("id", "hours-slept"), class_("thick")],
-        [text(hoursSlept.toString())]
-      ),
-    ]
+function renderSleepState(
+  moodValue: MoodValue,
+  activeNumber: MoodValue,
+  entry: JournalEntry
+): HtmlNode<Update> {
+  const moodText = moodStateFromValue(moodValue);
+  const isActive = activeNumber === moodValue;
+  const activeClass = isActive ? `circle-active` : "";
+
+  const elementId = idHash(
+    encodeURI(`update-sleep-quality-${moodValue}`)
   );
-}
 
-export function renderSleepSlider(entry: JournalEntry): HtmlNode<Update> {
-  const currentValue = entry.hoursSlept * 2;
-  const percentFilled = (currentValue / MAX_SLEEPING_30_MINUTE_SLOTS) * 100;
+  const hover = sleepHoverText(moodValue);
+  const icon = getCircleMoodIcon(moodValue);
 
   return div(
     [],
-    [],
+    [class_("prompt-button-container"), class_(isActive ? "active" : "")],
     [
-      renderHoursSleptMessage(entry.hoursSlept),
       div(
-        [],
-        [class_("hours-slept-last-night-message")],
         [
-          div([], [class_("slider-label")], [text("0")]),
-          input(
-            [on("input", (event) => dynamicallyShowSliderValue(event, entry))],
-            [
-              attribute("id", "sleep-slider"),
-              attribute("title", "Drag slider to find your sleep hours"),
-              class_("slider"),
-              attribute("type", "range"),
-              attribute("min", "0"),
-              attribute("max", MAX_SLEEPING_30_MINUTE_SLOTS.toString()),
-              attribute("step", "1"),
-              attribute("list", "steplist"),
-              attribute("value", currentValue.toString()),
-              attribute(
-                "style",
-                `background: ${sliderFillStyle(percentFilled)}`
-              ),
-            ]
-          ),
-          div([], [class_("slider-label")], [text("24")]),
-        ]
+          on("click", () => {
+            return updateSleepQuality(entry, moodValue);
+          }),
+        ],
+        [
+          class_("circle-container"),
+          class_(isActive ? "active" : ""),
+          class_(activeClass),
+          attribute("id", elementId),
+          attribute("title", hover),
+          attribute("data-mood-value", moodValue.toString()),
+          class_("prompt-answer"),
+          class_("svg-circle"),
+        ],
+        [icon]
       ),
+      label([], [attribute("for", elementId)], [text(moodText)]),
     ]
   );
 }
 
-function dynamicallyShowSliderValue(event: Event, entry: JournalEntry): Update {
-  const target = event.target as HTMLInputElement | null;
-  if (!target) {
-    return dontSend();
-  }
+export function renderSleepQuality(entry: JournalEntry): HtmlNode<Update> {
+  const activeNumber = entry.sleepQuality;
 
-  const percentFilled =
-    (parseInt(target.value) / MAX_SLEEPING_30_MINUTE_SLOTS) * 100;
-  target.style.background = sliderFillStyle(percentFilled);
+  const sleepStates = MOOD_VALUES.map((x) =>
+    renderSleepState(x, activeNumber, entry)
+  );
 
+  return div(
+    [],
+    [class_("prompt-group")],
+    [
+      div([], [class_("prompt")], [h4([], [], [text("Sleep quality")])]),
+      div([], [class_("mood-group")], sleepStates),
+    ]
+  );
+}
+
+function updateSleepQuality(
+  entry: JournalEntry,
+  value: MoodValue
+): Update {
   return {
-    kind: "UpdateSleepValue",
-    entry: entry,
-    value: parseInt((event.target as HTMLInputElement).value, 10) / 2,
+    kind: "UpdateSleepQuality",
+    entry,
+    value,
   };
 }

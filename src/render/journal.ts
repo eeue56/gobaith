@@ -6,7 +6,7 @@ import { renderDate } from "./date";
 import { renderEnterTimestampMessage, renderLogs } from "./ui/logs";
 import { renderButtonSet } from "./ui/mood";
 import { renderPill } from "./ui/pills";
-import { renderSleepSlider } from "./ui/sleep";
+import { renderSleepQuality } from "./ui/sleep";
 
 export function renderJournal(model: Model): HtmlNode<Update> {
   let todaysEntry: JournalEntry | null = null;
@@ -40,7 +40,7 @@ export function renderJournal(model: Model): HtmlNode<Update> {
           renderDate(model.appState.day),
           renderEnterTimestampMessage(model.appState.day),
           renderLogs(todaysEntry),
-          renderSleepSlider(todaysEntry),
+          renderSleepQuality(todaysEntry),
           ...PROMPTS.map((prompt) => renderButtonSet(todaysEntry, prompt)),
           ...model.settings.currentPills.map((pill) =>
             renderPill(todaysEntry, pill)

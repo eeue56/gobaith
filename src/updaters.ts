@@ -45,14 +45,14 @@ export function updatePromptValue(
   return { ...state, journalEntries: state.journalEntries };
 }
 
-export function updateSleepValue(
+export function updateSleepQuality(
   entry: JournalEntry,
-  value: number,
+  value: MoodValue,
   state: AppState
 ): AppState {
   for (const journalEntry of state.journalEntries) {
     if (isSameDay(journalEntry.day, entry.day)) {
-      journalEntry.hoursSlept = value;
+      journalEntry.sleepQuality = value;
       break;
     }
   }
