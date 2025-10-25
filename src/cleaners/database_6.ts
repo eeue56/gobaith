@@ -2,7 +2,7 @@ import { isMoodValue } from "../types";
 import { markDatabaseVersion } from "./mark_database_version";
 
 export function migrateHoursSleptToSleepQuality(data: unknown): unknown {
-  if (data === null) {
+  if (typeof data !== "object" || data === null) {
     return data;
   }
 
@@ -10,26 +10,33 @@ export function migrateHoursSleptToSleepQuality(data: unknown): unknown {
 
   if (dataObj.kind === "AppState" && Array.isArray(dataObj.journalEntries)) {
     for (const entry of dataObj.journalEntries) {
-      if ("hoursSlept" in entry && !("sleepQuality" in entry)) {
+      let sleepQualityValue: number = 3;
+
+      if ("hoursSlept" in entry) {
         const hoursSlept = entry.hoursSlept;
         delete entry.hoursSlept;
 
-        if (hoursSlept < 3 || hoursSlept > 12) {
-          entry.sleepQuality = 1;
-        } else if (hoursSlept < 6 || hoursSlept > 10) {
-          entry.sleepQuality = 2;
-        } else if (hoursSlept < 7 || hoursSlept > 9) {
-          entry.sleepQuality = 3;
+        if (hoursSlept < 5) {
+          sleepQualityValue = 1;
+        } else if (hoursSlept < 7) {
+          sleepQualityValue = 2;
+        } else if (hoursSlept < 9) {
+          sleepQualityValue = 3;
         } else {
-          entry.sleepQuality = 4;
+          sleepQualityValue = 4;
         }
+      } else if ("sleepQuality" in entry && isMoodValue(entry.sleepQuality)) {
+        sleepQualityValue = entry.sleepQuality;
+        delete entry.sleepQuality;
+      } else if ("sleepQuality" in entry) {
+        delete entry.sleepQuality;
       }
 
-      if (!("sleepQuality" in entry)) {
-        entry.sleepQuality = 3;
-      } else if (!isMoodValue(entry.sleepQuality)) {
-        entry.sleepQuality = 3;
+      if (!entry.promptResponses) {
+        entry.promptResponses = {};
       }
+      
+      entry.promptResponses["Sleep quality"] = sleepQualityValue;
     }
   }
 

@@ -12,37 +12,6 @@ import {
 } from "../../types";
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
 
-function renderSleepRow(entries: JournalEntry[]): HtmlNode<Update> {
-  const bodies: HtmlNode<Update>[] = [];
-
-  for (const entry of entries) {
-    const dayValue = entry.sleepQuality;
-    const height = ((dayValue - 1) / 3) * 70;
-
-    bodies.push(
-      div(
-        [
-          on("click", (): Update => {
-            return {
-              kind: "GoToSpecificDay",
-              entry: entry,
-              tab: "JOURNAL",
-            };
-          }),
-        ],
-        [
-          attribute("title", dayToString(entry.day)),
-          class_("daily-bar-sleep"),
-          attribute("style", `height: ${height}px`),
-        ],
-        []
-      )
-    );
-  }
-
-  return div([], [class_("daily-bar-colors")], bodies);
-}
-
 function renderRowBars(
   prompt: Prompt,
   entries: JournalEntry[]
@@ -104,17 +73,10 @@ export function renderDailyBar(
     promptBodies.push(row);
   }
 
-  const sleepRow = renderSleepRow(entries);
-  const sleepParts: HtmlNode<Update> = div(
-    [],
-    [class_("daily-bar-row")],
-    [span([], [class_("daily-bar-prompt")], [text("Sleep")]), sleepRow]
-  );
-
   return div(
     [],
     [class_("daily-bar-graph-container")],
-    [sleepParts, ...promptBodies]
+    promptBodies
   );
 }
 

@@ -41,9 +41,10 @@ test("version 0, 1, 2 AppState gets successfully converted to the current versio
     ]
   ).toEqual(undefined);
 
-  // hoursSlept should be converted to sleepQuality
-  expect((cleanedData as any)["journalEntries"][0]).toHaveProperty("sleepQuality");
+  // hoursSlept should be converted to Sleep quality in promptResponses
+  expect((cleanedData as any)["journalEntries"][0]["promptResponses"]).toHaveProperty("Sleep quality");
   expect((cleanedData as any)["journalEntries"][0]).not.toHaveProperty("hoursSlept");
+  expect((cleanedData as any)["journalEntries"][0]).not.toHaveProperty("sleepQuality");
 
   // databaseVersion should be added
   expect(cleanedData).toHaveProperty(
@@ -63,13 +64,13 @@ test("version 6 AppState is untouched", () => {
         day: dateToDay(new Date()),
         pills: {},
         promptResponses: {
+          "Sleep quality": 3,
           "Today's feelings of depression": 1,
           "Today's feelings of anxiety": 2,
           "Today's feelings of elevation": 2,
           "Today's feelings of irritableness": 3,
           "Today's psychotic symptoms": 1,
         },
-        sleepQuality: 3,
         logs: [],
       },
     ],

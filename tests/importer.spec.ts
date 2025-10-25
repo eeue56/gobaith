@@ -16,13 +16,12 @@ import { awaitForTitleToChange, changeTab, expectActiveTab } from "./helpers";
 test("the importer can import state", async ({ context, page }) => {
   await changeTab(page, "IMPORT");
 
-  const responses = PromptResponses(1, 2, 3, 4, 1);
+  const responses = PromptResponses(3, 1, 2, 3, 4, 1);
   const logEntry: LogEntry = { time: new Date(), text: "Imported stuff" };
   const journalEntry = JournalEntry(
     dateToDay(new Date()),
     {},
     responses,
-    3,
     [logEntry]
   );
 
@@ -63,7 +62,7 @@ test("the importer can import state", async ({ context, page }) => {
   const sleepMoodValue = await sleepPromptGroup
     .locator(".prompt-answer.active")
     .getAttribute("data-mood-value");
-  expect(sleepMoodValue).toEqual(`${journalEntry.sleepQuality}`);
+  expect(sleepMoodValue).toEqual(`${journalEntry.promptResponses["Sleep quality"]}`);
 
   const promptGroups = await page.locator(".prompt-group").all();
 

@@ -55,6 +55,7 @@ export function generateRandomMoodValueInRange(
  * The type system should warn you in all the places you need to change it.
  */
 export const PROMPTS = [
+  "Sleep quality",
   "Today's feelings of depression",
   "Today's feelings of anxiety",
   "Today's feelings of elevation",
@@ -73,6 +74,7 @@ export type PromptResponses = {
 };
 
 export function PromptResponses(
+  sleepQuality: MoodValue,
   depression: MoodValue,
   anxiety: MoodValue,
   elevation: MoodValue,
@@ -80,6 +82,7 @@ export function PromptResponses(
   psychotic: MoodValue
 ): PromptResponses {
   return {
+    "Sleep quality": sleepQuality,
     "Today's feelings of depression": depression,
     "Today's feelings of anxiety": anxiety,
     "Today's feelings of elevation": elevation,
@@ -89,6 +92,7 @@ export function PromptResponses(
 }
 
 export const SHORT_PROMPTS: Record<Prompt, string> = {
+  "Sleep quality": "Sleep",
   "Today's feelings of depression": "Depression",
   "Today's feelings of anxiety": "Anxiety",
   "Today's feelings of elevation": "Elevation",
@@ -222,7 +226,6 @@ export type JournalEntry = {
   day: Day;
   pills: Record<string, number>;
   promptResponses: PromptResponses;
-  sleepQuality: MoodValue;
   logs: LogEntry[];
 };
 
@@ -230,14 +233,12 @@ export function JournalEntry(
   day: Day,
   pills: Record<string, number>,
   promptResponses: PromptResponses,
-  sleepQuality: MoodValue,
   logs: LogEntry[]
 ): JournalEntry {
   return {
     day,
     pills,
     promptResponses,
-    sleepQuality,
     logs,
   };
 }
@@ -311,7 +312,6 @@ export type Update =
     }
   | { kind: "RemoveSettings" }
   | { kind: "RemoveAppState" }
-  | { kind: "UpdateSleepQuality"; entry: JournalEntry; value: MoodValue }
   | { kind: "UpdateCurrentTab"; tab: TabName }
   | { kind: "UpdateCurrentGraph"; graphName: GraphName }
   | { kind: "AddPill"; pillName: string }

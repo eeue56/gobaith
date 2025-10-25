@@ -26,7 +26,6 @@ import {
   updatePillValue,
   updatePromptValue,
   updateQuery,
-  updateSleepQuality,
 } from "./updaters";
 import { dateToDay, nextDay, previousDay } from "./utils/dates";
 import { storeDebuggingInfo } from "./utils/localstorage";
@@ -179,17 +178,6 @@ export async function update(message: Update, model: Model): Promise<Model> {
         databaseVersion: LATEST_DATABASE_VERSION,
       };
       console.log("UpdateHandler: Removed state");
-      await syncStateAndSettings(hasBackend, appState, model.settings);
-      return {
-        appState,
-        settings: model.settings,
-        localState: model.localState,
-      };
-    }
-    case "UpdateSleepQuality": {
-      const entry = message.entry;
-      const value = message.value;
-      const appState = updateSleepQuality(entry, value, model.appState);
       await syncStateAndSettings(hasBackend, appState, model.settings);
       return {
         appState,

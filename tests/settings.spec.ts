@@ -83,7 +83,7 @@ test("the debug log contains events triggered", async ({ context, page }) => {
 UpdateCurrentTab
 UpdateCurrentTab
 UpdateCurrentDay
-UpdateSleepQuality
+UpdatePromptValue
 UpdatePromptValue
 UpdatePromptValue
 UpdatePromptValue
