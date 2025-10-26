@@ -31,40 +31,40 @@
   --mood-4: #336b34;
   
   /* Sleep quality - soft teal (calming, restful) */
-  --sleep-1: #a8c5c0;
-  --sleep-2: #87ada8;
-  --sleep-3: #6a9490;
-  --sleep-4: #527a78;
+  --sleep-1: #a0d4ce;
+  --sleep-2: #7bc4bb;
+  --sleep-3: #5ab4a8;
+  --sleep-4: #3d9b8f;
   
   /* Depression - gentle lavender (soothing, peaceful) */
-  --depression-1: #c4b8c8;
-  --depression-2: #a99db3;
-  --depression-3: #8e849a;
-  --depression-4: #756b81;
+  --depression-1: #d4c4e0;
+  --depression-2: #c4aed4;
+  --depression-3: #b398c8;
+  --depression-4: #9d7fb8;
   
-  /* Anxiety - warm beige (grounding, safe) */
-  --anxiety-1: #d4c4b0;
-  --anxiety-2: #bfab94;
-  --anxiety-3: #a89179;
-  --anxiety-4: #8f7862;
+  /* Anxiety - warm amber (grounding, safe) */
+  --anxiety-1: #e8d4a8;
+  --anxiety-2: #ddc488;
+  --anxiety-3: #d2b468;
+  --anxiety-4: #c4a04c;
   
-  /* Elevation - soft peach (warm, nurturing) */
-  --elevation-1: #d9b8a8;
-  --elevation-2: #c49f8c;
-  --elevation-3: #ad8672;
-  --elevation-4: #946e5b;
+  /* Elevation - soft coral (warm, nurturing) */
+  --elevation-1: #e8c4b0;
+  --elevation-2: #e0b098;
+  --elevation-3: #d89c80;
+  --elevation-4: #cc8468;
   
   /* Irritableness - muted sage (calming, natural) */
-  --irrability-1: #b8c9a8;
-  --irrability-2: #9fb38c;
-  --irrability-3: #879b72;
-  --irrability-4: #70825b;
+  --irrability-1: #c4dca8;
+  --irrability-2: #b0cc88;
+  --irrability-3: #9cbc6c;
+  --irrability-4: #88a854;
   
   /* Psychotic - dusty rose (gentle, comforting) */
-  --psychotic-1: #d4b0b8;
-  --psychotic-2: #bf969f;
-  --psychotic-3: #a87d87;
-  --psychotic-4: #8f666f;
+  --psychotic-1: #e8c4cc;
+  --psychotic-2: #e0b0bc;
+  --psychotic-3: #d89cac;
+  --psychotic-4: #cc8498;
   
   --pico-color-sand-50: #f2f0ec;
   --pico-color-zinc-150: #d1d5db;
