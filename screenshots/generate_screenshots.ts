@@ -91,9 +91,6 @@ async function screenshotGraphSpiderweb(page: Page, basePath: string) {
   await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("SPIDERWEB");
 
-  // pause so that the animation can finish
-  await page.waitForTimeout(500);
-
   await page.screenshot({
     path: `${basePath}/graph_spiderweb.png`,
   });
@@ -102,9 +99,6 @@ async function screenshotGraphSpiderweb(page: Page, basePath: string) {
 async function screenshotGraphLineOverview(page: Page, basePath: string) {
   await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("LINE_OVERVIEW");
-
-  // pause so that the animation can finish
-  await page.waitForTimeout(500);
 
   // only show one field
   for (let i = 0; i < 5; i++) {
