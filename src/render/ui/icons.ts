@@ -1,6 +1,6 @@
 import { attribute, class_, HtmlNode, span, style_, text } from "@eeue56/coed";
 import { circle, svg } from "@eeue56/coed/svg";
-import { MoodValue } from "../../types";
+import { MoodValue, Prompt, SHORT_PROMPTS } from "../../types";
 
 function icon(iconName: string): HtmlNode<never> {
   return span([], [class_("material-symbols-outlined")], [text(iconName)]);
@@ -66,20 +66,11 @@ function circleMoodIcon(
   );
 }
 
-export const circle1 = circleMoodIcon(4, "var(--mood-1)");
-export const circle2 = circleMoodIcon(6, "var(--mood-2)");
-export const circle3 = circleMoodIcon(8, "var(--mood-3)");
-export const circle4 = circleMoodIcon(10, "var(--mood-4)");
-
-export function getCircleMoodIcon(mood: MoodValue): HtmlNode<never> {
-  switch (mood) {
-    case 1:
-      return circle1;
-    case 2:
-      return circle2;
-    case 3:
-      return circle3;
-    case 4:
-      return circle4;
-  }
+export function getCircleMoodIcon(mood: MoodValue, prompt: Prompt): HtmlNode<never> {
+  const promptShort = SHORT_PROMPTS[prompt].toLowerCase();
+  const colorVar = `var(--${promptShort}-${mood})`;
+  
+  const radiusSize = mood === 1 ? 4 : mood === 2 ? 6 : mood === 3 ? 8 : 10;
+  
+  return circleMoodIcon(radiusSize, colorVar);
 }

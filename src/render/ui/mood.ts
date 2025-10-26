@@ -47,7 +47,7 @@ function renderMoodState(
   );
 
   const hover = hoverText(moodValue);
-  const icon = getCircleMoodIcon(moodValue);
+  const icon = getCircleMoodIcon(moodValue, prompt);
 
   return div(
     [],

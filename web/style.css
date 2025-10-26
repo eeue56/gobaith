@@ -29,6 +29,43 @@
   --mood-2: #52ec73;
   --mood-3: #42ac64;
   --mood-4: #336b34;
+  
+  /* Sleep quality - cyan/blue theme */
+  --sleep-1: #a8e6f5;
+  --sleep-2: #5eb8d6;
+  --sleep-3: #3a8fa8;
+  --sleep-4: #2b6d80;
+  
+  /* Depression - fuchsia/pink theme */
+  --depression-1: #f9b3e0;
+  --depression-2: #f573c9;
+  --depression-3: #f748b7;
+  --depression-4: #c73594;
+  
+  /* Anxiety - yellow theme */
+  --anxiety-1: #fff175;
+  --anxiety-2: #f5e645;
+  --anxiety-3: #e8d600;
+  --anxiety-4: #bfb000;
+  
+  /* Elevation - orange theme */
+  --elevation-1: #ffb380;
+  --elevation-2: #ff8c4d;
+  --elevation-3: #e74b1a;
+  --elevation-4: #b83b15;
+  
+  /* Irritableness - green theme */
+  --irritableness-1: #b3f585;
+  --irritableness-2: #8ef05c;
+  --irritableness-3: #77ef3d;
+  --irritableness-4: #5ec930;
+  
+  /* Psychotic - red theme */
+  --psychotic-1: #ff9999;
+  --psychotic-2: #ff6666;
+  --psychotic-3: #d93526;
+  --psychotic-4: #a82a1f;
+  
   --pico-color-sand-50: #f2f0ec;
   --pico-color-zinc-150: #d1d5db;
   --pico-color-zinc-300: #a4acba;
@@ -488,6 +525,103 @@
   margin-bottom: 0px;
 }
 
+/* Prompt-specific colors for daily bars */
+.daily-bar-sleep-1 {
+  background-color: var(--sleep-1);
+}
+
+.daily-bar-sleep-2 {
+  background-color: var(--sleep-2);
+}
+
+.daily-bar-sleep-3 {
+  background-color: var(--sleep-3);
+}
+
+.daily-bar-sleep-4 {
+  background-color: var(--sleep-4);
+}
+
+.daily-bar-depression-1 {
+  background-color: var(--depression-1);
+}
+
+.daily-bar-depression-2 {
+  background-color: var(--depression-2);
+}
+
+.daily-bar-depression-3 {
+  background-color: var(--depression-3);
+}
+
+.daily-bar-depression-4 {
+  background-color: var(--depression-4);
+}
+
+.daily-bar-anxiety-1 {
+  background-color: var(--anxiety-1);
+}
+
+.daily-bar-anxiety-2 {
+  background-color: var(--anxiety-2);
+}
+
+.daily-bar-anxiety-3 {
+  background-color: var(--anxiety-3);
+}
+
+.daily-bar-anxiety-4 {
+  background-color: var(--anxiety-4);
+}
+
+.daily-bar-elevation-1 {
+  background-color: var(--elevation-1);
+}
+
+.daily-bar-elevation-2 {
+  background-color: var(--elevation-2);
+}
+
+.daily-bar-elevation-3 {
+  background-color: var(--elevation-3);
+}
+
+.daily-bar-elevation-4 {
+  background-color: var(--elevation-4);
+}
+
+.daily-bar-irrability-1 {
+  background-color: var(--irritableness-1);
+}
+
+.daily-bar-irrability-2 {
+  background-color: var(--irritableness-2);
+}
+
+.daily-bar-irrability-3 {
+  background-color: var(--irritableness-3);
+}
+
+.daily-bar-irrability-4 {
+  background-color: var(--irritableness-4);
+}
+
+.daily-bar-psychotic-1 {
+  background-color: var(--psychotic-1);
+}
+
+.daily-bar-psychotic-2 {
+  background-color: var(--psychotic-2);
+}
+
+.daily-bar-psychotic-3 {
+  background-color: var(--psychotic-3);
+}
+
+.daily-bar-psychotic-4 {
+  background-color: var(--psychotic-4);
+}
+
 .daily-bar-sleep {
   background-color: var(--mood-3);
   width: 10px;
@@ -598,24 +732,28 @@
   width: 5px;
 }
 
+.daily-bar-total-Sleep {
+  background-color: var(--sleep-3);
+}
+
 .daily-bar-total-Depression {
-  background-color: var(--pico-color-fuchsia-400);
+  background-color: var(--depression-3);
 }
 
 .daily-bar-total-Elevation {
-  background-color: var(--pico-color-orange-450);
+  background-color: var(--elevation-3);
 }
 
 .daily-bar-total-Anxiety {
-  background-color: var(--pico-color-yellow-150);
+  background-color: var(--anxiety-3);
 }
 
 .daily-bar-total-Irrability {
-  background-color: var(--pico-color-green-150);
+  background-color: var(--irritableness-3);
 }
 
 .daily-bar-total-Psychotic {
-  background-color: var(--pico-color-red-500);
+  background-color: var(--psychotic-3);
 }
 
 .bipolar-periods {

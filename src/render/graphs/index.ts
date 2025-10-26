@@ -13,6 +13,7 @@ import {
   Settings,
   Update,
 } from "../../types";
+import { getPromptColor } from "../../utils/colors";
 import { dayToDate } from "../../utils/dates";
 import { renderDailyBar, renderTotaledDailyBar } from "./dailyBar";
 import { renderGraphChoices } from "./graphSelector";
@@ -54,7 +55,7 @@ export function getDataPerPrompt(entries: JournalEntry[]): PromptRenderData[] {
     data.push({
       prompt: prompt,
       data: promptData,
-      borderColor: getColorForPrompt(prompt),
+      borderColor: getPromptColor(prompt),
       borderWidth: 2,
       fill: false,
     });
@@ -71,18 +72,3 @@ export const GRAPHS: Record<GraphName, GraphRenderer> = {
   TOTALED_DAILY_BAR: renderTotaledDailyBar,
   "Interactive queries": renderInteractiveQueries,
 };
-
-const COLOR_INDEX: string[] = [
-  "#396AB1",
-  "#DA7C30",
-  "#3E9651",
-  "#CC2529",
-  "#535154",
-  "#6B4C9A",
-  "#922428",
-  "#948B3D",
-];
-
-function getColorForPrompt(prompt: Prompt): string {
-  return COLOR_INDEX[PROMPTS.indexOf(prompt)];
-}

@@ -17,6 +17,7 @@ function renderRowBars(
   entries: JournalEntry[]
 ): HtmlNode<Update> {
   const bodies: HtmlNode<Update>[] = [];
+  const promptShort = SHORT_PROMPTS[prompt].toLowerCase();
 
   for (const entry of entries) {
     const dayValue = entry.promptResponses[prompt];
@@ -37,6 +38,7 @@ function renderRowBars(
           attribute("title", title),
           class_("daily-bar"),
           class_(`daily-bar-${dayValue}`),
+          class_(`daily-bar-${promptShort}-${dayValue}`),
         ],
         []
       )
