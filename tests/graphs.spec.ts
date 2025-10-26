@@ -219,8 +219,10 @@ test("LINE_OVERVIEW filtering via clicking legend items", async ({ context, page
   // Click the first legend item to toggle its filter
   await legendIcons.first().click();
 
-  // After filtering, there should be fewer visible paths
-  // (The filtered prompt's path should still exist but be hidden or styled differently)
+  // After filtering, verify the path count changed
+  const filteredPathCount = await svgContent.locator("path").count();
+  expect(filteredPathCount).toBeLessThan(initialPathCount);
+
   // Check that the legend icon's stroke changed (indicating it's now filtered)
   const firstLegendIcon = legendIcons.first();
   const strokeWidth = await firstLegendIcon.getAttribute("stroke-width");
@@ -230,6 +232,10 @@ test("LINE_OVERVIEW filtering via clicking legend items", async ({ context, page
 
   // Click again to unfilter
   await legendIcons.first().click();
+
+  // After unfiltering, path count should return to initial
+  const unfilteredPathCount = await svgContent.locator("path").count();
+  expect(unfilteredPathCount).toBe(initialPathCount);
 
   // Stroke should return to "1px" when not filtered
   const newStrokeWidth = await firstLegendIcon.getAttribute("stroke-width");
