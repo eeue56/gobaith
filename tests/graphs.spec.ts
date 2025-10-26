@@ -148,3 +148,91 @@ test("LINE_OVERVIEW graph is responsive on mobile", async ({ context, page }) =>
   await expect(svgElement).toBeVisible();
 });
 
+test("LINE_OVERVIEW graph renders data points when no prompts are filtered", async ({ context, page }) => {
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "LINE_OVERVIEW");
+
+  const lineElement = page.locator("#line-overview");
+  await expect(lineElement).toBeVisible();
+
+  const svgContent = lineElement.locator("svg");
+  await expect(svgContent).toBeVisible();
+
+  // Check that path elements exist (representing the lines for each prompt)
+  const paths = svgContent.locator("path");
+  const pathCount = await paths.count();
+  expect(pathCount).toBeGreaterThan(0);
+
+  // Check that circles exist (representing data points)
+  const circles = svgContent.locator("circle");
+  const circleCount = await circles.count();
+  expect(circleCount).toBeGreaterThan(0);
+});
+
+test("SPIDERWEB graph renders data points", async ({ context, page }) => {
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "SPIDERWEB");
+
+  const spiderwebElement = page.locator("#spiderweb");
+  await expect(spiderwebElement).toBeVisible();
+
+  const svgContent = spiderwebElement.locator("svg");
+  await expect(svgContent).toBeVisible();
+
+  // Check that path elements exist (representing the mood data polygon)
+  const paths = svgContent.locator("path");
+  const pathCount = await paths.count();
+  expect(pathCount).toBeGreaterThan(0);
+
+  // Check that circles exist (representing data points at each axis)
+  const circles = svgContent.locator("circle");
+  const circleCount = await circles.count();
+  expect(circleCount).toBeGreaterThan(0);
+});
+
+test("LINE_OVERVIEW filtering via clicking legend items", async ({ context, page }) => {
+  await changeTab(page, "GRAPH");
+  await expectActiveTab(page, "GRAPH");
+
+  await page.selectOption("#graph-selection", "LINE_OVERVIEW");
+
+  const lineElement = page.locator("#line-overview");
+  await expect(lineElement).toBeVisible();
+
+  const svgContent = lineElement.locator("svg");
+  await expect(svgContent).toBeVisible();
+
+  // Get initial path count (all prompts visible)
+  const initialPaths = svgContent.locator("path");
+  const initialPathCount = await initialPaths.count();
+  expect(initialPathCount).toBeGreaterThan(0);
+
+  // Click on a legend item to filter it out
+  const legendIcons = svgContent.locator(".legend-color-icon");
+  const legendCount = await legendIcons.count();
+  expect(legendCount).toBeGreaterThan(0);
+
+  // Click the first legend item to toggle its filter
+  await legendIcons.first().click();
+
+  // After filtering, there should be fewer visible paths
+  // (The filtered prompt's path should still exist but be hidden or styled differently)
+  // Check that the legend icon's stroke changed (indicating it's now filtered)
+  const firstLegendIcon = legendIcons.first();
+  const strokeWidth = await firstLegendIcon.getAttribute("stroke-width");
+  
+  // When filtered, stroke-width should be "3px" (as per the code)
+  expect(strokeWidth).toBe("3px");
+
+  // Click again to unfilter
+  await legendIcons.first().click();
+
+  // Stroke should return to "1px" when not filtered
+  const newStrokeWidth = await firstLegendIcon.getAttribute("stroke-width");
+  expect(newStrokeWidth).toBe("1px");
+});
+
