@@ -14,7 +14,12 @@ import { generateData } from "../src/utils/data";
 import { dateToDay } from "../src/utils/dates";
 import { awaitForTitleToChange, changeTab } from "../tests/helpers";
 
-async function closeElectron(electronApp: ElectronApplication) {
+type PageRunner =
+  | { kind: "Electron"; electronApp: ElectronApplication }
+  | { kind: "Android"; device: AndroidDevice }
+  | { kind: "Chromium"; browser: Browser };
+
+async function closeElectron(electronApp: ElectronApplication): Promise<void> {
   await electronApp.close();
 }
 
@@ -101,8 +106,15 @@ async function screenshotGraphLineOverview(page: Page, basePath: string) {
   // pause so that the animation can finish
   await page.waitForTimeout(500);
 
+  // only show one field
+  for (let i = 0; i < 5; i++) {
+    await page.locator(".legend-color-icon").nth(i).click();
+  }
+  await page.locator(".legend-color-icon").nth(2).click();
+
   await page.screenshot({
     path: `${basePath}/graph_line_overview.png`,
+    scale: "device",
   });
 }
 
@@ -142,13 +154,9 @@ async function screenshotSettings(page: Page, basePath: string) {
 
   await page.screenshot({
     path: `${basePath}/settings.png`,
+    scale: "device",
   });
 }
-
-type PageRunner =
-  | { kind: "Electron"; electronApp: ElectronApplication }
-  | { kind: "Android"; device: AndroidDevice }
-  | { kind: "Chromium"; browser: Browser };
 
 async function setupPage(page: Page): Promise<void> {
   await page.locator(".current-day").first().innerHTML();
@@ -203,13 +211,13 @@ async function makePage(): Promise<{ page: Page; runner: PageRunner }> {
     return { page, runner: { kind: "Electron", electronApp } };
   }
 
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
 
   const page = await browser.newPage({
     screen: { width: 500, height: 1200 },
   });
 
-  await page.goto("http://localhost:9000");
+  await page.goto("http://localhost:8000");
 
   return {
     page: page,
