@@ -55,10 +55,10 @@
   --elevation-4: #b83b15;
   
   /* Irritableness - green theme */
-  --irritableness-1: #b3f585;
-  --irritableness-2: #8ef05c;
-  --irritableness-3: #77ef3d;
-  --irritableness-4: #5ec930;
+  --irrability-1: #b3f585;
+  --irrability-2: #8ef05c;
+  --irrability-3: #77ef3d;
+  --irrability-4: #5ec930;
   
   /* Psychotic - red theme */
   --psychotic-1: #ff9999;
@@ -591,19 +591,19 @@
 }
 
 .daily-bar-irrability-1 {
-  background-color: var(--irritableness-1);
+  background-color: var(--irrability-1);
 }
 
 .daily-bar-irrability-2 {
-  background-color: var(--irritableness-2);
+  background-color: var(--irrability-2);
 }
 
 .daily-bar-irrability-3 {
-  background-color: var(--irritableness-3);
+  background-color: var(--irrability-3);
 }
 
 .daily-bar-irrability-4 {
-  background-color: var(--irritableness-4);
+  background-color: var(--irrability-4);
 }
 
 .daily-bar-psychotic-1 {
@@ -749,7 +749,7 @@
 }
 
 .daily-bar-total-Irrability {
-  background-color: var(--irritableness-3);
+  background-color: var(--irrability-3);
 }
 
 .daily-bar-total-Psychotic {
