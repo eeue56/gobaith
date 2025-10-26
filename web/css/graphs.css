@@ -21,9 +21,16 @@
 
 .spiderweb-container,
 .line-overview-container {
-  width: 100%;
   margin: auto auto;
   padding: 10px;
+}
+
+.spiderweb-container {
+  width: 70vh;
+}
+
+.line-overview-container {
+  width: 100%;
 }
 
 .spiderweb-container svg,
@@ -31,9 +38,24 @@
   max-width: 100%;
 }
 
+.graphs-tab-content > div > .date-controls {
+  row-gap: 10px;
+  max-width: 60vw;
+  align-self: center;
+  justify-self: center;
+}
+
 @media (max-width: 600px) {
   .spiderweb-container,
   .line-overview-container {
     padding: 10px;
+  }
+
+  .spiderweb-container {
+    width: auto;
+  }
+
+  #graph-selection {
+    margin-top: 30px;
   }
 }

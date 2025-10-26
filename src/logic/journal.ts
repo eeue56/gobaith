@@ -36,7 +36,7 @@ export function initializeEntryForDay(
     pills[pillName] = 0;
   }
 
-  entry = JournalEntry(day, pills, PromptResponses(1, 1, 1, 1, 1), 0, []);
+  entry = JournalEntry(day, pills, PromptResponses(1, 1, 1, 1, 1, 1), []);
 
   return { kind: "CreatedNewEntry", entry };
 }

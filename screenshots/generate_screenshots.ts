@@ -14,11 +14,17 @@ import { generateData } from "../src/utils/data";
 import { dateToDay } from "../src/utils/dates";
 import { awaitForTitleToChange, changeTab } from "../tests/helpers";
 
-async function closeElectron(electronApp: ElectronApplication) {
+type PageRunner =
+  | { kind: "Electron"; electronApp: ElectronApplication }
+  | { kind: "Android"; device: AndroidDevice }
+  | { kind: "Chromium"; browser: Browser };
+
+async function closeElectron(electronApp: ElectronApplication): Promise<void> {
   await electronApp.close();
 }
 
 const logEntries: Record<Prompt, string> = {
+  "Sleep quality": "I had a good night's sleep",
   "Today's feelings of anxiety":
     "I felt a bit anxious when getting on a crowded train",
   "Today's feelings of elevation": "I could do anything right now",
@@ -85,9 +91,6 @@ async function screenshotGraphSpiderweb(page: Page, basePath: string) {
   await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("SPIDERWEB");
 
-  // pause so that the animation can finish
-  await page.waitForTimeout(500);
-
   await page.screenshot({
     path: `${basePath}/graph_spiderweb.png`,
   });
@@ -97,11 +100,15 @@ async function screenshotGraphLineOverview(page: Page, basePath: string) {
   await changeTab(page, "GRAPH");
   await page.locator("#graph-selection").selectOption("LINE_OVERVIEW");
 
-  // pause so that the animation can finish
-  await page.waitForTimeout(500);
+  // only show one field
+  for (let i = 0; i < 5; i++) {
+    await page.locator(".legend-color-icon").nth(i).click();
+  }
+  await page.locator(".legend-color-icon").nth(2).click();
 
   await page.screenshot({
     path: `${basePath}/graph_line_overview.png`,
+    scale: "device",
   });
 }
 
@@ -141,13 +148,9 @@ async function screenshotSettings(page: Page, basePath: string) {
 
   await page.screenshot({
     path: `${basePath}/settings.png`,
+    scale: "device",
   });
 }
-
-type PageRunner =
-  | { kind: "Electron"; electronApp: ElectronApplication }
-  | { kind: "Android"; device: AndroidDevice }
-  | { kind: "Chromium"; browser: Browser };
 
 async function setupPage(page: Page): Promise<void> {
   await page.locator(".current-day").first().innerHTML();
@@ -202,13 +205,13 @@ async function makePage(): Promise<{ page: Page; runner: PageRunner }> {
     return { page, runner: { kind: "Electron", electronApp } };
   }
 
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
 
   const page = await browser.newPage({
     screen: { width: 500, height: 1200 },
   });
 
-  await page.goto("http://localhost:9000");
+  await page.goto("http://localhost:8000");
 
   return {
     page: page,

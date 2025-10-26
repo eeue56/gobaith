@@ -16,13 +16,12 @@ import { awaitForTitleToChange, changeTab, expectActiveTab } from "./helpers";
 test("the importer can import state", async ({ context, page }) => {
   await changeTab(page, "IMPORT");
 
-  const responses = PromptResponses(1, 2, 3, 4, 1);
+  const responses = PromptResponses(3, 1, 2, 3, 4, 1);
   const logEntry: LogEntry = { time: new Date(), text: "Imported stuff" };
   const journalEntry = JournalEntry(
     dateToDay(new Date()),
     {},
     responses,
-    13.5,
     [logEntry]
   );
 
@@ -51,28 +50,40 @@ test("the importer can import state", async ({ context, page }) => {
 
   await changeTab(page, "JOURNAL");
 
-  await expect(await page.locator("#hours-slept").innerText()).toContain(
-    `${journalEntry.hoursSlept}`
-  );
+  // Find the sleep quality prompt group specifically
+  const sleepPromptGroup = page.locator(".prompt-group").filter({
+    has: page.locator('.prompt h4:text("Sleep quality")')
+  });
+  
+  // Verify the sleep quality prompt exists
+  await expect(sleepPromptGroup).toHaveCount(1);
+  
+  // Check the active mood value for sleep quality
+  const sleepMoodValue = await sleepPromptGroup
+    .locator(".prompt-answer.active")
+    .getAttribute("data-mood-value");
+  expect(sleepMoodValue).toEqual(`${journalEntry.promptResponses["Sleep quality"]}`);
 
   const promptGroups = await page.locator(".prompt-group").all();
 
   for (const promptGroup of promptGroups) {
-    const prompt = await promptGroup.locator(".prompt");
+    const prompt = await promptGroup.locator(".prompt h4");
     const promptTitle = await prompt.innerText();
 
-    if (!isPrompt(promptTitle)) {
+    if (!isPrompt(promptTitle) && promptTitle !== "Sleep quality") {
       console.error("Expected prompt, got", promptTitle);
       await expect(promptTitle).toEqual("Invalid prompt!");
       break;
     }
 
-    const promptValue = responses[promptTitle];
-    const moodValue = await promptGroup
-      .locator(".prompt-answer.active")
-      .getAttribute("data-mood-value");
+    if (isPrompt(promptTitle)) {
+      const promptValue = responses[promptTitle];
+      const moodValue = await promptGroup
+        .locator(".prompt-answer.active")
+        .getAttribute("data-mood-value");
 
-    await expect(moodValue).toEqual(`${promptValue}`);
+      await expect(moodValue).toEqual(`${promptValue}`);
+    }
   }
 });
 

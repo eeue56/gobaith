@@ -240,6 +240,10 @@ async function runMigration(
       console.info("IndexedDB: Adding queries to settings");
       return upgradeDatabaseToVersion5(db, transaction);
     }
+    case 6: {
+      console.info("IndexedDB: Migrating hoursSlept to sleepQuality");
+      return db;
+    }
   }
 }
 

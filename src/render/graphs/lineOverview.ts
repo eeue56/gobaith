@@ -4,6 +4,7 @@ import {
   div,
   Event,
   HtmlNode,
+  none,
   on,
   text,
 } from "@eeue56/coed";
@@ -90,20 +91,22 @@ function viewLegends(
       rect(
         [clickHandler],
         [
-          attribute("x", String(width - padding.right + 10)),
+          attribute("x", String(width - padding.right + 20)),
           attribute("y", String(legendY - 22)),
           attribute("fill", dataset.borderColor),
           attribute("stroke", isNotFiltered ? "black" : "white"),
+          attribute("stroke-width", isNotFiltered ? "1px" : "3px"),
           class_("legend-color-icon"),
         ]
       ),
       svgText(
         [clickHandler],
         [
-          attribute("x", String(width - padding.right + 40)),
+          attribute("x", String(width - padding.right + 60)),
           attribute("y", String(legendY)),
           attribute("font-size", "14"),
           attribute("fill", "#333"),
+          isNotFiltered ? none() : attribute("text-decoration", "line-through"),
           class_("legend-text"),
         ],
         [text(SHORT_PROMPTS[dataset.prompt])]
@@ -181,7 +184,7 @@ function viewXLabels(labels: string[], xStep: number): HtmlNode<never>[] {
           [],
           [
             attribute("x", String(x)),
-            attribute("y", String(height - padding.bottom + 50)),
+            attribute("y", String(height - padding.bottom + 60)),
             class_("graph-overview-date-label"),
             attribute("text-anchor", "middle"),
             attribute(

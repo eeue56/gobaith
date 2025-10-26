@@ -46,10 +46,10 @@ test("the user removes app state (including journals)", async ({
   await changeTab(page, "GRAPH");
 
   // there should only be one day's worth of bars (today's)
-  await expect(await page.locator(".daily-bar")).toHaveCount(5);
+  await expect(await page.locator(".daily-bar")).toHaveCount(6);
 
   // ...and all the bars should be at the default value (1)
-  await expect(await page.locator(".daily-bar-1")).toHaveCount(5);
+  await expect(await page.locator(".daily-bar-1")).toHaveCount(6);
 });
 
 test("the debug log contains events triggered", async ({ context, page }) => {
@@ -83,6 +83,7 @@ test("the debug log contains events triggered", async ({ context, page }) => {
 UpdateCurrentTab
 UpdateCurrentTab
 UpdateCurrentDay
+UpdatePromptValue
 UpdatePromptValue
 UpdatePromptValue
 UpdatePromptValue

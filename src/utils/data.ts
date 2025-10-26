@@ -15,9 +15,9 @@ import { dateToDay, previousDay } from "./dates";
  */
 function generateDataForADay(day: Day): JournalEntry {
   const pills = {};
-  const hoursSlept = Math.floor(Math.random() * 48) / 2;
   const logs: LogEntry[] = [];
   const promptResponses: PromptResponses = PromptResponses(
+    generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
@@ -29,7 +29,6 @@ function generateDataForADay(day: Day): JournalEntry {
     day: day,
     pills: pills,
     promptResponses: promptResponses,
-    hoursSlept: hoursSlept,
     logs: logs,
   };
 }
@@ -49,6 +48,7 @@ function generatePromptResponsesBasedOnMoodState(
   newLength: CurrentMoodLength;
 } {
   const promptResponses: PromptResponses = PromptResponses(
+    generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
@@ -160,12 +160,11 @@ export function generateDataBasedOnCurrentMood(startDay: Day): AppState {
       );
 
     const pills = {};
-    const hoursSlept = Math.floor(Math.random() * 48) / 2;
     const logs: LogEntry[] = [];
 
     currentMoodState = newState;
     currentMoodLength = newLength;
-    entries.push({ day: day, hoursSlept, pills, logs, promptResponses });
+    entries.push({ day: day, pills, logs, promptResponses });
     day = previousDay(day);
   }
 
