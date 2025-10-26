@@ -30,41 +30,41 @@
   --mood-3: #42ac64;
   --mood-4: #336b34;
   
-  /* Sleep quality - cyan/blue theme */
-  --sleep-1: #a8e6f5;
-  --sleep-2: #5eb8d6;
-  --sleep-3: #3a8fa8;
-  --sleep-4: #2b6d80;
+  /* Sleep quality - muted blue theme */
+  --sleep-1: #8ba6b8;
+  --sleep-2: #6b8a9f;
+  --sleep-3: #4d6e85;
+  --sleep-4: #36556b;
   
-  /* Depression - fuchsia/pink theme */
-  --depression-1: #f9b3e0;
-  --depression-2: #f573c9;
-  --depression-3: #f748b7;
-  --depression-4: #c73594;
+  /* Depression - muted purple theme */
+  --depression-1: #a88bab;
+  --depression-2: #8e6f91;
+  --depression-3: #745578;
+  --depression-4: #5c3f5f;
   
-  /* Anxiety - yellow theme */
-  --anxiety-1: #fff175;
-  --anxiety-2: #f5e645;
-  --anxiety-3: #e8d600;
-  --anxiety-4: #bfb000;
+  /* Anxiety - muted amber theme */
+  --anxiety-1: #bfa878;
+  --anxiety-2: #a58d5e;
+  --anxiety-3: #8a7347;
+  --anxiety-4: #6f5b34;
   
-  /* Elevation - orange theme */
-  --elevation-1: #ffb380;
-  --elevation-2: #ff8c4d;
-  --elevation-3: #e74b1a;
-  --elevation-4: #b83b15;
+  /* Elevation - muted coral theme */
+  --elevation-1: #b88976;
+  --elevation-2: #9f6e5b;
+  --elevation-3: #855543;
+  --elevation-4: #6b3f30;
   
-  /* Irritableness - green theme */
-  --irrability-1: #b3f585;
-  --irrability-2: #8ef05c;
-  --irrability-3: #77ef3d;
-  --irrability-4: #5ec930;
+  /* Irritableness - muted sage theme */
+  --irrability-1: #8eb889;
+  --irrability-2: #749e6f;
+  --irrability-3: #5c8357;
+  --irrability-4: #466842;
   
-  /* Psychotic - red theme */
-  --psychotic-1: #ff9999;
-  --psychotic-2: #ff6666;
-  --psychotic-3: #d93526;
-  --psychotic-4: #a82a1f;
+  /* Psychotic - muted rose theme */
+  --psychotic-1: #b88589;
+  --psychotic-2: #9f6a6e;
+  --psychotic-3: #855156;
+  --psychotic-4: #6b3c40;
   
   --pico-color-sand-50: #f2f0ec;
   --pico-color-zinc-150: #d1d5db;
