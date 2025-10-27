@@ -44,7 +44,7 @@ import {
 } from "../../types";
 import { dayToString } from "../../utils/dates";
 import { iconDelete } from "../ui/icons";
-import { getPromptColor } from "../../utils/colors";
+import { getPromptColor, getPromptColorHex } from "../../utils/colors";
 
 /**
  * Extract all unique prompts from a query
@@ -109,13 +109,16 @@ function renderComparisonChoice(
 
 function renderMoodValueChoice(
   value: MoodValue,
-  activeValue: MoodValue
+  activeValue: MoodValue,
+  prompt: Prompt
 ): HtmlNode<never> {
+  const backgroundColor = getPromptColorHex(prompt, value);
   return option(
     [],
     [
       attribute("value", value.toString()),
       booleanAttribute("selected", value === activeValue),
+      attribute("style", `background-color: ${backgroundColor}; color: #000;`),
     ],
     [text(moodStateFromValue(value))]
   );
@@ -125,11 +128,13 @@ function renderPromptChoice(
   prompt: Prompt,
   activePrompt: Prompt
 ): HtmlNode<never> {
+  const backgroundColor = getPromptColor(prompt);
   return option(
     [],
     [
       attribute("value", prompt),
       booleanAttribute("selected", prompt === activePrompt),
+      attribute("style", `background-color: ${backgroundColor}; color: #000;`),
     ],
     [text(prompt)]
   );
@@ -177,12 +182,14 @@ function renderComparisonChoices(
 
 function renderMoodValueChoices(
   activeMoodValue: MoodValue,
+  prompt: Prompt,
   index: number,
   path: QueryPath[]
 ): HtmlNode<Update> {
   const choices = MOOD_VALUES.map((moodValue) =>
-    renderMoodValueChoice(moodValue, activeMoodValue)
+    renderMoodValueChoice(moodValue, activeMoodValue, prompt)
   );
+  const selectBackgroundColor = getPromptColorHex(prompt, activeMoodValue);
   return div(
     [],
     [],
@@ -206,7 +213,7 @@ function renderMoodValueChoices(
             };
           }),
         ],
-        [],
+        [attribute("style", `background-color: ${selectBackgroundColor}; color: #000;`)],
         choices
       ),
     ]
@@ -219,6 +226,7 @@ function renderPromptChoices(
   path: QueryPath[]
 ): HtmlNode<Update> {
   const choices = PROMPTS.map((key) => renderPromptChoice(key, activePrompt));
+  const selectBackgroundColor = getPromptColor(activePrompt);
   return div(
     [],
     [],
@@ -242,7 +250,7 @@ function renderPromptChoices(
             };
           }),
         ],
-        [],
+        [attribute("style", `background-color: ${selectBackgroundColor}; color: #000;`)],
         choices
       ),
     ]
@@ -343,7 +351,7 @@ function renderFilterBuilder(
     [
       renderPromptChoices(query.prompt, index, path),
       renderComparisonChoices(query.comparison, index, path),
-      renderMoodValueChoices(query.value, index, path),
+      renderMoodValueChoices(query.value, query.prompt, index, path),
     ]
   );
 }
