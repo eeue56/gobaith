@@ -791,11 +791,46 @@
 }
 
 .export-data {
-  height: fit-content;
+  min-height: 200px;
+  max-height: 400px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .import-field {
-  height: fit-content;
+  min-height: 150px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.import-export-instructions {
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(1, 170, 255, 0.1);
+  border-left: 4px solid var(--pico-primary);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.import-export-instructions strong {
+  color: var(--pico-primary);
+}
+
+.import-section,
+.export-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+
+.export-section h3 {
+  margin-top: 0;
 }
 
 .tab-title {

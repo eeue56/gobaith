@@ -18,54 +18,85 @@ import { importDataFromJson } from "../../logic/journal";
 import { AppState, dontSend, Settings, Update } from "../../types";
 
 export function renderEnterTextToImport(): HtmlNode<Update> {
-  return form(
+  return div(
     [],
-    [],
+    [class_("import-section")],
     [
-      fieldset(
+      h3([], [], [text("Import data")]),
+      div(
         [],
-        [],
+        [class_("import-export-instructions")],
         [
-          textarea(
-            [],
-            [
-              attribute("id", "import-text"),
-              class_("import-field"),
-              attribute("placeholder", "Paste JSON here to import it..."),
-            ],
-            []
-          ),
-          button(
-            [on("click", () => updateImport())],
-            [
-              attribute("id", "update-import-from-text"),
-              attribute(
-                "title",
-                "Import JSON. Check the developer console to see success/errors"
-              ),
-            ],
-            [text("Import")]
-          ),
+          p([], [], [
+            text(
+              "To import your data, either paste the JSON content below or choose a file. "
+            ),
+          ]),
+          p([], [], [
+            text("You can import either "),
+            text("settings"),
+            text(" (including your pills) or "),
+            text("state"),
+            text(" (including all journal entries). "),
+          ]),
+          p([], [], [
+            text(
+              "Warning: Importing will replace your current data. Make sure to export first if you want to keep a backup!"
+            ),
+          ]),
         ]
       ),
-      label([], [], [text("Chose a json file to import")]),
-      input<Update>(
+      form(
+        [],
+        [],
         [
-          on("change", (event) => {
-            if (!event.target) {
-              return dontSend();
-            }
+          fieldset(
+            [],
+            [],
+            [
+              textarea(
+                [],
+                [
+                  attribute("id", "import-text"),
+                  class_("import-field"),
+                  attribute("placeholder", "Paste JSON here to import it..."),
+                  attribute("rows", "8"),
+                ],
+                []
+              ),
+              button(
+                [on("click", () => updateImport())],
+                [
+                  attribute("id", "update-import-from-text"),
+                  attribute(
+                    "title",
+                    "Import JSON. Check the developer console to see success/errors"
+                  ),
+                ],
+                [text("Import from text")]
+              ),
+            ]
+          ),
+          label([], [], [text("Or choose a JSON file to import:")]),
+          input<Update>(
+            [
+              on("change", (event) => {
+                if (!event.target) {
+                  return dontSend();
+                }
 
-            return {
-              kind: "ReadImportedFile",
-              target: event.target as HTMLInputElement,
-            };
-          }),
-        ],
-        [attribute("type", "file"), attribute("accept", ".json")]
+                return {
+                  kind: "ReadImportedFile",
+                  target: event.target as HTMLInputElement,
+                };
+              }),
+            ],
+            [attribute("type", "file"), attribute("accept", ".json")]
+          ),
+
+          div([], [], [p([], [attribute("id", "import-status")], [])]),
+        ]
       ),
-
-      div([], [], [p([], [attribute("id", "import-status")], [])]),
     ]
   );
 }
@@ -113,18 +144,25 @@ function renderExported(
   title: string,
   downloadText: string,
   id: string,
-  data: AppState | Settings
+  data: AppState | Settings,
+  description: string
 ): HtmlNode<Update> {
-  const stringData = JSON.stringify(data);
+  const stringData = JSON.stringify(data, null, 2); // Pretty print with 2-space indentation
 
   return div(
     [],
-    [],
+    [class_("export-section")],
     [
       h3([], [], [text(title)]),
+      p([], [], [text(description)]),
       textarea(
         [],
-        [attribute("id", `textarea-${id}`), class_("export-data")],
+        [
+          attribute("id", `textarea-${id}`),
+          class_("export-data"),
+          attribute("readonly", "true"),
+          attribute("rows", "10"),
+        ],
         [text(stringData)]
       ),
       button(
@@ -139,20 +177,22 @@ function renderExported(
 export function renderExportedSettings(settings: Settings): HtmlNode<Update> {
   const id = "download-settings";
   return renderExported(
-    "Exported settings (including pills)",
-    "Download settings",
+    "Export settings",
+    "Download settings as JSON file",
     id,
-    settings
+    settings,
+    "Your settings include custom pills and query configurations. You can copy this JSON or download it as a file to back up or transfer to another device."
   );
 }
 
 export function renderExportedState(state: AppState): HtmlNode<Update> {
   const id = "download-state";
   return renderExported(
-    "Exported state (including journal entries)",
-    "Download state",
+    "Export state",
+    "Download state as JSON file",
     id,
-    state
+    state,
+    "Your state includes all journal entries, mood data, and logs. You can copy this JSON or download it as a file to back up or transfer to another device."
   );
 }
 
@@ -169,8 +209,8 @@ function downloadJson(object: AppState | Settings): Update {
     }
   }
 
-  const blob = new Blob([JSON.stringify(object)], {
-    type: "text/json",
+  const blob = new Blob([JSON.stringify(object, null, 2)], {
+    type: "application/json",
   });
 
   const url = URL.createObjectURL(blob);
