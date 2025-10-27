@@ -721,11 +721,18 @@
   padding-bottom: 40px;
 }
 
+.daily-bar-total-row {
+  display: flex;
+  align-items: center;
+  min-height: 50vh;
+}
+
 .daily-bar-total-colors {
   display: flex;
   align-items: center;
   width: fit-content;
-  transform: rotate(-90deg) translate(-100%) translateY(50%);
+  transform: rotate(-90deg) translateX(-50%);
+  transform-origin: left top;
 }
 
 .daily-bar-total {
