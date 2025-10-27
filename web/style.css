@@ -731,8 +731,8 @@
   display: flex;
   align-items: center;
   width: fit-content;
-  transform: rotate(-90deg) translateX(-50%);
-  transform-origin: left top;
+  transform: rotate(-90deg);
+  transform-origin: center center;
   margin-top: 100px;
 }
 
