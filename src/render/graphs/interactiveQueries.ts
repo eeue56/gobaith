@@ -75,8 +75,9 @@ function getColorLuminance(hexColor: string): number {
 function getContrastTextColor(backgroundColor: string): string {
   const luminance = getColorLuminance(backgroundColor);
   // Use white text for dark backgrounds, black for light backgrounds
-  // Threshold at 0.5 provides good contrast
-  return luminance > 0.5 ? '#000' : '#fff';
+  // WCAG recommends threshold at 0.179 for optimal contrast
+  // This corresponds to approximately #808080 gray
+  return luminance > 0.179 ? '#000' : '#fff';
 }
 
 /**
