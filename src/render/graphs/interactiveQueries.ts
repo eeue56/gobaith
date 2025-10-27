@@ -12,6 +12,7 @@ import {
   option,
   select,
   strong,
+  style_,
   text,
 } from "@eeue56/coed";
 import { pathToKey, runDurationQuery, runQuery } from "../../logic/query";
@@ -42,9 +43,9 @@ import {
   Settings,
   Update,
 } from "../../types";
+import { getPromptColor, getPromptColorHex } from "../../utils/colors";
 import { dayToString } from "../../utils/dates";
 import { iconDelete } from "../ui/icons";
-import { getPromptColor, getPromptColorHex } from "../../utils/colors";
 
 /**
  * Calculate relative luminance of a hex color
@@ -52,18 +53,18 @@ import { getPromptColor, getPromptColorHex } from "../../utils/colors";
  */
 function getColorLuminance(hexColor: string): number {
   // Remove # if present
-  const hex = hexColor.replace('#', '');
-  
+  const hex = hexColor.replace("#", "");
+
   // Convert to RGB
   const r = parseInt(hex.substring(0, 2), 16) / 255;
   const g = parseInt(hex.substring(2, 4), 16) / 255;
   const b = parseInt(hex.substring(4, 6), 16) / 255;
-  
+
   // Apply gamma correction
   const rLinear = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
   const gLinear = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
   const bLinear = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
-  
+
   // Calculate luminance
   return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
 }
@@ -77,7 +78,7 @@ function getContrastTextColor(backgroundColor: string): string {
   // Use white text for dark backgrounds, black for light backgrounds
   // WCAG recommends threshold at 0.179 for optimal contrast
   // This corresponds to approximately #808080 gray
-  return luminance > 0.179 ? '#000' : '#fff';
+  return luminance > 0.179 ? "#000" : "#fff";
 }
 
 /**
@@ -90,7 +91,7 @@ function getSelectTextColor(backgroundColor: string): string {
   // Use a higher threshold (0.4) for select elements to ensure
   // the actively selected text is always highly readable
   // Most colored backgrounds will get white text
-  return luminance > 0.4 ? '#000' : '#fff';
+  return luminance > 0.4 ? "#000" : "#fff";
 }
 
 /**
@@ -98,7 +99,7 @@ function getSelectTextColor(backgroundColor: string): string {
  */
 function extractPromptsFromQuery(query: Query | Duration): Prompt[] {
   const prompts: Prompt[] = [];
-  
+
   function extractFromQuery(q: Query | Duration): void {
     switch (q.kind) {
       case "And":
@@ -119,7 +120,7 @@ function extractPromptsFromQuery(query: Query | Duration): Prompt[] {
         break;
     }
   }
-  
+
   extractFromQuery(query);
   return prompts;
 }
@@ -131,12 +132,12 @@ function generatePromptGradient(prompts: Prompt[]): string {
   if (prompts.length === 0) {
     return "var(--pico-primary)";
   }
-  
+
   if (prompts.length === 1) {
     return getPromptColor(prompts[0]);
   }
-  
-  const colors = prompts.map(p => getPromptColor(p));
+
+  const colors = prompts.map((p) => getPromptColor(p));
   return `linear-gradient(90deg, ${colors.join(", ")})`;
 }
 
@@ -166,7 +167,8 @@ function renderMoodValueChoice(
     [
       attribute("value", value.toString()),
       booleanAttribute("selected", value === activeValue),
-      attribute("style", `background-color: ${backgroundColor}; color: ${textColor};`),
+      style_(`background-color`, backgroundColor),
+      style_("color", textColor),
     ],
     [text(moodStateFromValue(value))]
   );
@@ -183,7 +185,8 @@ function renderPromptChoice(
     [
       attribute("value", prompt),
       booleanAttribute("selected", prompt === activePrompt),
-      attribute("style", `background-color: ${backgroundColor}; color: ${textColor};`),
+      style_(`background-color`, backgroundColor),
+      style_("color", textColor),
     ],
     [text(prompt)]
   );
@@ -222,7 +225,7 @@ function renderComparisonChoices(
             };
           }),
         ],
-        [],
+        [attribute("color", "black")],
         choices
       ),
     ]
@@ -263,7 +266,10 @@ function renderMoodValueChoices(
             };
           }),
         ],
-        [attribute("style", `background-color: ${selectBackgroundColor}; color: ${selectTextColor};`)],
+        [
+          style_(`background-color`, selectBackgroundColor),
+          style_("color", selectTextColor),
+        ],
         choices
       ),
     ]
@@ -301,7 +307,10 @@ function renderPromptChoices(
             };
           }),
         ],
-        [attribute("style", `background-color: ${selectBackgroundColor}; color: ${selectTextColor};`)],
+        [
+          style_(`background-color`, selectBackgroundColor),
+          style_("color", selectTextColor),
+        ],
         choices
       ),
     ]
@@ -584,19 +593,21 @@ export function renderQueryExplaination(query: Query | Duration): string {
   }
 }
 
-function renderPeriod(entries: JournalEntry[], prompts: Prompt[]): HtmlNode<never> {
+function renderPeriod(
+  entries: JournalEntry[],
+  prompts: Prompt[]
+): HtmlNode<never> {
   const earliestDay = entries[0];
   const latestDay = entries[entries.length - 1];
-  const borderColor = prompts.length > 0 ? getPromptColor(prompts[0]) : "var(--pico-primary-background)";
+  const borderColor =
+    prompts.length > 0
+      ? getPromptColor(prompts[0])
+      : "var(--pico-primary-background)";
   return div(
     [],
-    [class_("period-item"), attribute("style", `border-left-color: ${borderColor}`)],
+    [class_("period-item"), style_(`border-left-color`, borderColor)],
     [
-      div(
-        [],
-        [class_("period-duration")],
-        [text(`${entries.length} days`)]
-      ),
+      div([], [class_("period-duration")], [text(`${entries.length} days`)]),
       div(
         [],
         [class_("period-dates")],
@@ -610,11 +621,22 @@ function renderPeriod(entries: JournalEntry[], prompts: Prompt[]): HtmlNode<neve
   );
 }
 
-function renderPeriods(periods: JournalEntry[][], prompts: Prompt[]): HtmlNode<never> {
+function renderPeriods(
+  periods: JournalEntry[][],
+  prompts: Prompt[]
+): HtmlNode<never> {
   if (periods.length === 0) {
-    return div([], [class_("no-periods")], [text("No matching periods found.")]);
+    return div(
+      [],
+      [class_("no-periods")],
+      [text("No matching periods found.")]
+    );
   }
-  return div([], [class_("periods-list")], periods.map(p => renderPeriod(p, prompts)));
+  return div(
+    [],
+    [class_("periods-list")],
+    periods.map((p) => renderPeriod(p, prompts))
+  );
 }
 
 function renderAddDurationQueryButton(): HtmlNode<Update> {
@@ -665,10 +687,19 @@ function renderQueryHeader(
   const gradient = generatePromptGradient(prompts);
   return div(
     [],
-    [class_("query-header"), attribute("style", `border-left: 4px solid; border-image: ${gradient} 1;`)],
     [
-      div([], [class_("query-title")], [text(`Query #${index + 1} (${queryType})`)]),
-      div([], [class_("query-controls")], [])
+      class_("query-header"),
+      style_(`border-left`, `4px solid`),
+      style_(`padding-left`, "5px"),
+      style_(`border-image`, `${gradient} 1`),
+    ],
+    [
+      div(
+        [],
+        [class_("query-title")],
+        [text(`Query #${index + 1} (${queryType})`)]
+      ),
+      div([], [class_("query-controls")], []),
     ]
   );
 }
@@ -678,7 +709,8 @@ function renderResultVisualization(
   totalDays: number,
   prompts: Prompt[]
 ): HtmlNode<never> {
-  const percentage = totalDays > 0 ? Math.min((days / totalDays) * 100, 100) : 0;
+  const percentage =
+    totalDays > 0 ? Math.min((days / totalDays) * 100, 100) : 0;
   const gradient = generatePromptGradient(prompts);
   return div(
     [],
@@ -686,7 +718,11 @@ function renderResultVisualization(
     [
       div(
         [],
-        [class_("result-bar"), attribute("style", `width: ${percentage}%; background: ${gradient}`)],
+        [
+          class_("result-bar"),
+          style_(`width`, `${percentage}%`),
+          style_(`background`, `${gradient}`),
+        ],
         []
       ),
     ]
@@ -712,7 +748,21 @@ function renderInteractiveFilterQuery(
     [class_("filter-query"), attribute("id", id)],
     [
       renderQueryHeader(index, "Filter", prompts),
-      div([], [class_("query-explanation"), attribute("style", `border-left-color: ${prompts.length > 0 ? getPromptColor(prompts[0]) : "var(--pico-primary)"}`)], [text(explanation)]),
+      div(
+        [],
+        [
+          class_("query-explanation"),
+          style_(
+            `border-left-color`,
+            `${
+              prompts.length > 0
+                ? getPromptColor(prompts[0])
+                : "var(--pico-primary)"
+            }`
+          ),
+        ],
+        [text(explanation)]
+      ),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
@@ -754,7 +804,21 @@ function renderInteractiveDuplicationQuery(
     [class_("duration-query"), attribute("id", id)],
     [
       renderQueryHeader(index, "Duration", prompts),
-      div([], [class_("query-explanation"), attribute("style", `border-left-color: ${prompts.length > 0 ? getPromptColor(prompts[0]) : "var(--pico-primary)"}`)], [text(explanation)]),
+      div(
+        [],
+        [
+          class_("query-explanation"),
+          style_(
+            `border-left-color`,
+            `${
+              prompts.length > 0
+                ? getPromptColor(prompts[0])
+                : "var(--pico-primary)"
+            }`
+          ),
+        ],
+        [text(explanation)]
+      ),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
