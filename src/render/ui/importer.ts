@@ -33,11 +33,9 @@ export function renderEnterTextToImport(): HtmlNode<Update> {
             ),
           ]),
           p([], [], [
-            text("You can import either "),
-            text("settings"),
-            text(" (including your pills) or "),
-            text("state"),
-            text(" (including all journal entries). "),
+            text(
+              "You can import either settings (including your pills) or state (including all journal entries). "
+            ),
           ]),
           p([], [], [
             text(
