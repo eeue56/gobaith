@@ -482,12 +482,21 @@ function renderPeriod(entries: JournalEntry[]): HtmlNode<never> {
   const latestDay = entries[entries.length - 1];
   return div(
     [],
-    [],
+    [class_("period-item")],
     [
-      text(
-        `A period of ${entries.length} days, from ${dayToString(
-          earliestDay.day
-        )} to ${dayToString(latestDay.day)}</div>`
+      div(
+        [],
+        [class_("period-duration")],
+        [text(`${entries.length} days`)]
+      ),
+      div(
+        [],
+        [class_("period-dates")],
+        [
+          text(
+            `${dayToString(earliestDay.day)} to ${dayToString(latestDay.day)}`
+          ),
+        ]
       ),
     ]
   );
@@ -495,9 +504,9 @@ function renderPeriod(entries: JournalEntry[]): HtmlNode<never> {
 
 function renderPeriods(periods: JournalEntry[][]): HtmlNode<never> {
   if (periods.length === 0) {
-    return text("No matching periods.");
+    return div([], [class_("no-periods")], [text("No matching periods found.")]);
   }
-  return div([], [], periods.map(renderPeriod));
+  return div([], [class_("periods-list")], periods.map(renderPeriod));
 }
 
 function renderAddDurationQueryButton(): HtmlNode<Update> {
@@ -540,6 +549,38 @@ function renderAddFilterQueryButton(): HtmlNode<Update> {
   );
 }
 
+function renderQueryHeader(
+  index: number,
+  queryType: string
+): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("query-header")],
+    [
+      div([], [class_("query-title")], [text(`Query #${index + 1} (${queryType})`)]),
+      div([], [class_("query-controls")], [])
+    ]
+  );
+}
+
+function renderResultVisualization(
+  days: number,
+  totalDays: number
+): HtmlNode<never> {
+  const percentage = totalDays > 0 ? Math.min((days / totalDays) * 100, 100) : 0;
+  return div(
+    [],
+    [class_("result-visualization")],
+    [
+      div(
+        [],
+        [class_("result-bar"), attribute("style", `width: ${percentage}%`)],
+        []
+      ),
+    ]
+  );
+}
+
 function renderInteractiveFilterQuery(
   query: Query,
   index: number,
@@ -548,20 +589,31 @@ function renderInteractiveFilterQuery(
   const path: QueryPath[] = [];
 
   const days = runQuery(query, state.journalEntries).length;
+  const totalDays = state.journalEntries.length;
   const id = `${pathToKey(index, path)}-interactive-filter`;
+  const explanation = renderQueryExplaination(query);
 
   return div(
     [],
     [class_("filter-query"), attribute("id", id)],
     [
+      renderQueryHeader(index, "Filter"),
+      div([], [class_("query-explanation")], [text(explanation)]),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
         [class_("filter-query-result")],
         [
-          text("A total of "),
-          strong([], [], [text(days.toString())]),
-          text(" days"),
+          div(
+            [],
+            [],
+            [
+              text("Matching "),
+              strong([], [], [text(days.toString())]),
+              text(` of ${totalDays} days`),
+            ]
+          ),
+          renderResultVisualization(days, totalDays),
         ]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
@@ -575,19 +627,33 @@ function renderInteractiveDuplicationQuery(
   state: AppState
 ): HtmlNode<Update> {
   const path: QueryPath[] = [];
-  const periods = renderPeriods(runDurationQuery(query, state.journalEntries));
+  const matchedPeriods = runDurationQuery(query, state.journalEntries);
+  const periods = renderPeriods(matchedPeriods);
 
   const id = `${pathToKey(index, path)}-interactive-duplication`;
+  const explanation = renderQueryExplaination(query);
 
   return div(
     [],
     [class_("duration-query"), attribute("id", id)],
     [
+      renderQueryHeader(index, "Duration"),
+      div([], [class_("query-explanation")], [text(explanation)]),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
         [class_("duration-query-result")],
-        [text("Matching periods: "), periods]
+        [
+          div(
+            [],
+            [],
+            [
+              strong([], [], [text(matchedPeriods.length.toString())]),
+              text(" matching period(s)"),
+            ]
+          ),
+          periods,
+        ]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
     ]
