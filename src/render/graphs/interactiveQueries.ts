@@ -12,6 +12,7 @@ import {
   option,
   select,
   strong,
+  style_,
   text,
 } from "@eeue56/coed";
 import { pathToKey, runDurationQuery, runQuery } from "../../logic/query";
@@ -42,8 +43,103 @@ import {
   Settings,
   Update,
 } from "../../types";
+import { getPromptColor, getPromptColorHex } from "../../utils/colors";
 import { dayToString } from "../../utils/dates";
 import { iconDelete } from "../ui/icons";
+
+/**
+ * Calculate relative luminance of a hex color
+ * Returns a value between 0 (darkest) and 1 (brightest)
+ */
+function getColorLuminance(hexColor: string): number {
+  // Remove # if present
+  const hex = hexColor.replace("#", "");
+
+  // Convert to RGB
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  // Apply gamma correction
+  const rLinear = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+  const gLinear = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+  const bLinear = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+
+  // Calculate luminance
+  return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
+}
+
+/**
+ * Get appropriate text color (white or black) based on background color
+ * Uses WCAG contrast guidelines
+ */
+function getContrastTextColor(backgroundColor: string): string {
+  const luminance = getColorLuminance(backgroundColor);
+  // Use white text for dark backgrounds, black for light backgrounds
+  // WCAG recommends threshold at 0.179 for optimal contrast
+  // This corresponds to approximately #808080 gray
+  return luminance > 0.179 ? "#000" : "#fff";
+}
+
+/**
+ * Get high contrast text color for select elements
+ * Uses white text for all but the very lightest backgrounds
+ * to ensure maximum readability of the selected value
+ */
+function getSelectTextColor(backgroundColor: string): string {
+  const luminance = getColorLuminance(backgroundColor);
+  // Use a higher threshold (0.4) for select elements to ensure
+  // the actively selected text is always highly readable
+  // Most colored backgrounds will get white text
+  return luminance > 0.4 ? "#000" : "#fff";
+}
+
+/**
+ * Extract all unique prompts from a query
+ */
+function extractPromptsFromQuery(query: Query | Duration): Prompt[] {
+  const prompts: Prompt[] = [];
+
+  function extractFromQuery(q: Query | Duration): void {
+    switch (q.kind) {
+      case "And":
+      case "Or":
+        extractFromQuery(q.left);
+        extractFromQuery(q.right);
+        break;
+      case "Not":
+        extractFromQuery(q.query);
+        break;
+      case "Filter":
+        if (!prompts.includes(q.prompt)) {
+          prompts.push(q.prompt);
+        }
+        break;
+      case "Duration":
+        extractFromQuery(q.query);
+        break;
+    }
+  }
+
+  extractFromQuery(query);
+  return prompts;
+}
+
+/**
+ * Generate a CSS gradient from prompt colors
+ */
+function generatePromptGradient(prompts: Prompt[]): string {
+  if (prompts.length === 0) {
+    return "var(--pico-primary)";
+  }
+
+  if (prompts.length === 1) {
+    return getPromptColor(prompts[0]);
+  }
+
+  const colors = prompts.map((p) => getPromptColor(p));
+  return `linear-gradient(90deg, ${colors.join(", ")})`;
+}
 
 function renderComparisonChoice(
   comparison: Comparison,
@@ -61,13 +157,18 @@ function renderComparisonChoice(
 
 function renderMoodValueChoice(
   value: MoodValue,
-  activeValue: MoodValue
+  activeValue: MoodValue,
+  prompt: Prompt
 ): HtmlNode<never> {
+  const backgroundColor = getPromptColorHex(prompt, value);
+  const textColor = getContrastTextColor(backgroundColor);
   return option(
     [],
     [
       attribute("value", value.toString()),
       booleanAttribute("selected", value === activeValue),
+      style_(`background-color`, backgroundColor),
+      style_("color", textColor),
     ],
     [text(moodStateFromValue(value))]
   );
@@ -77,11 +178,15 @@ function renderPromptChoice(
   prompt: Prompt,
   activePrompt: Prompt
 ): HtmlNode<never> {
+  const backgroundColor = getPromptColor(prompt);
+  const textColor = getContrastTextColor(backgroundColor);
   return option(
     [],
     [
       attribute("value", prompt),
       booleanAttribute("selected", prompt === activePrompt),
+      style_(`background-color`, backgroundColor),
+      style_("color", textColor),
     ],
     [text(prompt)]
   );
@@ -120,7 +225,7 @@ function renderComparisonChoices(
             };
           }),
         ],
-        [],
+        [attribute("color", "black")],
         choices
       ),
     ]
@@ -129,12 +234,15 @@ function renderComparisonChoices(
 
 function renderMoodValueChoices(
   activeMoodValue: MoodValue,
+  prompt: Prompt,
   index: number,
   path: QueryPath[]
 ): HtmlNode<Update> {
   const choices = MOOD_VALUES.map((moodValue) =>
-    renderMoodValueChoice(moodValue, activeMoodValue)
+    renderMoodValueChoice(moodValue, activeMoodValue, prompt)
   );
+  const selectBackgroundColor = getPromptColorHex(prompt, activeMoodValue);
+  const selectTextColor = getSelectTextColor(selectBackgroundColor);
   return div(
     [],
     [],
@@ -158,7 +266,10 @@ function renderMoodValueChoices(
             };
           }),
         ],
-        [],
+        [
+          style_(`background-color`, selectBackgroundColor),
+          style_("color", selectTextColor),
+        ],
         choices
       ),
     ]
@@ -171,6 +282,8 @@ function renderPromptChoices(
   path: QueryPath[]
 ): HtmlNode<Update> {
   const choices = PROMPTS.map((key) => renderPromptChoice(key, activePrompt));
+  const selectBackgroundColor = getPromptColor(activePrompt);
+  const selectTextColor = getSelectTextColor(selectBackgroundColor);
   return div(
     [],
     [],
@@ -194,7 +307,10 @@ function renderPromptChoices(
             };
           }),
         ],
-        [],
+        [
+          style_(`background-color`, selectBackgroundColor),
+          style_("color", selectTextColor),
+        ],
         choices
       ),
     ]
@@ -295,7 +411,7 @@ function renderFilterBuilder(
     [
       renderPromptChoices(query.prompt, index, path),
       renderComparisonChoices(query.comparison, index, path),
-      renderMoodValueChoices(query.value, index, path),
+      renderMoodValueChoices(query.value, query.prompt, index, path),
     ]
   );
 }
@@ -477,27 +593,50 @@ export function renderQueryExplaination(query: Query | Duration): string {
   }
 }
 
-function renderPeriod(entries: JournalEntry[]): HtmlNode<never> {
+function renderPeriod(
+  entries: JournalEntry[],
+  prompts: Prompt[]
+): HtmlNode<never> {
   const earliestDay = entries[0];
   const latestDay = entries[entries.length - 1];
+  const borderColor =
+    prompts.length > 0
+      ? getPromptColor(prompts[0])
+      : "var(--pico-primary-background)";
   return div(
     [],
-    [],
+    [class_("period-item"), style_(`border-left-color`, borderColor)],
     [
-      text(
-        `A period of ${entries.length} days, from ${dayToString(
-          earliestDay.day
-        )} to ${dayToString(latestDay.day)}</div>`
+      div([], [class_("period-duration")], [text(`${entries.length} days`)]),
+      div(
+        [],
+        [class_("period-dates")],
+        [
+          text(
+            `${dayToString(earliestDay.day)} to ${dayToString(latestDay.day)}`
+          ),
+        ]
       ),
     ]
   );
 }
 
-function renderPeriods(periods: JournalEntry[][]): HtmlNode<never> {
+function renderPeriods(
+  periods: JournalEntry[][],
+  prompts: Prompt[]
+): HtmlNode<never> {
   if (periods.length === 0) {
-    return text("No matching periods.");
+    return div(
+      [],
+      [class_("no-periods")],
+      [text("No matching periods found.")]
+    );
   }
-  return div([], [], periods.map(renderPeriod));
+  return div(
+    [],
+    [class_("periods-list")],
+    periods.map((p) => renderPeriod(p, prompts))
+  );
 }
 
 function renderAddDurationQueryButton(): HtmlNode<Update> {
@@ -540,6 +679,56 @@ function renderAddFilterQueryButton(): HtmlNode<Update> {
   );
 }
 
+function renderQueryHeader(
+  index: number,
+  queryType: string,
+  prompts: Prompt[]
+): HtmlNode<Update> {
+  const gradient = generatePromptGradient(prompts);
+  return div(
+    [],
+    [
+      class_("query-header"),
+      style_(`border-left`, `4px solid`),
+      style_(`padding-left`, "5px"),
+      style_(`border-image`, `${gradient} 1`),
+    ],
+    [
+      div(
+        [],
+        [class_("query-title")],
+        [text(`Query #${index + 1} (${queryType})`)]
+      ),
+      div([], [class_("query-controls")], []),
+    ]
+  );
+}
+
+function renderResultVisualization(
+  days: number,
+  totalDays: number,
+  prompts: Prompt[]
+): HtmlNode<never> {
+  const percentage =
+    totalDays > 0 ? Math.min((days / totalDays) * 100, 100) : 0;
+  const gradient = generatePromptGradient(prompts);
+  return div(
+    [],
+    [class_("result-visualization")],
+    [
+      div(
+        [],
+        [
+          class_("result-bar"),
+          style_(`width`, `${percentage}%`),
+          style_(`background`, `${gradient}`),
+        ],
+        []
+      ),
+    ]
+  );
+}
+
 function renderInteractiveFilterQuery(
   query: Query,
   index: number,
@@ -548,20 +737,47 @@ function renderInteractiveFilterQuery(
   const path: QueryPath[] = [];
 
   const days = runQuery(query, state.journalEntries).length;
+  const totalDays = state.journalEntries.length;
   const id = `${pathToKey(index, path)}-interactive-filter`;
+  const explanation = renderQueryExplaination(query);
+  const prompts = extractPromptsFromQuery(query);
+  const gradient = generatePromptGradient(prompts);
 
   return div(
     [],
     [class_("filter-query"), attribute("id", id)],
     [
+      renderQueryHeader(index, "Filter", prompts),
+      div(
+        [],
+        [
+          class_("query-explanation"),
+          style_(
+            `border-left-color`,
+            `${
+              prompts.length > 0
+                ? getPromptColor(prompts[0])
+                : "var(--pico-primary)"
+            }`
+          ),
+        ],
+        [text(explanation)]
+      ),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
         [class_("filter-query-result")],
         [
-          text("A total of "),
-          strong([], [], [text(days.toString())]),
-          text(" days"),
+          div(
+            [],
+            [],
+            [
+              text("Matching "),
+              strong([], [], [text(days.toString())]),
+              text(` of ${totalDays} days`),
+            ]
+          ),
+          renderResultVisualization(days, totalDays, prompts),
         ]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
@@ -575,19 +791,49 @@ function renderInteractiveDuplicationQuery(
   state: AppState
 ): HtmlNode<Update> {
   const path: QueryPath[] = [];
-  const periods = renderPeriods(runDurationQuery(query, state.journalEntries));
+  const matchedPeriods = runDurationQuery(query, state.journalEntries);
+  const prompts = extractPromptsFromQuery(query);
+  const periods = renderPeriods(matchedPeriods, prompts);
 
   const id = `${pathToKey(index, path)}-interactive-duplication`;
+  const explanation = renderQueryExplaination(query);
+  const gradient = generatePromptGradient(prompts);
 
   return div(
     [],
     [class_("duration-query"), attribute("id", id)],
     [
+      renderQueryHeader(index, "Duration", prompts),
+      div(
+        [],
+        [
+          class_("query-explanation"),
+          style_(
+            `border-left-color`,
+            `${
+              prompts.length > 0
+                ? getPromptColor(prompts[0])
+                : "var(--pico-primary)"
+            }`
+          ),
+        ],
+        [text(explanation)]
+      ),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
         [class_("duration-query-result")],
-        [text("Matching periods: "), periods]
+        [
+          div(
+            [],
+            [],
+            [
+              strong([], [], [text(matchedPeriods.length.toString())]),
+              text(" matching period(s)"),
+            ]
+          ),
+          periods,
+        ]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
     ]
