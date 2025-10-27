@@ -44,6 +44,54 @@ import {
 } from "../../types";
 import { dayToString } from "../../utils/dates";
 import { iconDelete } from "../ui/icons";
+import { getPromptColor } from "../../utils/colors";
+
+/**
+ * Extract all unique prompts from a query
+ */
+function extractPromptsFromQuery(query: Query | Duration): Prompt[] {
+  const prompts: Prompt[] = [];
+  
+  function extractFromQuery(q: Query | Duration): void {
+    switch (q.kind) {
+      case "And":
+      case "Or":
+        extractFromQuery(q.left);
+        extractFromQuery(q.right);
+        break;
+      case "Not":
+        extractFromQuery(q.query);
+        break;
+      case "Filter":
+        if (!prompts.includes(q.prompt)) {
+          prompts.push(q.prompt);
+        }
+        break;
+      case "Duration":
+        extractFromQuery(q.query);
+        break;
+    }
+  }
+  
+  extractFromQuery(query);
+  return prompts;
+}
+
+/**
+ * Generate a CSS gradient from prompt colors
+ */
+function generatePromptGradient(prompts: Prompt[]): string {
+  if (prompts.length === 0) {
+    return "var(--pico-primary)";
+  }
+  
+  if (prompts.length === 1) {
+    return getPromptColor(prompts[0]);
+  }
+  
+  const colors = prompts.map(p => getPromptColor(p));
+  return `linear-gradient(90deg, ${colors.join(", ")})`;
+}
 
 function renderComparisonChoice(
   comparison: Comparison,
@@ -477,12 +525,13 @@ export function renderQueryExplaination(query: Query | Duration): string {
   }
 }
 
-function renderPeriod(entries: JournalEntry[]): HtmlNode<never> {
+function renderPeriod(entries: JournalEntry[], prompts: Prompt[]): HtmlNode<never> {
   const earliestDay = entries[0];
   const latestDay = entries[entries.length - 1];
+  const borderColor = prompts.length > 0 ? getPromptColor(prompts[0]) : "var(--pico-primary-background)";
   return div(
     [],
-    [class_("period-item")],
+    [class_("period-item"), attribute("style", `border-left-color: ${borderColor}`)],
     [
       div(
         [],
@@ -502,11 +551,11 @@ function renderPeriod(entries: JournalEntry[]): HtmlNode<never> {
   );
 }
 
-function renderPeriods(periods: JournalEntry[][]): HtmlNode<never> {
+function renderPeriods(periods: JournalEntry[][], prompts: Prompt[]): HtmlNode<never> {
   if (periods.length === 0) {
     return div([], [class_("no-periods")], [text("No matching periods found.")]);
   }
-  return div([], [class_("periods-list")], periods.map(renderPeriod));
+  return div([], [class_("periods-list")], periods.map(p => renderPeriod(p, prompts)));
 }
 
 function renderAddDurationQueryButton(): HtmlNode<Update> {
@@ -551,11 +600,13 @@ function renderAddFilterQueryButton(): HtmlNode<Update> {
 
 function renderQueryHeader(
   index: number,
-  queryType: string
+  queryType: string,
+  prompts: Prompt[]
 ): HtmlNode<Update> {
+  const gradient = generatePromptGradient(prompts);
   return div(
     [],
-    [class_("query-header")],
+    [class_("query-header"), attribute("style", `border-left: 4px solid; border-image: ${gradient} 1;`)],
     [
       div([], [class_("query-title")], [text(`Query #${index + 1} (${queryType})`)]),
       div([], [class_("query-controls")], [])
@@ -565,16 +616,18 @@ function renderQueryHeader(
 
 function renderResultVisualization(
   days: number,
-  totalDays: number
+  totalDays: number,
+  prompts: Prompt[]
 ): HtmlNode<never> {
   const percentage = totalDays > 0 ? Math.min((days / totalDays) * 100, 100) : 0;
+  const gradient = generatePromptGradient(prompts);
   return div(
     [],
     [class_("result-visualization")],
     [
       div(
         [],
-        [class_("result-bar"), attribute("style", `width: ${percentage}%`)],
+        [class_("result-bar"), attribute("style", `width: ${percentage}%; background: ${gradient}`)],
         []
       ),
     ]
@@ -592,13 +645,15 @@ function renderInteractiveFilterQuery(
   const totalDays = state.journalEntries.length;
   const id = `${pathToKey(index, path)}-interactive-filter`;
   const explanation = renderQueryExplaination(query);
+  const prompts = extractPromptsFromQuery(query);
+  const gradient = generatePromptGradient(prompts);
 
   return div(
     [],
     [class_("filter-query"), attribute("id", id)],
     [
-      renderQueryHeader(index, "Filter"),
-      div([], [class_("query-explanation")], [text(explanation)]),
+      renderQueryHeader(index, "Filter", prompts),
+      div([], [class_("query-explanation"), attribute("style", `border-left-color: ${prompts.length > 0 ? getPromptColor(prompts[0]) : "var(--pico-primary)"}`)], [text(explanation)]),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
@@ -613,7 +668,7 @@ function renderInteractiveFilterQuery(
               text(` of ${totalDays} days`),
             ]
           ),
-          renderResultVisualization(days, totalDays),
+          renderResultVisualization(days, totalDays, prompts),
         ]
       ),
       div([], [], [renderRemoveQueryButton(index, path)]),
@@ -628,17 +683,19 @@ function renderInteractiveDuplicationQuery(
 ): HtmlNode<Update> {
   const path: QueryPath[] = [];
   const matchedPeriods = runDurationQuery(query, state.journalEntries);
-  const periods = renderPeriods(matchedPeriods);
+  const prompts = extractPromptsFromQuery(query);
+  const periods = renderPeriods(matchedPeriods, prompts);
 
   const id = `${pathToKey(index, path)}-interactive-duplication`;
   const explanation = renderQueryExplaination(query);
+  const gradient = generatePromptGradient(prompts);
 
   return div(
     [],
     [class_("duration-query"), attribute("id", id)],
     [
-      renderQueryHeader(index, "Duration"),
-      div([], [class_("query-explanation")], [text(explanation)]),
+      renderQueryHeader(index, "Duration", prompts),
+      div([], [class_("query-explanation"), attribute("style", `border-left-color: ${prompts.length > 0 ? getPromptColor(prompts[0]) : "var(--pico-primary)"}`)], [text(explanation)]),
       div([], [], [renderQueryBuilder(query, index, [])]),
       div(
         [],
