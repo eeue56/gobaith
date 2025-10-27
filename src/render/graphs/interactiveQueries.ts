@@ -47,6 +47,39 @@ import { iconDelete } from "../ui/icons";
 import { getPromptColor, getPromptColorHex } from "../../utils/colors";
 
 /**
+ * Calculate relative luminance of a hex color
+ * Returns a value between 0 (darkest) and 1 (brightest)
+ */
+function getColorLuminance(hexColor: string): number {
+  // Remove # if present
+  const hex = hexColor.replace('#', '');
+  
+  // Convert to RGB
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  
+  // Apply gamma correction
+  const rLinear = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+  const gLinear = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+  const bLinear = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+  
+  // Calculate luminance
+  return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
+}
+
+/**
+ * Get appropriate text color (white or black) based on background color
+ * Uses WCAG contrast guidelines
+ */
+function getContrastTextColor(backgroundColor: string): string {
+  const luminance = getColorLuminance(backgroundColor);
+  // Use white text for dark backgrounds, black for light backgrounds
+  // Threshold at 0.5 provides good contrast
+  return luminance > 0.5 ? '#000' : '#fff';
+}
+
+/**
  * Extract all unique prompts from a query
  */
 function extractPromptsFromQuery(query: Query | Duration): Prompt[] {
@@ -113,12 +146,13 @@ function renderMoodValueChoice(
   prompt: Prompt
 ): HtmlNode<never> {
   const backgroundColor = getPromptColorHex(prompt, value);
+  const textColor = getContrastTextColor(backgroundColor);
   return option(
     [],
     [
       attribute("value", value.toString()),
       booleanAttribute("selected", value === activeValue),
-      attribute("style", `background-color: ${backgroundColor}; color: #000;`),
+      attribute("style", `background-color: ${backgroundColor}; color: ${textColor};`),
     ],
     [text(moodStateFromValue(value))]
   );
@@ -129,12 +163,13 @@ function renderPromptChoice(
   activePrompt: Prompt
 ): HtmlNode<never> {
   const backgroundColor = getPromptColor(prompt);
+  const textColor = getContrastTextColor(backgroundColor);
   return option(
     [],
     [
       attribute("value", prompt),
       booleanAttribute("selected", prompt === activePrompt),
-      attribute("style", `background-color: ${backgroundColor}; color: #000;`),
+      attribute("style", `background-color: ${backgroundColor}; color: ${textColor};`),
     ],
     [text(prompt)]
   );
@@ -190,6 +225,7 @@ function renderMoodValueChoices(
     renderMoodValueChoice(moodValue, activeMoodValue, prompt)
   );
   const selectBackgroundColor = getPromptColorHex(prompt, activeMoodValue);
+  const selectTextColor = getContrastTextColor(selectBackgroundColor);
   return div(
     [],
     [],
@@ -213,7 +249,7 @@ function renderMoodValueChoices(
             };
           }),
         ],
-        [attribute("style", `background-color: ${selectBackgroundColor}; color: #000;`)],
+        [attribute("style", `background-color: ${selectBackgroundColor}; color: ${selectTextColor};`)],
         choices
       ),
     ]
@@ -227,6 +263,7 @@ function renderPromptChoices(
 ): HtmlNode<Update> {
   const choices = PROMPTS.map((key) => renderPromptChoice(key, activePrompt));
   const selectBackgroundColor = getPromptColor(activePrompt);
+  const selectTextColor = getContrastTextColor(selectBackgroundColor);
   return div(
     [],
     [],
@@ -250,7 +287,7 @@ function renderPromptChoices(
             };
           }),
         ],
-        [attribute("style", `background-color: ${selectBackgroundColor}; color: #000;`)],
+        [attribute("style", `background-color: ${selectBackgroundColor}; color: ${selectTextColor};`)],
         choices
       ),
     ]
