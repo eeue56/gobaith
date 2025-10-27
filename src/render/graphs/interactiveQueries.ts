@@ -81,6 +81,19 @@ function getContrastTextColor(backgroundColor: string): string {
 }
 
 /**
+ * Get high contrast text color for select elements
+ * Uses white text for all but the very lightest backgrounds
+ * to ensure maximum readability of the selected value
+ */
+function getSelectTextColor(backgroundColor: string): string {
+  const luminance = getColorLuminance(backgroundColor);
+  // Use a higher threshold (0.4) for select elements to ensure
+  // the actively selected text is always highly readable
+  // Most colored backgrounds will get white text
+  return luminance > 0.4 ? '#000' : '#fff';
+}
+
+/**
  * Extract all unique prompts from a query
  */
 function extractPromptsFromQuery(query: Query | Duration): Prompt[] {
@@ -226,7 +239,7 @@ function renderMoodValueChoices(
     renderMoodValueChoice(moodValue, activeMoodValue, prompt)
   );
   const selectBackgroundColor = getPromptColorHex(prompt, activeMoodValue);
-  const selectTextColor = getContrastTextColor(selectBackgroundColor);
+  const selectTextColor = getSelectTextColor(selectBackgroundColor);
   return div(
     [],
     [],
@@ -264,7 +277,7 @@ function renderPromptChoices(
 ): HtmlNode<Update> {
   const choices = PROMPTS.map((key) => renderPromptChoice(key, activePrompt));
   const selectBackgroundColor = getPromptColor(activePrompt);
-  const selectTextColor = getContrastTextColor(selectBackgroundColor);
+  const selectTextColor = getSelectTextColor(selectBackgroundColor);
   return div(
     [],
     [],
