@@ -32,6 +32,8 @@ const minY = 1;
 const maxY = 4;
 const yRange = maxY - minY;
 
+const fontColor = "white";
+
 function viewGridlines(): HtmlNode<never>[] {
   const gridLines: HtmlNode<never>[] = [];
   for (let i = minY; i <= maxY; i++) {
@@ -105,7 +107,7 @@ function viewLegends(
           attribute("x", String(width - padding.right + 60)),
           attribute("y", String(legendY)),
           attribute("font-size", "14"),
-          attribute("fill", "#333"),
+          attribute("fill", fontColor),
           isNotFiltered ? none() : attribute("text-decoration", "line-through"),
           class_("legend-text"),
         ],
@@ -222,7 +224,7 @@ function viewLineChartSvg(
         [
           attribute("width", `${width}`),
           attribute("height", `${height}`),
-          attribute("fill", "white"),
+          attribute("fill", "#13171f"),
         ]
       ),
       svgText(
@@ -231,9 +233,9 @@ function viewLineChartSvg(
           attribute("x", String(width / 2)),
           attribute("y", "30"),
           attribute("text-anchor", "middle"),
-          attribute("font-size", "20"),
+          attribute("font-size", "30"),
           attribute("font-weight", "bold"),
-          attribute("fill", "#333"),
+          attribute("fill", fontColor),
         ],
         [text("Mood Overview Over Time")]
       ),
@@ -245,7 +247,7 @@ function viewLineChartSvg(
           attribute("y1", `${padding.top}`),
           attribute("x2", `${padding.left}`),
           attribute("y2", `${height - padding.bottom}`),
-          attribute("stroke", "#333"),
+          attribute("stroke", fontColor),
           attribute("stroke-width", "2"),
         ]
       ),
@@ -256,7 +258,7 @@ function viewLineChartSvg(
           attribute("y1", `${height - padding.bottom}`),
           attribute("x2", `${width - padding.right}`),
           attribute("y2", `${height - padding.bottom}`),
-          attribute("stroke", "#333"),
+          attribute("stroke", fontColor),
           attribute("stroke-width", "2"),
         ]
       ),
