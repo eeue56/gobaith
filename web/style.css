@@ -29,43 +29,43 @@
   --mood-2: #52ec73;
   --mood-3: #42ac64;
   --mood-4: #336b34;
-  
+
   /* Sleep quality - soft teal (calming, restful) */
   --sleep-1: #a0d4ce;
   --sleep-2: #7bc4bb;
   --sleep-3: #5ab4a8;
   --sleep-4: #3d9b8f;
-  
+
   /* Depression - gentle lavender (soothing, peaceful) */
   --depression-1: #d4c4e0;
   --depression-2: #c4aed4;
   --depression-3: #b398c8;
   --depression-4: #9d7fb8;
-  
+
   /* Anxiety - warm amber (grounding, safe) */
   --anxiety-1: #e8d4a8;
   --anxiety-2: #ddc488;
   --anxiety-3: #d2b468;
   --anxiety-4: #c4a04c;
-  
+
   /* Elevation - soft coral (warm, nurturing) */
   --elevation-1: #e8c4b0;
   --elevation-2: #e0b098;
   --elevation-3: #d89c80;
   --elevation-4: #cc8468;
-  
+
   /* Irritableness - muted sage (calming, natural) */
   --irrability-1: #c4dca8;
   --irrability-2: #b0cc88;
   --irrability-3: #9cbc6c;
   --irrability-4: #88a854;
-  
+
   /* Psychotic - dusty rose (gentle, comforting) */
   --psychotic-1: #e8c4cc;
   --psychotic-2: #e0b0bc;
   --psychotic-3: #d89cac;
   --psychotic-4: #cc8498;
-  
+
   --pico-color-sand-50: #f2f0ec;
   --pico-color-zinc-150: #d1d5db;
   --pico-color-zinc-300: #a4acba;
@@ -808,7 +808,6 @@
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-all;
-  resize: vertical;
 }
 
 .import-export-instructions {
@@ -903,10 +902,6 @@
   margin-top: 10px;
 }
 
-#update-import-from-text {
-  padding: 2px;
-}
-
 .indent {
   margin-left: 50px;
 }
@@ -983,7 +978,11 @@
 
 .result-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--pico-primary-background), var(--pico-primary));
+  background: linear-gradient(
+    90deg,
+    var(--pico-primary-background),
+    var(--pico-primary)
+  );
   transition: width 0.3s ease;
   border-radius: 4px;
 }

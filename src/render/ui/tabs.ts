@@ -83,7 +83,7 @@ export function renderImport(model: Model): HtmlNode<Update> {
         [class_("import-tab-content")],
         [
           renderTabTitle("Import and export data"),
-          renderEnterTextToImport(model.localState.importStatus),
+          renderEnterTextToImport(model.localState.Importer.status),
           renderExportedSettings(model.settings),
           renderExportedState(model.appState),
         ]

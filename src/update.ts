@@ -281,11 +281,13 @@ export async function update(message: Update, model: Model): Promise<Model> {
         settings: model.settings,
         localState: {
           ...model.localState,
-          importStatus: {
-            message: `Successfully imported state with ${entryCount} journal ${
-              entryCount === 1 ? "entry" : "entries"
-            }`,
-            isError: false,
+          Importer: {
+            status: {
+              kind: "Ok",
+              value: `Successfully imported state with ${entryCount} journal ${
+                entryCount === 1 ? "entry" : "entries"
+              }`,
+            },
           },
         },
       };
@@ -319,11 +321,13 @@ export async function update(message: Update, model: Model): Promise<Model> {
         settings: model.settings,
         localState: {
           ...model.localState,
-          importStatus: {
-            message: `Successfully imported settings with ${pillCount} ${
-              pillCount === 1 ? "pill" : "pills"
-            }`,
-            isError: false,
+          Importer: {
+            status: {
+              kind: "Ok",
+              value: `Successfully imported settings with ${pillCount} ${
+                pillCount === 1 ? "pill" : "pills"
+              }`,
+            },
           },
         },
       };
@@ -334,10 +338,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         settings: model.settings,
         localState: {
           ...model.localState,
-          importStatus: {
-            message: message.message,
-            isError: message.isError,
-          },
+          Importer: { status: message.status },
         },
       };
     }

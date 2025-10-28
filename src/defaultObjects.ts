@@ -33,4 +33,7 @@ export const localState: LocalState = {
       nonFilteredPrompts: new Set(PROMPTS),
     },
   },
+  Importer: {
+    status: { kind: "Ok", value: "" },
+  },
 };

@@ -3,8 +3,6 @@ import {
   button,
   class_,
   div,
-  fieldset,
-  form,
   h3,
   HtmlNode,
   input,
@@ -15,10 +13,25 @@ import {
   textarea,
 } from "@eeue56/coed";
 import { importDataFromJson } from "../../logic/journal";
-import { AppState, dontSend, Settings, Update } from "../../types";
+import { AppState, dontSend, Result, Settings, Update } from "../../types";
+
+function renderImportStatus(importStatus: Result<string>): HtmlNode<never> {
+  if (importStatus.kind === "Ok" && importStatus.value.length === 0) {
+    return p([], [attribute("id", "import-status")], []);
+  }
+
+  const state = importStatus.kind === "Ok" ? "success" : "error";
+  const statusText =
+    importStatus.kind === "Ok" ? importStatus.value : importStatus.message;
+  return p(
+    [],
+    [attribute("id", "import-status"), class_("import-status"), class_(state)],
+    [text(statusText)]
+  );
+}
 
 export function renderEnterTextToImport(
-  importStatus?: { message: string; isError: boolean }
+  importStatus: Result<string>
 ): HtmlNode<Update> {
   return div(
     [],
@@ -29,87 +42,75 @@ export function renderEnterTextToImport(
         [],
         [class_("import-export-instructions")],
         [
-          p([], [], [
-            text(
-              "To import your data, either paste the JSON content below or choose a file. "
-            ),
-          ]),
-          p([], [], [
-            text(
-              "You can import either settings (including your pills) or state (including all journal entries). "
-            ),
-          ]),
-          p([], [], [
-            text(
-              "Warning: Importing will replace your current data. Make sure to export first if you want to keep a backup!"
-            ),
-          ]),
-        ]
-      ),
-      form(
-        [],
-        [],
-        [
-          fieldset(
+          p(
             [],
             [],
             [
-              textarea(
-                [],
-                [
-                  attribute("id", "import-text"),
-                  class_("import-field"),
-                  attribute("placeholder", "Paste JSON here to import it..."),
-                  attribute("rows", "8"),
-                ],
-                []
-              ),
-              button(
-                [on("click", () => updateImport())],
-                [
-                  attribute("id", "update-import-from-text"),
-                  attribute(
-                    "title",
-                    "Import JSON. Check the developer console to see success/errors"
-                  ),
-                ],
-                [text("Import from text")]
+              text(
+                "To import your data, either paste the JSON content below or choose a file. "
               ),
             ]
           ),
-          label([], [], [text("Or choose a JSON file to import:")]),
-          input<Update>(
+          p(
+            [],
+            [],
             [
-              on("change", (event) => {
-                if (!event.target) {
-                  return dontSend();
-                }
-
-                return {
-                  kind: "ReadImportedFile",
-                  target: event.target as HTMLInputElement,
-                };
-              }),
-            ],
-            [attribute("type", "file"), attribute("accept", ".json")]
+              text(
+                "You can import either settings (including your pills) or state (including all journal entries). "
+              ),
+            ]
           ),
-
-          importStatus
-            ? p(
-                [],
-                [
-                  attribute("id", "import-status"),
-                  class_(
-                    importStatus.isError
-                      ? "import-status error"
-                      : "import-status success"
-                  ),
-                ],
-                [text(importStatus.message)]
-              )
-            : p([], [attribute("id", "import-status")], []),
+          p(
+            [],
+            [],
+            [
+              text(
+                "Warning: Importing will replace your current data. Make sure to export first if you want to keep a backup!"
+              ),
+            ]
+          ),
         ]
       ),
+
+      textarea(
+        [],
+        [
+          attribute("id", "import-text"),
+          class_("import-field"),
+          attribute("placeholder", "Paste JSON here to import it..."),
+          attribute("rows", "8"),
+        ],
+        []
+      ),
+      button(
+        [on("click", () => updateImport())],
+        [
+          attribute("id", "update-import-from-text"),
+          attribute(
+            "title",
+            "Import JSON. Check the developer console to see success/errors"
+          ),
+        ],
+        [text("Import from text")]
+      ),
+      label([], [], [text("Or choose a JSON file to import:")]),
+      input<Update>(
+        [
+          on("change", (event) => {
+            if (!event.target) {
+              return dontSend();
+            }
+
+            return {
+              kind: "ReadImportedFile",
+              target: event.target as HTMLInputElement,
+            };
+          }),
+        ],
+        [attribute("type", "file"), attribute("accept", ".json")]
+      ),
+
+      renderImportStatus(importStatus),
     ]
   );
 }
@@ -119,8 +120,7 @@ function importer(imported: string | AppState | Settings): Update {
     console.error("Failed to import", imported);
     return {
       kind: "SetImportStatus",
-      message: `Import failed: ${imported}`,
-      isError: true,
+      status: { kind: "Err", message: `Import failed: ${imported}` },
     };
   }
 
@@ -151,8 +151,11 @@ function updateImport(): Update {
     console.error("Did not get json in importer");
     return {
       kind: "SetImportStatus",
-      message: "Import failed: Invalid JSON format. Please paste valid JSON data.",
-      isError: true,
+      status: {
+        kind: "Err",
+        message:
+          "Import failed: Invalid JSON format. Please paste valid JSON data.",
+      },
     };
   }
 
