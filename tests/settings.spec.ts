@@ -5,7 +5,8 @@ import { changeTab, expectActiveTab } from "./helpers";
 test("the user adds a pill", async ({ context, page }) => {
   await changeTab(page, "SETTINGS");
 
-  await page.locator("#new-pill-entry").fill("Paracetamol 100mg");
+  await page.locator("#new-pill-name").fill("Paracetamol");
+  await page.locator("#new-pill-dosage").fill("100mg");
   await page.locator("#add-pill").click();
 
   await changeTab(page, "JOURNAL");
@@ -21,7 +22,8 @@ test("the user removes settings (including pills)", async ({
 }) => {
   await changeTab(page, "SETTINGS");
 
-  await page.locator("#new-pill-entry").fill("Paracetamol 100mg");
+  await page.locator("#new-pill-name").fill("Paracetamol");
+  await page.locator("#new-pill-dosage").fill("100mg");
   await page.locator("#add-pill").click();
 
   await changeTab(page, "JOURNAL");
@@ -56,7 +58,7 @@ test("the debug log contains events triggered", async ({ context, page }) => {
   await changeTab(page, "SETTINGS");
 
   await expect(await page.locator(".event-log").innerText()).toEqual(
-    "UpdateCurrentTab"
+    "Switched tab"
   );
 
   await changeTab(page, "JOURNAL");
@@ -80,16 +82,16 @@ test("the debug log contains events triggered", async ({ context, page }) => {
 
   await expect(await page.locator(".event-log").innerText()).toEqual(
     `
-UpdateCurrentTab
-UpdateCurrentTab
-UpdateCurrentDay
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdateCurrentTab
+Switched tab
+Switched tab
+Changed day
+Updated mood value
+Updated mood value
+Updated mood value
+Updated mood value
+Updated mood value
+Updated mood value
+Switched tab
   `.trim()
   );
 });

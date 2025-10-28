@@ -4,6 +4,7 @@ import {
   class_,
   div,
   HtmlNode,
+  input,
   on,
   text,
   textarea,
@@ -66,13 +67,27 @@ export function renderAddPill(): HtmlNode<Update> {
     [],
     [class_("pill-entry-container")],
     [
-      textarea(
+      div(
         [],
+        [class_("pill-input-row")],
         [
-          attribute("id", "new-pill-entry"),
-          attribute("placeholder", "Enter a med name with dosage..."),
-        ],
-        []
+          input(
+            [],
+            [
+              attribute("id", "new-pill-name"),
+              attribute("type", "text"),
+              attribute("placeholder", "Medication name"),
+            ]
+          ),
+          input(
+            [],
+            [
+              attribute("id", "new-pill-dosage"),
+              attribute("type", "text"),
+              attribute("placeholder", "Dosage (e.g., 100mg)"),
+            ]
+          ),
+        ]
       ),
       button(
         [on("click", updateAddPill)],
@@ -84,15 +99,28 @@ export function renderAddPill(): HtmlNode<Update> {
 }
 
 function updateAddPill(): Update {
-  const pillEntryElement: HTMLTextAreaElement | null = document.getElementById(
-    "new-pill-entry"
-  ) as HTMLTextAreaElement | null;
+  const pillNameElement: HTMLInputElement | null = document.getElementById(
+    "new-pill-name"
+  ) as HTMLInputElement | null;
+  const pillDosageElement: HTMLInputElement | null = document.getElementById(
+    "new-pill-dosage"
+  ) as HTMLInputElement | null;
 
-  if (!pillEntryElement) {
-    console.error("Couldn't find new-pill-entry");
+  if (!pillNameElement || !pillDosageElement) {
+    console.error("Couldn't find pill input elements");
     return dontSend();
   }
-  const pill = pillEntryElement.value;
+
+  const name = pillNameElement.value.trim();
+  const dosage = pillDosageElement.value.trim();
+
+  if (!name) {
+    console.error("Medication name is required");
+    return dontSend();
+  }
+
+  // Combine name and dosage with a space if dosage is provided
+  const pill = dosage ? `${name} ${dosage}` : name;
 
   return {
     kind: "AddPill",
