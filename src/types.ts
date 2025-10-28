@@ -217,6 +217,20 @@ export function Pill(name: string, dosage: string): Pill {
 }
 
 /**
+ * Type guard to check if an unknown value is a valid Pill object
+ */
+export function isPill(value: unknown): value is Pill {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "name" in value &&
+    "dosage" in value &&
+    typeof (value as any).name === "string" &&
+    typeof (value as any).dosage === "string"
+  );
+}
+
+/**
  * Gets the full display name for a pill (name + dosage)
  */
 export function pillDisplayName(pill: Pill): string {

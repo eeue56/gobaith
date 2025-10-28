@@ -1,4 +1,4 @@
-import { Pill } from "../types";
+import { isPill, Pill } from "../types";
 import { markDatabaseVersion } from "./mark_database_version";
 
 /**
@@ -17,15 +17,8 @@ export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
     const newPills: Pill[] = [];
     
     for (const pill of dataObj.currentPills) {
-      // If it's already a Pill object with valid structure, keep it
-      if (
-        pill &&
-        typeof pill === "object" &&
-        "name" in pill &&
-        "dosage" in pill &&
-        typeof pill.name === "string" &&
-        typeof pill.dosage === "string"
-      ) {
+      // If it's already a valid Pill object, keep it
+      if (isPill(pill)) {
         newPills.push(pill);
       } else if (typeof pill === "string") {
         // Parse string format to extract name and dosage
