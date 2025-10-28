@@ -801,9 +801,13 @@
 }
 
 .import-field {
-  min-height: 150px;
+  min-height: 200px;
+  max-height: 400px;
   font-family: monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
   resize: vertical;
 }
 
@@ -819,6 +823,28 @@
 
 .import-export-instructions strong {
   color: var(--pico-primary);
+}
+
+.import-status {
+  margin-top: 15px;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  display: none;
+}
+
+.import-status.success {
+  display: block;
+  background: rgba(22, 137, 106, 0.2);
+  border-left: 4px solid var(--pico-form-element-valid-border-color);
+  color: var(--pico-form-element-valid-border-color);
+}
+
+.import-status.error {
+  display: block;
+  background: rgba(150, 74, 80, 0.2);
+  border-left: 4px solid var(--pico-form-element-invalid-border-color);
+  color: var(--pico-form-element-invalid-border-color);
 }
 
 .import-section,

@@ -178,6 +178,7 @@ export type AppState = {
 export type LocalState = {
   kind: "LocalState";
   Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt> } };
+  importStatus?: { message: string; isError: boolean };
 };
 
 export function isAppState(object: unknown): object is AppState {
@@ -321,6 +322,7 @@ export type Update =
   | { kind: "ReadImportedFile"; target: HTMLInputElement }
   | { kind: "UpdateImportAppState"; state: AppState }
   | { kind: "UpdateImportSettings"; settings: Settings }
+  | { kind: "SetImportStatus"; message: string; isError: boolean }
   | {
       kind: "UpdatePillValue";
       entry: JournalEntry;

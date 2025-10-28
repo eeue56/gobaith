@@ -17,7 +17,9 @@ import {
 import { importDataFromJson } from "../../logic/journal";
 import { AppState, dontSend, Settings, Update } from "../../types";
 
-export function renderEnterTextToImport(): HtmlNode<Update> {
+export function renderEnterTextToImport(
+  importStatus?: { message: string; isError: boolean }
+): HtmlNode<Update> {
   return div(
     [],
     [class_("import-section")],
@@ -92,7 +94,20 @@ export function renderEnterTextToImport(): HtmlNode<Update> {
             [attribute("type", "file"), attribute("accept", ".json")]
           ),
 
-          div([], [], [p([], [attribute("id", "import-status")], [])]),
+          importStatus
+            ? p(
+                [],
+                [
+                  attribute("id", "import-status"),
+                  class_(
+                    importStatus.isError
+                      ? "import-status error"
+                      : "import-status success"
+                  ),
+                ],
+                [text(importStatus.message)]
+              )
+            : p([], [attribute("id", "import-status")], []),
         ]
       ),
     ]
@@ -102,7 +117,11 @@ export function renderEnterTextToImport(): HtmlNode<Update> {
 function importer(imported: string | AppState | Settings): Update {
   if (typeof imported === "string") {
     console.error("Failed to import", imported);
-    return dontSend();
+    return {
+      kind: "SetImportStatus",
+      message: `Import failed: ${imported}`,
+      isError: true,
+    };
   }
 
   switch (imported.kind) {
@@ -130,7 +149,11 @@ function updateImport(): Update {
 
   if (!isJson) {
     console.error("Did not get json in importer");
-    return { kind: "Noop" };
+    return {
+      kind: "SetImportStatus",
+      message: "Import failed: Invalid JSON format. Please paste valid JSON data.",
+      isError: true,
+    };
   }
 
   const imported = importDataFromJson(textToImport);

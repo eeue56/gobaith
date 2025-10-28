@@ -273,14 +273,21 @@ export async function update(message: Update, model: Model): Promise<Model> {
     }
     case "UpdateImportAppState": {
       const appState = cleanData(message.state) as AppState;
-      console.log(
-        `Imported state with ${appState.journalEntries.length} journal entries`
-      );
+      const entryCount = appState.journalEntries.length;
+      console.log(`Imported state with ${entryCount} journal entries`);
       await syncStateAndSettings(hasBackend, appState, model.settings);
       return {
         appState,
         settings: model.settings,
-        localState: model.localState,
+        localState: {
+          ...model.localState,
+          importStatus: {
+            message: `Successfully imported state with ${entryCount} journal ${
+              entryCount === 1 ? "entry" : "entries"
+            }`,
+            isError: false,
+          },
+        },
       };
     }
     case "UpdateImportSettings": {
@@ -304,12 +311,34 @@ export async function update(message: Update, model: Model): Promise<Model> {
 
         console.log("Imported pill:", pill);
       }
+      const pillCount = model.settings.currentPills.length;
       console.log("Imported settings");
       await syncStateAndSettings(hasBackend, model.appState, model.settings);
       return {
         appState: model.appState,
         settings: model.settings,
-        localState: model.localState,
+        localState: {
+          ...model.localState,
+          importStatus: {
+            message: `Successfully imported settings with ${pillCount} ${
+              pillCount === 1 ? "pill" : "pills"
+            }`,
+            isError: false,
+          },
+        },
+      };
+    }
+    case "SetImportStatus": {
+      return {
+        appState: model.appState,
+        settings: model.settings,
+        localState: {
+          ...model.localState,
+          importStatus: {
+            message: message.message,
+            isError: message.isError,
+          },
+        },
       };
     }
     case "UpdatePillValue": {
