@@ -169,6 +169,10 @@ export type AppState = {
   databaseVersion: DatabaseVersion;
 };
 
+export type Result<value> =
+  | { value: value; kind: "Ok" }
+  | { message: string; kind: "Err" };
+
 /**
  * State for UI elements which don't need to saved to local storage
  *
@@ -178,6 +182,7 @@ export type AppState = {
 export type LocalState = {
   kind: "LocalState";
   Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt> } };
+  Importer: { status: Result<string> };
 };
 
 export function isAppState(object: unknown): object is AppState {
@@ -321,6 +326,7 @@ export type Update =
   | { kind: "ReadImportedFile"; target: HTMLInputElement }
   | { kind: "UpdateImportAppState"; state: AppState }
   | { kind: "UpdateImportSettings"; settings: Settings }
+  | { kind: "SetImportStatus"; status: Result<string> }
   | {
       kind: "UpdatePillValue";
       entry: JournalEntry;
