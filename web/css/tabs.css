@@ -1,10 +1,9 @@
 .import-tab-content {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  column-gap: 20px;
-  height: 60vh;
+  row-gap: 20px;
 }
 
 .import-tab-content > div {
