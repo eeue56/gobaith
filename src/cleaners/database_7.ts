@@ -17,8 +17,15 @@ export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
     const newPills: Pill[] = [];
     
     for (const pill of dataObj.currentPills) {
-      // If it's already a Pill object, keep it
-      if (typeof pill === "object" && "name" in pill && "dosage" in pill) {
+      // If it's already a Pill object with valid structure, keep it
+      if (
+        pill &&
+        typeof pill === "object" &&
+        "name" in pill &&
+        "dosage" in pill &&
+        typeof pill.name === "string" &&
+        typeof pill.dosage === "string"
+      ) {
         newPills.push(pill);
       } else if (typeof pill === "string") {
         // Parse string format to extract name and dosage

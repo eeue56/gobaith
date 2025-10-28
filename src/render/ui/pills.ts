@@ -137,10 +137,9 @@ function updateAddPill(): Update {
     return dontSend();
   }
 
-  // Clear the input fields after adding
-  pillNameElement.value = "";
-  pillDosageElement.value = "";
-
+  // Note: Fields are not cleared here to preserve user input in case of errors.
+  // This allows users to easily modify and retry if needed (e.g., fixing duplicates).
+  
   return {
     kind: "AddPill",
     pill: Pill(name, dosage),
