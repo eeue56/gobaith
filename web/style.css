@@ -849,7 +849,8 @@
 .import-section,
 .export-section {
   margin-bottom: 30px;
-  padding: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
 }
