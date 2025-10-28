@@ -92,7 +92,7 @@ test("the importer can import settings", async ({ context, page }) => {
 
   const settings: Settings = {
     kind: "Settings",
-    currentPills: ["Ibux 200mg"],
+    currentPills: [{ name: "Ibux", dosage: "200mg" }],
     queries: [...BUILT_IN_QUERIES],
     databaseVersion: LATEST_DATABASE_VERSION,
   };

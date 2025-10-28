@@ -14,6 +14,7 @@ import {
   LATEST_DATABASE_VERSION,
   LocalState,
   Model,
+  pillKey,
   Settings,
   Update,
 } from "./types";
@@ -208,7 +209,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
     }
     case "AddPill": {
       const modified = addPill(
-        message.pillName,
+        message.pill,
         model.appState.journalEntries,
         model.settings
       );
@@ -297,10 +298,15 @@ export async function update(message: Update, model: Model): Promise<Model> {
     }
     case "UpdateImportSettings": {
       for (const pill of message.settings.currentPills) {
-        if (model.settings.currentPills.includes(pill)) {
+        const pillKeyValue = pillKey(pill);
+        if (
+          model.settings.currentPills.some(
+            (p) => pillKey(p) === pillKeyValue
+          )
+        ) {
           console.log(
             "Skipping import of pill",
-            pill,
+            pillKeyValue,
             "as it's already in the settings"
           );
           continue;
@@ -314,7 +320,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         model.appState.journalEntries = modified.entries;
         model.settings = modified.settings;
 
-        console.log("Imported pill:", pill);
+        console.log("Imported pill:", pillKeyValue);
       }
       const pillCount = model.settings.currentPills.length;
       console.log("Imported settings");
@@ -362,7 +368,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
     case "UpdatePillOrder": {
       const settings = updatePillOrder(
         model.settings,
-        message.pillName,
+        message.pill,
         message.direction
       );
       await syncStateAndSettings(hasBackend, model.appState, settings);

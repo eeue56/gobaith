@@ -4,14 +4,18 @@ import {
   class_,
   div,
   HtmlNode,
+  input,
+  label,
   on,
   text,
-  textarea,
 } from "@eeue56/coed";
 import {
   Direction,
   dontSend,
   JournalEntry,
+  Pill,
+  pillDisplayName,
+  pillKey,
   PillOrderDirection,
   Settings,
   Update,
@@ -20,15 +24,16 @@ import { iconPill } from "./icons";
 
 export function renderPill(
   entry: JournalEntry,
-  pill: string
+  pill: Pill
 ): HtmlNode<Update> {
-  const amountTaken = entry.pills[pill];
+  const key = pillKey(pill);
+  const amountTaken = entry.pills[key];
 
   function makeCallback(direction: Direction): () => Update {
     return (): Update => {
       return {
         kind: "UpdatePillValue",
-        pillName: pill,
+        pillName: key,
         entry: entry,
         direction: direction,
       };
@@ -39,7 +44,7 @@ export function renderPill(
     [],
     [class_("prompt-group"), class_("journal-pill")],
     [
-      div([], [], [div([], [class_("prompt")], [text(pill)])]),
+      div([], [], [div([], [class_("prompt")], [text(pillDisplayName(pill))])]),
       div(
         [],
         [],
@@ -66,13 +71,41 @@ export function renderAddPill(): HtmlNode<Update> {
     [],
     [class_("pill-entry-container")],
     [
-      textarea(
+      div(
         [],
+        [class_("pill-input-row")],
         [
-          attribute("id", "new-pill-entry"),
-          attribute("placeholder", "Enter a med name with dosage..."),
-        ],
-        []
+          div(
+            [],
+            [class_("pill-input-group")],
+            [
+              label([], [attribute("for", "new-pill-name")], [text("Medication name")]),
+              input(
+                [],
+                [
+                  attribute("type", "text"),
+                  attribute("id", "new-pill-name"),
+                  attribute("placeholder", "e.g., Paracetamol"),
+                ]
+              ),
+            ]
+          ),
+          div(
+            [],
+            [class_("pill-input-group")],
+            [
+              label([], [attribute("for", "new-pill-dosage")], [text("Dosage")]),
+              input(
+                [],
+                [
+                  attribute("type", "text"),
+                  attribute("id", "new-pill-dosage"),
+                  attribute("placeholder", "e.g., 100mg"),
+                ]
+              ),
+            ]
+          ),
+        ]
       ),
       button(
         [on("click", updateAddPill)],
@@ -84,29 +117,43 @@ export function renderAddPill(): HtmlNode<Update> {
 }
 
 function updateAddPill(): Update {
-  const pillEntryElement: HTMLTextAreaElement | null = document.getElementById(
-    "new-pill-entry"
-  ) as HTMLTextAreaElement | null;
+  const pillNameElement: HTMLInputElement | null = document.getElementById(
+    "new-pill-name"
+  ) as HTMLInputElement | null;
+  const pillDosageElement: HTMLInputElement | null = document.getElementById(
+    "new-pill-dosage"
+  ) as HTMLInputElement | null;
 
-  if (!pillEntryElement) {
-    console.error("Couldn't find new-pill-entry");
+  if (!pillNameElement || !pillDosageElement) {
+    console.error("Couldn't find pill input elements");
     return dontSend();
   }
-  const pill = pillEntryElement.value;
+
+  const name = pillNameElement.value.trim();
+  const dosage = pillDosageElement.value.trim();
+
+  if (!name) {
+    console.error("Pill name is required");
+    return dontSend();
+  }
+
+  // Clear the input fields after adding
+  pillNameElement.value = "";
+  pillDosageElement.value = "";
 
   return {
     kind: "AddPill",
-    pillName: pill,
+    pill: Pill(name, dosage),
   };
 }
 
 export function renderPillOrder(settings: Settings): HtmlNode<Update> {
-  const pills: HtmlNode<Update>[] = settings.currentPills.map((pillName) => {
+  const pills: HtmlNode<Update>[] = settings.currentPills.map((pill) => {
     function makeCallback(direction: PillOrderDirection): () => Update {
       return (): Update => {
         return {
           kind: "UpdatePillOrder",
-          pillName: pillName,
+          pill: pill,
           direction: direction,
         };
       };
@@ -116,7 +163,7 @@ export function renderPillOrder(settings: Settings): HtmlNode<Update> {
       [],
       [],
       [
-        div([], [], [text(pillName)]),
+        div([], [], [text(pillDisplayName(pill))]),
         div(
           [on("click", makeCallback("Top"))],
           [class_("button")],

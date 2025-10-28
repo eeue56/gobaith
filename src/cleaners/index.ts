@@ -6,6 +6,7 @@ import {
   addQueriesToSettings,
 } from "./database_5";
 import { migrateHoursSleptToSleepQuality, updateSettingsToDatabaseVersion6 } from "./database_6";
+import { migrateCurrentPillsToPillObjects } from "./database_7";
 import { renameField } from "./rename_fields";
 
 /**
@@ -83,6 +84,12 @@ function cleanSettings(data: unknown): unknown {
 
   const dataVersion5 = addQueriesToSettings(dataWithDatabaseVersion);
   const dataVersion6 = updateSettingsToDatabaseVersion6(dataVersion5);
+  
+  if (dataWithDatabaseVersion.databaseVersion < 7) {
+    const dataVersion7 = migrateCurrentPillsToPillObjects(dataVersion6);
+    console.log("Cleaner: migrated currentPills to Pill objects");
+    return dataVersion7;
+  }
 
   return dataVersion6;
 }

@@ -778,6 +778,43 @@
   text-align: center;
 }
 
+.pill-entry-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--pico-muted-border-color);
+}
+
+.pill-input-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.pill-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pill-input-group label {
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+  margin-bottom: 0;
+}
+
+.pill-input-group input {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .pill-input-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .slider-label {
   display: grid;
   align-items: center;

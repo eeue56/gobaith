@@ -142,7 +142,7 @@ export type LogEntry = {
   text: string;
 };
 
-export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5, 6] as const;
+export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
 
 export type DatabaseVersion = (typeof DATABASE_VERSIONS)[number];
 
@@ -155,7 +155,7 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
  * any migrations needed in between the current db version
  * and the latest db version will be run
  */
-export const LATEST_DATABASE_VERSION: DatabaseVersion = 6;
+export const LATEST_DATABASE_VERSION: DatabaseVersion = 7;
 
 /**
  * AppState includes UI state and data (journal entries)
@@ -207,9 +207,35 @@ export type DebuggingInfo = {
   eventLog: EventLogEntry[];
 };
 
+export type Pill = {
+  name: string;
+  dosage: string;
+};
+
+export function Pill(name: string, dosage: string): Pill {
+  return { name, dosage };
+}
+
+/**
+ * Gets the full display name for a pill (name + dosage)
+ */
+export function pillDisplayName(pill: Pill): string {
+  if (pill.dosage) {
+    return `${pill.name} ${pill.dosage}`;
+  }
+  return pill.name;
+}
+
+/**
+ * Creates a pill key for storing in the pills record
+ */
+export function pillKey(pill: Pill): string {
+  return pillDisplayName(pill);
+}
+
 export type Settings = {
   kind: "Settings";
-  currentPills: string[];
+  currentPills: Pill[];
   queries: Queryable[];
   databaseVersion: DatabaseVersion;
 };
@@ -324,7 +350,7 @@ export type Update =
   | { kind: "RemoveAppState" }
   | { kind: "UpdateCurrentTab"; tab: TabName }
   | { kind: "UpdateCurrentGraph"; graphName: GraphName }
-  | { kind: "AddPill"; pillName: string }
+  | { kind: "AddPill"; pill: Pill }
   | { kind: "ResetCurrentDay" }
   | { kind: "UpdateCurrentDay"; direction: Direction }
   | { kind: "GoToSpecificDay"; tab: TabName; entry: JournalEntry }
@@ -340,7 +366,7 @@ export type Update =
     }
   | {
       kind: "UpdatePillOrder";
-      pillName: string;
+      pill: Pill;
       direction: PillOrderDirection;
     }
   | { kind: "ReadyToRender" }

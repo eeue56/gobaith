@@ -6,6 +6,8 @@ import {
   GraphName,
   JournalEntry,
   MoodValue,
+  Pill,
+  pillKey,
   PillOrderDirection,
   Prompt,
   Settings,
@@ -91,10 +93,12 @@ function move<a>(arr: a[], from: number, to: number): void {
 
 export function updatePillOrder(
   settings: Settings,
-  pillName: string,
+  pill: Pill,
   direction: PillOrderDirection
 ): Settings {
-  const pillIndex = settings.currentPills.indexOf(pillName);
+  const pillIndex = settings.currentPills.findIndex(
+    (p) => pillKey(p) === pillKey(pill)
+  );
 
   switch (direction) {
     case "Up": {
@@ -120,11 +124,12 @@ export type Modified = {
 };
 
 export function addPill(
-  newName: string,
+  newPill: Pill,
   entries: JournalEntry[],
   settings: Settings
 ): Modified {
-  if (settings.currentPills.includes(newName)) {
+  const key = pillKey(newPill);
+  if (settings.currentPills.some((p) => pillKey(p) === key)) {
     return {
       entries,
       settings,
@@ -132,10 +137,10 @@ export function addPill(
   }
 
   for (const entry of entries) {
-    entry.pills[newName] = 0;
+    entry.pills[key] = 0;
   }
 
-  settings.currentPills.push(newName);
+  settings.currentPills.push(newPill);
 
   return {
     entries,

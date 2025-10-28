@@ -3,6 +3,7 @@ import {
   Day,
   DayState,
   JournalEntry,
+  pillKey,
   PROMPTS,
   Prompt,
   PromptResponses,
@@ -21,9 +22,10 @@ export function initializeEntryForDay(
 ): InitializeResult {
   let entry = entries.filter((entry) => isSameDay(day, entry.day))[0];
   if (entry) {
-    for (const pillName of settings.currentPills) {
-      if (!Object.keys(entry.pills).includes(pillName)) {
-        entry.pills[pillName] = 0;
+    for (const pill of settings.currentPills) {
+      const key = pillKey(pill);
+      if (!Object.keys(entry.pills).includes(key)) {
+        entry.pills[key] = 0;
       }
     }
 
@@ -32,8 +34,8 @@ export function initializeEntryForDay(
 
   const pills: Record<string, number> = {};
 
-  for (const pillName of settings.currentPills) {
-    pills[pillName] = 0;
+  for (const pill of settings.currentPills) {
+    pills[pillKey(pill)] = 0;
   }
 
   entry = JournalEntry(day, pills, PromptResponses(1, 1, 1, 1, 1, 1), []);
