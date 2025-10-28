@@ -7,7 +7,6 @@ import {
   input,
   on,
   text,
-  textarea,
 } from "@eeue56/coed";
 import {
   Direction,
@@ -121,6 +120,10 @@ function updateAddPill(): Update {
 
   // Combine name and dosage with a space if dosage is provided
   const pill = dosage ? `${name} ${dosage}` : name;
+
+  // Clear the input fields after successful submission
+  pillNameElement.value = "";
+  pillDosageElement.value = "";
 
   return {
     kind: "AddPill",
