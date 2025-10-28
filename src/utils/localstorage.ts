@@ -14,9 +14,15 @@ export function getDebuggingInfo(): DebuggingInfo | null {
   if (infoAsString === null) return null;
 
   try {
-    const parsed = JSON.parse(infoAsString);
-
+    const parsed = JSON.parse(infoAsString) as DebuggingInfo;
     console.log("debug info parsed:", parsed);
+
+    for (const entry of parsed.eventLog) {
+      if (!entry.timestamp) entry.timestamp = new Date();
+      if (typeof entry.timestamp === "string") {
+        entry.timestamp = new Date(entry.timestamp);
+      }
+    }
 
     return parsed;
   } catch (error) {
