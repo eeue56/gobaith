@@ -197,9 +197,14 @@ export function isAppState(object: unknown): object is AppState {
   return false;
 }
 
+export type EventLogEntry = {
+  eventKind: Update["kind"];
+  timestamp: Date;
+};
+
 export type DebuggingInfo = {
   kind: "DebuggingInfo";
-  eventLog: Update["kind"][];
+  eventLog: EventLogEntry[];
 };
 
 export type Settings = {

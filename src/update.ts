@@ -85,7 +85,10 @@ export async function update(message: Update, model: Model): Promise<Model> {
 
   // just ignore debug info if it doesn't exist, to avoid breaking the update loop
   try {
-    debuggingInfo.eventLog.push(message.kind);
+    debuggingInfo.eventLog.push({
+      eventKind: message.kind,
+      timestamp: new Date(),
+    });
     storeDebuggingInfo(debuggingInfo);
   } catch (error) {
     console.error(

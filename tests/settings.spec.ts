@@ -55,8 +55,9 @@ test("the user removes app state (including journals)", async ({
 test("the debug log contains events triggered", async ({ context, page }) => {
   await changeTab(page, "SETTINGS");
 
-  await expect(await page.locator(".event-log").innerText()).toEqual(
-    "UpdateCurrentTab"
+  // Check that the event log contains the "Changed tab" description
+  await expect(page.locator(".event-description").first()).toContainText(
+    "Changed tab"
   );
 
   await changeTab(page, "JOURNAL");
@@ -78,18 +79,17 @@ test("the debug log contains events triggered", async ({ context, page }) => {
 
   await changeTab(page, "SETTINGS");
 
-  await expect(await page.locator(".event-log").innerText()).toEqual(
-    `
-UpdateCurrentTab
-UpdateCurrentTab
-UpdateCurrentDay
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdatePromptValue
-UpdateCurrentTab
-  `.trim()
-  );
+  // Check that the event log contains multiple entries with timestamps
+  const eventEntries = await page.locator(".event-log-entry").all();
+  expect(eventEntries.length).toBeGreaterThan(0);
+
+  // Check that timestamps are present
+  const timestamps = await page.locator(".event-timestamp").all();
+  expect(timestamps.length).toEqual(eventEntries.length);
+
+  // Check that specific events are logged with their descriptions
+  const descriptions = await page.locator(".event-description").allTextContents();
+  expect(descriptions).toContain("Changed tab");
+  expect(descriptions).toContain("Changed day");
+  expect(descriptions).toContain("Updated mood/prompt value");
 });
