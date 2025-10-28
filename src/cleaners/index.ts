@@ -6,7 +6,7 @@ import {
   addQueriesToSettings,
 } from "./database_5";
 import { migrateHoursSleptToSleepQuality, updateSettingsToDatabaseVersion6 } from "./database_6";
-import { migrateCurrentPillsToPillObjects } from "./database_7";
+import { migrateCurrentPillsToPillObjects, updateAppStateToDatabaseVersion7 } from "./database_7";
 import { renameField } from "./rename_fields";
 
 /**
@@ -61,7 +61,12 @@ function cleanAppState(data: unknown): unknown {
     console.log("Cleaner: migrated hoursSlept to sleepQuality");
   }
 
-  return dataWithDatabaseVersion;
+  if (dataWithDatabaseVersion.databaseVersion < 7) {
+    data = updateAppStateToDatabaseVersion7(data);
+    console.log("Cleaner: updated AppState to database version 7");
+  }
+
+  return data;
 }
 
 function cleanSettings(data: unknown): unknown {

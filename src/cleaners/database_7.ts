@@ -47,3 +47,15 @@ export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
   markDatabaseVersion(data, 7);
   return data;
 }
+
+/**
+ * Update AppState to database version 7
+ * AppState doesn't have pills, so this just marks the version
+ */
+export function updateAppStateToDatabaseVersion7(data: unknown): unknown {
+  if (typeof data === "object") {
+    markDatabaseVersion(data, 7);
+    return data;
+  }
+  return data;
+}
