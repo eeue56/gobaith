@@ -29,13 +29,25 @@ import {
   updateQuery,
 } from "./updaters";
 import { dateToDay, nextDay, previousDay } from "./utils/dates";
-import { storeDebuggingInfo } from "./utils/localstorage";
+import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
 export let hasBackend = false;
-export let debuggingInfo: DebuggingInfo = {
+
+// Initialize debuggingInfo from localStorage if available
+let initialDebuggingInfo: DebuggingInfo = {
   kind: "DebuggingInfo",
   eventLog: [],
 };
+
+// Try to load from localStorage on module initialization (browser context only)
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+  const storedInfo = getDebuggingInfo();
+  if (storedInfo) {
+    initialDebuggingInfo = storedInfo;
+  }
+}
+
+export let debuggingInfo: DebuggingInfo = initialDebuggingInfo;
 
 /**
  * Checks if the server has a healthcheck enabled
