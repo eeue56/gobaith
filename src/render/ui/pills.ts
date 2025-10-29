@@ -56,7 +56,7 @@ export function renderPill(entry: JournalEntry, pill: Pill): HtmlNode<Update> {
         [
           button(
             [on("click", makeCallback("Previous"))],
-            [class_("pill-button"), class_("pill-button-decrease")],
+            [class_("pill-button")],
             [iconRemove]
           ),
           div(
@@ -66,7 +66,7 @@ export function renderPill(entry: JournalEntry, pill: Pill): HtmlNode<Update> {
           ),
           button(
             [on("click", makeCallback("Next"))],
-            [class_("pill-button"), class_("pill-button-increase")],
+            [class_("pill-button")],
             [iconAdd]
           ),
         ]

@@ -774,7 +774,9 @@
   max-height: 15vh;
 }
 
-/* Medication tracking in Journal tab */
+/* Medication tracking in Journal tab
+ * Applied in: src/render/ui/pills.ts (renderPill function)
+ */
 .journal-pill {
   margin-bottom: 30px;
 }
