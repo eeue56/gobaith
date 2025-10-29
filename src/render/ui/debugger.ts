@@ -1,5 +1,5 @@
 import { class_, div, h3, h4, HtmlNode, small, text } from "@eeue56/coed";
-import { DebuggingInfo, EventLogEntry, Update } from "../../types";
+import { DebuggingInfo, EventLogEntry } from "../../types";
 
 function row<a>(children: HtmlNode<a>[]): HtmlNode<a> {
   return div([], [class_("row")], children);
@@ -8,8 +8,8 @@ function row<a>(children: HtmlNode<a>[]): HtmlNode<a> {
 /**
  * Convert event kind to a human-readable description
  */
-function eventKindToDescription(kind: Update["kind"]): string {
-  switch (kind) {
+function eventLogEntryToDescription(entry: EventLogEntry): string {
+  switch (entry.eventKind) {
     case "Noop":
       return "No operation";
     case "SetModel":
@@ -85,7 +85,7 @@ function formatTimestamp(date: Date): string {
 }
 
 function renderEventLogEntry(entry: EventLogEntry): HtmlNode<never> {
-  const description = eventKindToDescription(entry.eventKind);
+  const description = eventLogEntryToDescription(entry);
   const timestamp = formatTimestamp(entry.timestamp);
 
   return row([
