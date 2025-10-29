@@ -778,6 +778,43 @@
   text-align: center;
 }
 
+.pill-entry-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--pico-muted-border-color);
+}
+
+.pill-input-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.pill-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pill-input-group label {
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+  margin-bottom: 0;
+}
+
+.pill-input-group input {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .pill-input-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .slider-label {
   display: grid;
   align-items: center;
@@ -895,7 +932,40 @@
   overflow: scroll;
   border: 1px solid var(--pico-form-element-valid-border-color);
   padding: 20px;
-  font-size: 20px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-log-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+  border-left: 3px solid var(--pico-primary-background);
+  transition: all 0.2s ease;
+}
+
+.event-log-entry:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: var(--pico-primary);
+}
+
+.event-description {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.event-timestamp {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--pico-muted-color);
+  margin-left: 10px;
+  white-space: nowrap;
 }
 
 #download-settings,

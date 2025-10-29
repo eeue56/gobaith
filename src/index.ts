@@ -10,7 +10,7 @@ import {
 import { getDebuggingInfo } from "./utils/localstorage";
 
 import { div, HtmlNode, Program, program } from "@eeue56/coed";
-import { fetchModelFromStores, update } from "./update";
+import { debuggingInfo, fetchModelFromStores, update } from "./update";
 import { pushHistoryState } from "./updaters";
 
 /**
@@ -28,11 +28,8 @@ function renderBody(model: Model): HtmlNode<Update> {
       return renderGraph(model);
     }
     case "SETTINGS": {
-      let info: DebuggingInfo | null = getDebuggingInfo();
-      if (!info) {
-        info = { kind: "DebuggingInfo", eventLog: [] };
-      }
-      return renderSettings(model, info);
+      // Use the live debuggingInfo from update.ts instead of reading from localStorage
+      return renderSettings(model, debuggingInfo);
     }
   }
 }

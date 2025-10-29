@@ -8,7 +8,8 @@ testPeristentElectron("the user adds a pill", async ({ context, page }) => {
   if (!process.env.IS_ELECTRON) return;
   await changeTab(page, "SETTINGS");
 
-  await page.locator("#new-pill-entry").fill("Paracetamol 100mg");
+  await page.locator("#new-pill-name").fill("Paracetamol");
+  await page.locator("#new-pill-dosage").fill("100mg");
   await page.locator("#add-pill").click();
 
   await changeTab(page, "JOURNAL");

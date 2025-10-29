@@ -92,7 +92,7 @@ test("the importer can import settings", async ({ context, page }) => {
 
   const settings: Settings = {
     kind: "Settings",
-    currentPills: ["Ibux 200mg"],
+    currentPills: [{ kind: "Pill", name: "Ibux", dosage: "200mg" }],
     queries: [...BUILT_IN_QUERIES],
     databaseVersion: LATEST_DATABASE_VERSION,
   };
@@ -107,8 +107,12 @@ test("the importer can import settings", async ({ context, page }) => {
 
   await page.locator("#update-import-from-text").dispatchEvent("click");
 
+  // Check that the exported settings contain the pill name and dosage
   await expect(await page.locator("#textarea-download-settings")).toHaveValue(
-    /Ibux 200mg/
+    /Ibux/
+  );
+  await expect(await page.locator("#textarea-download-settings")).toHaveValue(
+    /200mg/
   );
 
   await page.reload();
@@ -117,7 +121,11 @@ test("the importer can import settings", async ({ context, page }) => {
 
   await expectActiveTab(page, "IMPORT");
 
+  // Check that the pill data persists after reload
   await expect(await page.locator("#textarea-download-settings")).toHaveValue(
-    /Ibux 200mg/
+    /Ibux/
+  );
+  await expect(await page.locator("#textarea-download-settings")).toHaveValue(
+    /200mg/
   );
 });

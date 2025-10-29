@@ -244,6 +244,10 @@ async function runMigration(
       console.info("IndexedDB: Migrating hoursSlept to sleepQuality");
       return db;
     }
+    case 7: {
+      console.info("IndexedDB: Migrating currentPills to Pill objects");
+      return db;
+    }
   }
 }
 

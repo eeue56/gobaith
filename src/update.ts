@@ -14,6 +14,7 @@ import {
   LATEST_DATABASE_VERSION,
   LocalState,
   Model,
+  pillKey,
   Settings,
   Update,
 } from "./types";
@@ -28,13 +29,30 @@ import {
   updateQuery,
 } from "./updaters";
 import { dateToDay, nextDay, previousDay } from "./utils/dates";
-import { storeDebuggingInfo } from "./utils/localstorage";
+import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
 export let hasBackend = false;
-export let debuggingInfo: DebuggingInfo = {
-  kind: "DebuggingInfo",
-  eventLog: [],
-};
+
+/**
+ * Initialize debuggingInfo from localStorage if available (browser context only)
+ */
+function initializeDebuggingInfo(): DebuggingInfo {
+  const defaultInfo: DebuggingInfo = {
+    kind: "DebuggingInfo",
+    eventLog: [],
+  };
+
+  if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+    const storedInfo = getDebuggingInfo();
+    if (storedInfo) {
+      return storedInfo;
+    }
+  }
+
+  return defaultInfo;
+}
+
+export let debuggingInfo: DebuggingInfo = initializeDebuggingInfo();
 
 /**
  * Checks if the server has a healthcheck enabled
@@ -85,7 +103,10 @@ export async function update(message: Update, model: Model): Promise<Model> {
 
   // just ignore debug info if it doesn't exist, to avoid breaking the update loop
   try {
-    debuggingInfo.eventLog.push(message.kind);
+    debuggingInfo.eventLog.push({
+      eventKind: message.kind,
+      timestamp: new Date(),
+    });
     storeDebuggingInfo(debuggingInfo);
   } catch (error) {
     console.error(
@@ -205,7 +226,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
     }
     case "AddPill": {
       const modified = addPill(
-        message.pillName,
+        message.pill,
         model.appState.journalEntries,
         model.settings
       );
@@ -294,10 +315,15 @@ export async function update(message: Update, model: Model): Promise<Model> {
     }
     case "UpdateImportSettings": {
       for (const pill of message.settings.currentPills) {
-        if (model.settings.currentPills.includes(pill)) {
+        const pillKeyValue = pillKey(pill);
+        if (
+          model.settings.currentPills.some(
+            (p) => pillKey(p) === pillKeyValue
+          )
+        ) {
           console.log(
             "Skipping import of pill",
-            pill,
+            pillKeyValue,
             "as it's already in the settings"
           );
           continue;
@@ -311,7 +337,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         model.appState.journalEntries = modified.entries;
         model.settings = modified.settings;
 
-        console.log("Imported pill:", pill);
+        console.log("Imported pill:", pillKeyValue);
       }
       const pillCount = model.settings.currentPills.length;
       console.log("Imported settings");
@@ -345,7 +371,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
     case "UpdatePillValue": {
       const appState = updatePillValue(
         message.entry,
-        message.pillName,
+        message.pill,
         message.direction,
         model.appState
       );
@@ -359,7 +385,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
     case "UpdatePillOrder": {
       const settings = updatePillOrder(
         model.settings,
-        message.pillName,
+        message.pill,
         message.direction
       );
       await syncStateAndSettings(hasBackend, model.appState, settings);
