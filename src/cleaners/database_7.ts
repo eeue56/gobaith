@@ -10,7 +10,7 @@ function extractPillFromString(pillString: string): Pill | null {
 
   const lastPart = parts[parts.length - 1];
   // Check if last part looks like a dosage (number + unit)
-  if (/^[\d.]+\s*(?:mg|g|ml|mcg|µg|iu|units?)$/i.test(lastPart)) {
+  if (/^[\d.].*/i.test(lastPart)) {
     const name = parts.slice(0, -1).join(" ");
     return { kind: "Pill", name, dosage: lastPart };
   }
