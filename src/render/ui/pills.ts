@@ -3,6 +3,7 @@ import {
   button,
   class_,
   div,
+  h4,
   HtmlNode,
   input,
   label,
@@ -20,7 +21,16 @@ import {
   Settings,
   Update,
 } from "../../types";
-import { iconPill } from "./icons";
+import { 
+  iconPill, 
+  iconAdd, 
+  iconRemove, 
+  iconCheck,
+  iconClose,
+  iconArrowUpward,
+  iconArrowDownward,
+  iconVerticalAlignTop
+} from "./icons";
 
 export function renderPill(entry: JournalEntry, pill: Pill): HtmlNode<Update> {
   const key = pillKey(pill);
@@ -37,26 +47,41 @@ export function renderPill(entry: JournalEntry, pill: Pill): HtmlNode<Update> {
     };
   }
 
+  // Render buttons for taken/not taken (0 or 1+)
+  const takenButton = button(
+    [on("click", makeCallback("Next"))],
+    [
+      class_("pill-button"),
+      class_(amountTaken > 0 ? "pill-taken" : ""),
+      attribute("title", amountTaken > 0 ? `Taken (${amountTaken} dose${amountTaken > 1 ? 's' : ''})` : "Mark as taken"),
+    ],
+    [iconCheck]
+  );
+
+  const notTakenButton = button(
+    [on("click", makeCallback("Previous"))],
+    [
+      class_("pill-button"),
+      class_(amountTaken === 0 ? "pill-not-taken" : ""),
+      attribute("title", "Mark as not taken"),
+    ],
+    [iconClose]
+  );
+
   return div(
     [],
     [class_("prompt-group"), class_("journal-pill")],
     [
-      div([], [], [div([], [class_("prompt")], [text(pillDisplayName(pill))])]),
+      div([], [class_("prompt")], [h4([], [], [text(pillDisplayName(pill))])]),
       div(
         [],
-        [],
+        [class_("pill-buttons-container")],
         [
-          button(
-            [on("click", makeCallback("Previous"))],
-            [class_("prompt-answer")],
-            [text("Minus")]
-          ),
-          button(
-            [on("click", makeCallback("Next"))],
-            [class_("pill-amount-taken")],
-            [text(amountTaken.toString())]
-          ),
-          button([], [class_("prompt-answer")], [text("Plus")]),
+          notTakenButton,
+          div([], [class_("pill-dose-count")], [
+            text(amountTaken > 0 ? `${amountTaken}` : "")
+          ]),
+          takenButton,
         ]
       ),
     ]
@@ -163,27 +188,33 @@ export function renderPillOrder(settings: Settings): HtmlNode<Update> {
 
     return div(
       [],
-      [],
+      [class_("pill-order-item")],
       [
-        div([], [], [text(pillDisplayName(pill))]),
+        div([], [class_("pill-order-name")], [text(pillDisplayName(pill))]),
         div(
-          [on("click", makeCallback("Top"))],
-          [class_("button")],
-          [text("Top")]
-        ),
-        div(
-          [on("click", makeCallback("Up"))],
-          [class_("button")],
-          [text("Up")]
-        ),
-        div(
-          [on("click", makeCallback("Down"))],
-          [class_("button")],
-          [text("Down")]
+          [],
+          [class_("pill-order-buttons")],
+          [
+            button(
+              [on("click", makeCallback("Top"))],
+              [class_("pill-order-button"), attribute("title", "Move to top")],
+              [iconVerticalAlignTop]
+            ),
+            button(
+              [on("click", makeCallback("Up"))],
+              [class_("pill-order-button"), attribute("title", "Move up")],
+              [iconArrowUpward]
+            ),
+            button(
+              [on("click", makeCallback("Down"))],
+              [class_("pill-order-button"), attribute("title", "Move down")],
+              [iconArrowDownward]
+            ),
+          ]
         ),
       ]
     );
   });
 
-  return div([], [], pills);
+  return div([], [class_("pill-order-container")], pills);
 }

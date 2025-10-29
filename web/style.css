@@ -778,6 +778,132 @@
   text-align: center;
 }
 
+/* Journal pill tracking styles */
+.journal-pill {
+  margin-bottom: 30px;
+}
+
+.pill-buttons-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.pill-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--pico-muted-border-color);
+  background-color: var(--pico-form-element-background-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 32px;
+  padding: 0;
+}
+
+.pill-button:hover {
+  background-color: var(--pico-form-element-active-background-color);
+  border-color: var(--pico-primary-border);
+  transform: scale(1.05);
+}
+
+.pill-button .material-symbols-outlined {
+  font-size: 32px;
+}
+
+.pill-button.pill-taken {
+  background-color: var(--pico-primary-background);
+  border-color: var(--pico-primary);
+  color: white;
+}
+
+.pill-button.pill-taken:hover {
+  background-color: var(--pico-primary-hover-background);
+  border-color: var(--pico-primary-hover);
+}
+
+.pill-button.pill-not-taken {
+  background-color: var(--pico-form-element-invalid-border-color);
+  border-color: var(--pico-form-element-invalid-active-border-color);
+  color: white;
+}
+
+.pill-button.pill-not-taken:hover {
+  background-color: var(--pico-form-element-invalid-active-border-color);
+}
+
+.pill-dose-count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+  color: var(--pico-primary);
+}
+
+/* Settings pill order styles */
+.pill-order-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--pico-muted-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.pill-order-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--pico-muted-border-color);
+}
+
+.pill-order-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.pill-order-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.pill-order-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 1px solid var(--pico-muted-border-color);
+  background-color: var(--pico-form-element-background-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.pill-order-button:hover {
+  background-color: var(--pico-primary-background);
+  border-color: var(--pico-primary);
+  transform: scale(1.05);
+}
+
+.pill-order-button .material-symbols-outlined {
+  font-size: 24px;
+}
+
 .pill-entry-container {
   margin: 20px 0;
   padding: 20px;
@@ -1220,5 +1346,43 @@
 
   .prompt-group {
     margin-bottom: 30px;
+  }
+
+  .pill-button {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+
+  .pill-button .material-symbols-outlined {
+    font-size: 28px;
+  }
+
+  .pill-buttons-container {
+    gap: 15px;
+  }
+
+  .pill-dose-count {
+    font-size: 1.2rem;
+    min-width: 30px;
+  }
+
+  .pill-order-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pill-order-button .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  .pill-order-item {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .pill-order-buttons {
+    justify-content: center;
   }
 }
