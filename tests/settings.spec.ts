@@ -81,6 +81,9 @@ test("the debug log contains events triggered", async ({ context, page }) => {
 
   await changeTab(page, "SETTINGS");
 
+  // Wait for the event log to be visible and populated
+  await page.waitForSelector(".event-log-entry", { timeout: 5000 });
+
   // Check that the event log contains multiple entries with timestamps
   const eventEntries = await page.locator(".event-log-entry").all();
   expect(eventEntries.length).toBeGreaterThan(0);
