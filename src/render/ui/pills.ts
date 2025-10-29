@@ -22,11 +22,11 @@ import {
   Update,
 } from "../../types";
 import {
+  iconAdd,
+  iconArrowDownward,
+  iconArrowUpward,
   iconPill,
   iconRemove,
-  iconAdd,
-  iconArrowUpward,
-  iconArrowDownward,
   iconVerticalAlignTop,
 } from "./icons";
 
@@ -161,47 +161,54 @@ function updateAddPill(): Update {
   };
 }
 
-export function renderPillOrder(settings: Settings): HtmlNode<Update> {
-  const pills: HtmlNode<Update>[] = settings.currentPills.map((pill) => {
-    function makeCallback(direction: PillOrderDirection): () => Update {
-      return (): Update => {
-        return {
-          kind: "UpdatePillOrder",
-          pill: pill,
-          direction: direction,
-        };
-      };
-    }
+function makePillOrderCallback(
+  pill: Pill,
+  direction: PillOrderDirection
+): () => Update {
+  return (): Update => {
+    return {
+      kind: "UpdatePillOrder",
+      pill: pill,
+      direction: direction,
+    };
+  };
+}
 
-    return div(
-      [],
-      [class_("pill-order-item")],
-      [
-        div([], [class_("pill-order-name")], [text(pillDisplayName(pill))]),
-        div(
-          [],
-          [class_("pill-order-controls")],
-          [
-            button(
-              [on("click", makeCallback("Top"))],
-              [class_("pill-order-button"), attribute("title", "Move to top")],
-              [iconVerticalAlignTop]
-            ),
-            button(
-              [on("click", makeCallback("Up"))],
-              [class_("pill-order-button"), attribute("title", "Move up")],
-              [iconArrowUpward]
-            ),
-            button(
-              [on("click", makeCallback("Down"))],
-              [class_("pill-order-button"), attribute("title", "Move down")],
-              [iconArrowDownward]
-            ),
-          ]
-        ),
-      ]
-    );
-  });
+function renderPillItemInOrder(pill: Pill): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("pill-order-item")],
+    [
+      div([], [class_("pill-order-name")], [text(pillDisplayName(pill))]),
+      div(
+        [],
+        [class_("pill-order-controls")],
+        [
+          button(
+            [on("click", makePillOrderCallback(pill, "Top"))],
+            [class_("pill-order-button"), attribute("title", "Move to top")],
+            [iconVerticalAlignTop]
+          ),
+          button(
+            [on("click", makePillOrderCallback(pill, "Up"))],
+            [class_("pill-order-button"), attribute("title", "Move up")],
+            [iconArrowUpward]
+          ),
+          button(
+            [on("click", makePillOrderCallback(pill, "Down"))],
+            [class_("pill-order-button"), attribute("title", "Move down")],
+            [iconArrowDownward]
+          ),
+        ]
+      ),
+    ]
+  );
+}
+
+export function renderPillOrder(settings: Settings): HtmlNode<Update> {
+  const pills: HtmlNode<Update>[] = settings.currentPills.map(
+    renderPillItemInOrder
+  );
 
   return div([], [class_("pill-order-container")], pills);
 }
