@@ -1,10 +1,7 @@
 import { isPill, Pill } from "../types";
 import { markDatabaseVersion } from "./mark_database_version";
 
-/**
- * Try to parse a dosage from the end of a string
- */
-function extractDosageFromString(pillString: string): { name: string; dosage: string } | null {
+function extractPillFromString(pillString: string): Pill | null {
   // Look for patterns like "100mg", "2.5g", etc. at the end
   const parts = pillString.trim().split(/\s+/);
   if (parts.length < 2) {
@@ -14,8 +11,8 @@ function extractDosageFromString(pillString: string): { name: string; dosage: st
   const lastPart = parts[parts.length - 1];
   // Check if last part looks like a dosage (number + unit)
   if (/^[\d.]+\s*(?:mg|g|ml|mcg|µg|iu|units?)$/i.test(lastPart)) {
-    const name = parts.slice(0, -1).join(' ');
-    return { name, dosage: lastPart };
+    const name = parts.slice(0, -1).join(" ");
+    return { kind: "Pill", name, dosage: lastPart };
   }
 
   return null;
@@ -30,9 +27,9 @@ function convertToPill(item: unknown): Pill | null {
   }
 
   if (typeof item === "string") {
-    const parsed = extractDosageFromString(item);
+    const parsed = extractPillFromString(item);
     if (parsed) {
-      return { kind: "Pill", name: parsed.name, dosage: parsed.dosage };
+      return parsed;
     }
     return { kind: "Pill", name: item.trim(), dosage: "" };
   }
@@ -42,7 +39,7 @@ function convertToPill(item: unknown): Pill | null {
 
 /**
  * Migrate Settings.currentPills from string[] to Pill[]
- * This migration converts old pill format like "Paracetamol 100mg" 
+ * This migration converts old pill format like "Paracetamol 100mg"
  * to new format { kind: "Pill", name: "Paracetamol", dosage: "100mg" }
  */
 export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
@@ -54,14 +51,14 @@ export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
 
   if (dataObj.kind === "Settings" && Array.isArray(dataObj.currentPills)) {
     const newPills: Pill[] = [];
-    
+
     for (const pill of dataObj.currentPills) {
       const converted = convertToPill(pill);
       if (converted) {
         newPills.push(converted);
       }
     }
-    
+
     dataObj.currentPills = newPills;
   }
 

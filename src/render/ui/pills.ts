@@ -22,10 +22,7 @@ import {
 } from "../../types";
 import { iconPill } from "./icons";
 
-export function renderPill(
-  entry: JournalEntry,
-  pill: Pill
-): HtmlNode<Update> {
+export function renderPill(entry: JournalEntry, pill: Pill): HtmlNode<Update> {
   const key = pillKey(pill);
   const amountTaken = entry.pills[key];
 
@@ -66,7 +63,7 @@ export function renderPill(
   );
 }
 
-function renderPillNameInput(): HtmlNode<Update> {
+function renderPillNameInput(): HtmlNode<never> {
   return div(
     [],
     [class_("pill-input-group")],
@@ -84,7 +81,7 @@ function renderPillNameInput(): HtmlNode<Update> {
   );
 }
 
-function renderPillDosageInput(): HtmlNode<Update> {
+function renderPillDosageInput(): HtmlNode<never> {
   return div(
     [],
     [class_("pill-input-group")],
@@ -146,9 +143,6 @@ function updateAddPill(): Update {
     return dontSend();
   }
 
-  // Note: Fields are not cleared here to preserve user input in case of errors.
-  // This allows users to easily modify and retry if needed (e.g., fixing duplicates).
-  
   return {
     kind: "AddPill",
     pill: Pill(name, dosage),
