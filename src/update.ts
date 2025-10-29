@@ -33,21 +33,26 @@ import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
 export let hasBackend = false;
 
-// Initialize debuggingInfo from localStorage if available
-let initialDebuggingInfo: DebuggingInfo = {
-  kind: "DebuggingInfo",
-  eventLog: [],
-};
+/**
+ * Initialize debuggingInfo from localStorage if available (browser context only)
+ */
+function initializeDebuggingInfo(): DebuggingInfo {
+  const defaultInfo: DebuggingInfo = {
+    kind: "DebuggingInfo",
+    eventLog: [],
+  };
 
-// Try to load from localStorage on module initialization (browser context only)
-if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
-  const storedInfo = getDebuggingInfo();
-  if (storedInfo) {
-    initialDebuggingInfo = storedInfo;
+  if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+    const storedInfo = getDebuggingInfo();
+    if (storedInfo) {
+      return storedInfo;
+    }
   }
+
+  return defaultInfo;
 }
 
-export let debuggingInfo: DebuggingInfo = initialDebuggingInfo;
+export let debuggingInfo: DebuggingInfo = initializeDebuggingInfo();
 
 /**
  * Checks if the server has a healthcheck enabled
@@ -366,7 +371,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
     case "UpdatePillValue": {
       const appState = updatePillValue(
         message.entry,
-        message.pillName,
+        message.pill,
         message.direction,
         model.appState
       );

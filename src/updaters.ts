@@ -49,10 +49,11 @@ export function updatePromptValue(
 
 export function updatePillValue(
   entry: JournalEntry,
-  pillName: string,
+  pill: Pill,
   direction: Direction,
   state: AppState
 ): AppState {
+  const pillName = pillKey(pill);
   for (const journalEntry of state.journalEntries) {
     if (isSameDay(journalEntry.day, entry.day)) {
       if (direction === "Next") {

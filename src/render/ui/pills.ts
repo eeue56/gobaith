@@ -33,7 +33,7 @@ export function renderPill(
     return (): Update => {
       return {
         kind: "UpdatePillValue",
-        pillName: key,
+        pill: pill,
         entry: entry,
         direction: direction,
       };
@@ -66,6 +66,50 @@ export function renderPill(
   );
 }
 
+function renderPillNameInput(): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("pill-input-group")],
+    [
+      label([], [attribute("for", "new-pill-name")], [text("Medication name")]),
+      input(
+        [],
+        [
+          attribute("type", "text"),
+          attribute("id", "new-pill-name"),
+          attribute("placeholder", "e.g., Paracetamol"),
+        ]
+      ),
+    ]
+  );
+}
+
+function renderPillDosageInput(): HtmlNode<Update> {
+  return div(
+    [],
+    [class_("pill-input-group")],
+    [
+      label([], [attribute("for", "new-pill-dosage")], [text("Dosage")]),
+      input(
+        [],
+        [
+          attribute("type", "text"),
+          attribute("id", "new-pill-dosage"),
+          attribute("placeholder", "e.g., 100mg"),
+        ]
+      ),
+    ]
+  );
+}
+
+function renderAddPillButton(): HtmlNode<Update> {
+  return button(
+    [on("click", updateAddPill)],
+    [attribute("id", "add-pill")],
+    [text("Add"), iconPill]
+  );
+}
+
 export function renderAddPill(): HtmlNode<Update> {
   return div(
     [],
@@ -74,44 +118,9 @@ export function renderAddPill(): HtmlNode<Update> {
       div(
         [],
         [class_("pill-input-row")],
-        [
-          div(
-            [],
-            [class_("pill-input-group")],
-            [
-              label([], [attribute("for", "new-pill-name")], [text("Medication name")]),
-              input(
-                [],
-                [
-                  attribute("type", "text"),
-                  attribute("id", "new-pill-name"),
-                  attribute("placeholder", "e.g., Paracetamol"),
-                ]
-              ),
-            ]
-          ),
-          div(
-            [],
-            [class_("pill-input-group")],
-            [
-              label([], [attribute("for", "new-pill-dosage")], [text("Dosage")]),
-              input(
-                [],
-                [
-                  attribute("type", "text"),
-                  attribute("id", "new-pill-dosage"),
-                  attribute("placeholder", "e.g., 100mg"),
-                ]
-              ),
-            ]
-          ),
-        ]
+        [renderPillNameInput(), renderPillDosageInput()]
       ),
-      button(
-        [on("click", updateAddPill)],
-        [attribute("id", "add-pill")],
-        [text("Add"), iconPill]
-      ),
+      renderAddPillButton(),
     ]
   );
 }

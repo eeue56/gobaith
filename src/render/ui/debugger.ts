@@ -86,12 +86,7 @@ function formatTimestamp(date: Date): string {
 
 function renderEventLogEntry(entry: EventLogEntry): HtmlNode<never> {
   const description = eventKindToDescription(entry.eventKind);
-  
-  // Ensure timestamp is a Date object (might be a string after JSON deserialization)
-  const timestampDate = entry.timestamp instanceof Date 
-    ? entry.timestamp 
-    : new Date(entry.timestamp);
-  const timestamp = formatTimestamp(timestampDate);
+  const timestamp = formatTimestamp(entry.timestamp);
 
   return row([
     div(

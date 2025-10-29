@@ -2,9 +2,48 @@ import { isPill, Pill } from "../types";
 import { markDatabaseVersion } from "./mark_database_version";
 
 /**
+ * Try to parse a dosage from the end of a string
+ */
+function extractDosageFromString(pillString: string): { name: string; dosage: string } | null {
+  // Look for patterns like "100mg", "2.5g", etc. at the end
+  const parts = pillString.trim().split(/\s+/);
+  if (parts.length < 2) {
+    return null;
+  }
+
+  const lastPart = parts[parts.length - 1];
+  // Check if last part looks like a dosage (number + unit)
+  if (/^[\d.]+\s*(?:mg|g|ml|mcg|µg|iu|units?)$/i.test(lastPart)) {
+    const name = parts.slice(0, -1).join(' ');
+    return { name, dosage: lastPart };
+  }
+
+  return null;
+}
+
+/**
+ * Convert a string or object to a Pill object
+ */
+function convertToPill(item: unknown): Pill | null {
+  if (isPill(item)) {
+    return item;
+  }
+
+  if (typeof item === "string") {
+    const parsed = extractDosageFromString(item);
+    if (parsed) {
+      return { kind: "Pill", name: parsed.name, dosage: parsed.dosage };
+    }
+    return { kind: "Pill", name: item.trim(), dosage: "" };
+  }
+
+  return null;
+}
+
+/**
  * Migrate Settings.currentPills from string[] to Pill[]
  * This migration converts old pill format like "Paracetamol 100mg" 
- * to new format { name: "Paracetamol", dosage: "100mg" }
+ * to new format { kind: "Pill", name: "Paracetamol", dosage: "100mg" }
  */
 export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
   if (typeof data !== "object" || data === null) {
@@ -17,27 +56,9 @@ export function migrateCurrentPillsToPillObjects(data: unknown): unknown {
     const newPills: Pill[] = [];
     
     for (const pill of dataObj.currentPills) {
-      // If it's already a valid Pill object, keep it
-      if (isPill(pill)) {
-        newPills.push(pill);
-      } else if (typeof pill === "string") {
-        // Parse string format to extract name and dosage
-        // Try to find common dosage patterns
-        const match = pill.match(/^(.+?)\s+([\d.]+\s*(?:mg|g|ml|mcg|µg|iu|units?))$/i);
-        
-        if (match) {
-          // If we found a dosage pattern, split it
-          newPills.push({
-            name: match[1].trim(),
-            dosage: match[2].trim(),
-          });
-        } else {
-          // No dosage found, use entire string as name
-          newPills.push({
-            name: pill.trim(),
-            dosage: "",
-          });
-        }
+      const converted = convertToPill(pill);
+      if (converted) {
+        newPills.push(converted);
       }
     }
     

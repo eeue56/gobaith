@@ -208,12 +208,13 @@ export type DebuggingInfo = {
 };
 
 export type Pill = {
+  kind: "Pill";
   name: string;
   dosage: string;
 };
 
 export function Pill(name: string, dosage: string): Pill {
-  return { name, dosage };
+  return { kind: "Pill", name, dosage };
 }
 
 /**
@@ -223,10 +224,8 @@ export function isPill(value: unknown): value is Pill {
   return (
     value !== null &&
     typeof value === "object" &&
-    "name" in value &&
-    "dosage" in value &&
-    typeof (value as any).name === "string" &&
-    typeof (value as any).dosage === "string"
+    "kind" in value &&
+    (value as any).kind === "Pill"
   );
 }
 
@@ -375,7 +374,7 @@ export type Update =
   | {
       kind: "UpdatePillValue";
       entry: JournalEntry;
-      pillName: string;
+      pill: Pill;
       direction: Direction;
     }
   | {
