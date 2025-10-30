@@ -1360,3 +1360,139 @@
     margin-bottom: 30px;
   }
 }
+
+/* First-time setup styles */
+.first-time-setup {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.setup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.prompt-pack-option {
+  border: 2px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background-color: var(--pico-card-background-color);
+}
+
+.prompt-pack-option h3 {
+  margin-top: 0;
+  color: var(--pico-h3-color);
+}
+
+.pack-description {
+  color: var(--pico-color);
+  margin: 0.5rem 0;
+}
+
+.pack-prompts {
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+  margin: 1rem 0;
+}
+
+.select-pack-button {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* Prompt configuration styles */
+.prompt-configuration {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+}
+
+.prompt-pack-toggle {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-left: 3px solid var(--pico-primary);
+}
+
+.prompt-toggle-item {
+  margin: 0.5rem 0;
+}
+
+.prompt-toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-form-element-background-color);
+}
+
+.prompt-toggle-button.enabled {
+  border-color: var(--pico-primary);
+  background-color: var(--pico-primary-background);
+}
+
+.prompt-toggle-button.disabled {
+  border-color: var(--pico-muted-border-color);
+  opacity: 0.6;
+}
+
+.prompt-toggle-button:hover {
+  opacity: 0.9;
+}
+
+/* Delete prompt data styles */
+.delete-prompt-data {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--pico-del-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+}
+
+.delete-prompt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+}
+
+.delete-prompt-button {
+  background-color: var(--pico-del-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  min-width: 120px;
+}
+
+.delete-prompt-button:hover {
+  background-color: var(--pico-del-hover-color);
+}
+
+@media (max-width: 768px) {
+  .first-time-setup {
+    padding: 1rem;
+  }
+
+  .prompt-pack-option {
+    padding: 1rem;
+  }
+
+  .delete-prompt-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .delete-prompt-button {
+    width: 100%;
+  }
+}
