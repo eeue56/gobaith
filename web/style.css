@@ -774,10 +774,125 @@
   max-height: 15vh;
 }
 
-.pill-amount-taken {
-  text-align: center;
+.journal-pill {
+  margin-bottom: 30px;
 }
 
+.pill-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.pill-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--pico-secondary-background);
+  border: 2px solid var(--pico-secondary-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.pill-button:hover {
+  background-color: var(--pico-secondary-hover-background);
+  border-color: var(--pico-secondary-hover-border);
+  transform: scale(1.05);
+}
+
+.pill-button:active {
+  transform: scale(0.95);
+}
+
+.pill-button .material-symbols-outlined {
+  font-size: 28px;
+  color: var(--text-color);
+}
+
+.pill-count-display {
+  font-size: 2rem;
+  font-weight: bold;
+  min-width: 60px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.pill-order-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--pico-muted-border-color);
+}
+
+.pill-order-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+  border: 1px solid var(--pico-muted-border-color);
+  transition: all 0.2s ease;
+  column-gap: 10px;
+}
+
+.pill-order-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--pico-primary);
+}
+
+.pill-order-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.pill-order-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.pill-order-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: var(--pico-secondary-background);
+  border: 1px solid var(--pico-secondary-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.pill-order-button:hover {
+  background-color: var(--pico-secondary-hover-background);
+  border-color: var(--pico-secondary-hover-border);
+  transform: translateY(-2px);
+}
+
+.pill-order-button:active {
+  transform: translateY(0);
+}
+
+.pill-order-button .material-symbols-outlined {
+  font-size: 24px;
+  color: var(--text-color);
+}
+
+/* Medication entry form */
 .pill-entry-container {
   margin: 20px 0;
   padding: 20px;
@@ -812,6 +927,29 @@
 @media (max-width: 600px) {
   .pill-input-row {
     grid-template-columns: 1fr;
+  }
+
+  .pill-controls {
+    gap: 15px;
+  }
+
+  .pill-button {
+    width: 45px;
+    height: 45px;
+  }
+
+  .pill-count-display {
+    font-size: 1.5rem;
+    min-width: 50px;
+  }
+
+  .pill-order-controls {
+    gap: 5px;
+  }
+
+  .pill-order-button {
+    width: 35px;
+    height: 35px;
   }
 }
 

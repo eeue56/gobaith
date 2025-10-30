@@ -37,12 +37,12 @@ export function renderJournal(model: Model): HtmlNode<Update> {
         [class_("selections")],
         [
           renderDate(model.appState.day),
-          renderEnterTimestampMessage(model.appState.day),
-          renderLogs(todaysEntry),
           ...PROMPTS.map((prompt) => renderButtonSet(todaysEntry, prompt)),
           ...model.settings.currentPills.map((pill) =>
             renderPill(todaysEntry, pill)
           ),
+          renderEnterTimestampMessage(model.appState.day),
+          renderLogs(todaysEntry),
         ]
       ),
     ]

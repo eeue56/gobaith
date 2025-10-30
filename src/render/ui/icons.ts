@@ -26,6 +26,16 @@ export const iconBack: HtmlNode<never> = icon("arrow_back");
 
 export const iconForward: HtmlNode<never> = icon("arrow_forward");
 
+export const iconRemove: HtmlNode<never> = icon("remove");
+
+export const iconAdd: HtmlNode<never> = icon("add");
+
+export const iconArrowUpward: HtmlNode<never> = icon("arrow_upward");
+
+export const iconArrowDownward: HtmlNode<never> = icon("arrow_downward");
+
+export const iconVerticalAlignTop: HtmlNode<never> = icon("vertical_align_top");
+
 function circleMoodIcon(
   innerRadiusSize: number,
   innerCircleColour: string
