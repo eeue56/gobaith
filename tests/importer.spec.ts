@@ -6,6 +6,7 @@ import {
   JournalEntry,
   LATEST_DATABASE_VERSION,
   LogEntry,
+  PROMPTS,
   PromptResponses,
   Settings,
 } from "../src/types";
@@ -95,6 +96,8 @@ test("the importer can import settings", async ({ context, page }) => {
     currentPills: [{ kind: "Pill", name: "Ibux", dosage: "200mg" }],
     queries: [...BUILT_IN_QUERIES],
     databaseVersion: LATEST_DATABASE_VERSION,
+    enabledPrompts: new Set(PROMPTS),
+    hasCompletedSetup: true,
   };
 
   const stringSettings = JSON.stringify(settings);

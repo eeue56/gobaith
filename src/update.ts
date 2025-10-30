@@ -178,6 +178,8 @@ export async function update(message: Update, model: Model): Promise<Model> {
         currentPills: [],
         queries: [...defaultObjects.DEFAULT_QUERIES],
         databaseVersion: LATEST_DATABASE_VERSION,
+        enabledPrompts: new Set(),
+        hasCompletedSetup: false,
       };
       console.log("UpdateHandler: Removed settings");
       await syncStateAndSettings(hasBackend, model.appState, settings);
@@ -593,6 +595,46 @@ export async function update(message: Update, model: Model): Promise<Model> {
       return {
         appState: model.appState,
         settings: model.settings,
+        localState: model.localState,
+      };
+    }
+    case "SelectPromptPack": {
+      const { selectPromptPack } = await import("./updaters.js");
+      const settings = selectPromptPack(message.packName, model.settings);
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "TogglePrompt": {
+      const { togglePrompt } = await import("./updaters.js");
+      const settings = togglePrompt(message.prompt, model.settings);
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "DeletePromptData": {
+      const { deletePromptData } = await import("./updaters.js");
+      const appState = deletePromptData(message.prompt, model.appState);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
+    }
+    case "CompleteSetup": {
+      const { completeSetup } = await import("./updaters.js");
+      const settings = completeSetup(model.settings);
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
         localState: model.localState,
       };
     }

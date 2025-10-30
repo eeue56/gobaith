@@ -61,6 +61,8 @@ export const PROMPTS = [
   "Today's feelings of elevation",
   "Today's feelings of irritableness",
   "Today's psychotic symptoms",
+  "Today's focus and concentration",
+  "Today's hyperactivity or impulsivity",
 ] as const;
 
 export type Prompt = (typeof PROMPTS)[number];
@@ -68,6 +70,37 @@ export type Prompt = (typeof PROMPTS)[number];
 export function isPrompt(str: string): str is Prompt {
   return PROMPTS.includes(str as Prompt);
 }
+
+/**
+ * Prompt packs based on different conditions
+ */
+export const PROMPT_PACKS = {
+  Bipolar: [
+    "Sleep quality",
+    "Today's feelings of depression",
+    "Today's feelings of anxiety",
+    "Today's feelings of elevation",
+    "Today's feelings of irritableness",
+  ] as const,
+  Schizophrenia: [
+    "Sleep quality",
+    "Today's feelings of anxiety",
+    "Today's psychotic symptoms",
+  ] as const,
+  ADHD: [
+    "Sleep quality",
+    "Today's focus and concentration",
+    "Today's hyperactivity or impulsivity",
+  ] as const,
+} as const;
+
+export type PromptPackName = keyof typeof PROMPT_PACKS;
+
+export const PROMPT_PACK_NAMES: PromptPackName[] = [
+  "Bipolar",
+  "Schizophrenia",
+  "ADHD",
+];
 
 export type PromptResponses = {
   [prompt in Prompt]: MoodValue;
@@ -79,7 +112,9 @@ export function PromptResponses(
   anxiety: MoodValue,
   elevation: MoodValue,
   irritableness: MoodValue,
-  psychotic: MoodValue
+  psychotic: MoodValue,
+  focus: MoodValue = 1,
+  hyperactivity: MoodValue = 1
 ): PromptResponses {
   return {
     "Sleep quality": sleepQuality,
@@ -88,6 +123,8 @@ export function PromptResponses(
     "Today's feelings of elevation": elevation,
     "Today's feelings of irritableness": irritableness,
     "Today's psychotic symptoms": psychotic,
+    "Today's focus and concentration": focus,
+    "Today's hyperactivity or impulsivity": hyperactivity,
   };
 }
 
@@ -98,6 +135,8 @@ export const SHORT_PROMPTS: Record<Prompt, string> = {
   "Today's feelings of elevation": "Elevation",
   "Today's feelings of irritableness": "Irrability",
   "Today's psychotic symptoms": "Psychotic",
+  "Today's focus and concentration": "Focus",
+  "Today's hyperactivity or impulsivity": "Hyperactivity",
 };
 
 export function depression(entry: JournalEntry): MoodValue {
@@ -142,7 +181,7 @@ export type LogEntry = {
   text: string;
 };
 
-export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
+export const DATABASE_VERSIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 export type DatabaseVersion = (typeof DATABASE_VERSIONS)[number];
 
@@ -155,7 +194,7 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
  * any migrations needed in between the current db version
  * and the latest db version will be run
  */
-export const LATEST_DATABASE_VERSION: DatabaseVersion = 7;
+export const LATEST_DATABASE_VERSION: DatabaseVersion = 8;
 
 /**
  * AppState includes UI state and data (journal entries)
@@ -251,6 +290,8 @@ export type Settings = {
   currentPills: Pill[];
   queries: Queryable[];
   databaseVersion: DatabaseVersion;
+  enabledPrompts: Set<Prompt>;
+  hasCompletedSetup: boolean;
 };
 
 export function isSettings(object: unknown): object is Settings {
@@ -421,7 +462,11 @@ export type Update =
   | {
       kind: "ToggleFilterLineGraphView";
       prompt: Prompt;
-    };
+    }
+  | { kind: "SelectPromptPack"; packName: PromptPackName }
+  | { kind: "TogglePrompt"; prompt: Prompt }
+  | { kind: "DeletePromptData"; prompt: Prompt }
+  | { kind: "CompleteSetup" };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel

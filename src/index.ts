@@ -7,6 +7,7 @@ import {
   renderSettings,
   renderTabNavigation,
 } from "./render/ui/tabs";
+import { renderFirstTimeSetup } from "./render/ui/prompt_setup";
 import { getDebuggingInfo } from "./utils/localstorage";
 
 import { div, HtmlNode, Program, program } from "@eeue56/coed";
@@ -17,6 +18,11 @@ import { pushHistoryState } from "./updaters";
  * Call the individual render functions
  */
 function renderBody(model: Model): HtmlNode<Update> {
+  // Show first-time setup if user hasn't completed it
+  if (!model.settings.hasCompletedSetup) {
+    return renderFirstTimeSetup();
+  }
+
   switch (model.appState.currentTab) {
     case "JOURNAL": {
       return renderJournal(model);
@@ -35,6 +41,11 @@ function renderBody(model: Model): HtmlNode<Update> {
 }
 
 function render(model: Model): HtmlNode<Update> {
+  // Don't show tab navigation during first-time setup
+  if (!model.settings.hasCompletedSetup) {
+    return div([], [], [renderBody(model)]);
+  }
+
   return div(
     [],
     [],

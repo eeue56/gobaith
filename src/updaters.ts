@@ -503,3 +503,63 @@ export function updateQuery(
 
   return newQueries;
 }
+
+/**
+ * Select a prompt pack and enable those prompts
+ */
+export function selectPromptPack(
+  packName: import("./types").PromptPackName,
+  settings: Settings
+): Settings {
+  const { PROMPT_PACKS } = require("./types");
+  const prompts = PROMPT_PACKS[packName];
+  
+  return {
+    ...settings,
+    enabledPrompts: new Set(prompts),
+    hasCompletedSetup: true,
+  };
+}
+
+/**
+ * Toggle a prompt on or off
+ */
+export function togglePrompt(prompt: Prompt, settings: Settings): Settings {
+  const newEnabledPrompts = new Set(settings.enabledPrompts);
+  
+  if (newEnabledPrompts.has(prompt)) {
+    newEnabledPrompts.delete(prompt);
+  } else {
+    newEnabledPrompts.add(prompt);
+  }
+  
+  return {
+    ...settings,
+    enabledPrompts: newEnabledPrompts,
+  };
+}
+
+/**
+ * Delete all data for a specific prompt from all journal entries
+ */
+export function deletePromptData(
+  prompt: Prompt,
+  state: AppState
+): AppState {
+  // Remove the prompt data from all journal entries
+  for (const entry of state.journalEntries) {
+    delete entry.promptResponses[prompt];
+  }
+  
+  return { ...state, journalEntries: state.journalEntries };
+}
+
+/**
+ * Mark setup as completed
+ */
+export function completeSetup(settings: Settings): Settings {
+  return {
+    ...settings,
+    hasCompletedSetup: true,
+  };
+}

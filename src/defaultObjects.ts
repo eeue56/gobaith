@@ -24,6 +24,8 @@ export const settings: Settings = {
   currentPills: [],
   queries: [...DEFAULT_QUERIES],
   databaseVersion: LATEST_DATABASE_VERSION,
+  enabledPrompts: new Set(),
+  hasCompletedSetup: false,
 };
 
 export const localState: LocalState = {

@@ -7,6 +7,7 @@ import {
 } from "./database_5";
 import { migrateHoursSleptToSleepQuality, updateSettingsToDatabaseVersion6 } from "./database_6";
 import { migrateCurrentPillsToPillObjects, updateAppStateToDatabaseVersion7 } from "./database_7";
+import { updateAppStateToDatabaseVersion8, updateSettingsToDatabaseVersion8 } from "./database_8";
 import { renameField } from "./rename_fields";
 
 /**
@@ -66,6 +67,11 @@ function cleanAppState(data: unknown): unknown {
     console.log("Cleaner: updated AppState to database version 7");
   }
 
+  if (dataWithDatabaseVersion.databaseVersion < 8) {
+    data = updateAppStateToDatabaseVersion8(data);
+    console.log("Cleaner: updated AppState to database version 8");
+  }
+
   return data;
 }
 
@@ -91,10 +97,16 @@ function cleanSettings(data: unknown): unknown {
   const dataVersion6 = updateSettingsToDatabaseVersion6(dataVersion5);
   
   if (dataWithDatabaseVersion.databaseVersion < 7) {
-    const dataVersion7 = migrateCurrentPillsToPillObjects(dataVersion6);
+    data = migrateCurrentPillsToPillObjects(dataVersion6);
     console.log("Cleaner: migrated currentPills to Pill objects");
-    return dataVersion7;
+  } else {
+    data = dataVersion6;
   }
 
-  return dataVersion6;
+  if ((data as DataWithDatabaseVersion).databaseVersion < 8) {
+    data = updateSettingsToDatabaseVersion8(data);
+    console.log("Cleaner: updated Settings to database version 8");
+  }
+
+  return data;
 }

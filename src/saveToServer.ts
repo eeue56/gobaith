@@ -1,4 +1,24 @@
-import { AppState, Settings, isAppState, isSettings } from "./types";
+import { AppState, Settings, isAppState, isSettings, Prompt } from "./types";
+
+/**
+ * Convert Settings to a JSON-serializable format
+ */
+function settingsToJSON(settings: Settings): any {
+  return {
+    ...settings,
+    enabledPrompts: Array.from(settings.enabledPrompts),
+  };
+}
+
+/**
+ * Convert JSON back to Settings with Set
+ */
+function settingsFromJSON(json: any): Settings {
+  return {
+    ...json,
+    enabledPrompts: new Set<Prompt>(json.enabledPrompts || []),
+  };
+}
 
 export async function saveToServer(
   state: AppState,
@@ -18,7 +38,8 @@ export async function loadSettingsFromServer(): Promise<Settings | string> {
     // probably means there's no backend, so ignore
     return "No backend";
   }
-  const settings = await response.json();
+  const json = await response.json();
+  const settings = settingsFromJSON(json);
 
   if (isSettings(settings)) {
     return settings;
@@ -49,7 +70,7 @@ export async function loadAppStateFromServer(): Promise<AppState | string> {
 async function saveSettingsToServer(settings: Settings): Promise<void> {
   const serverResponse = await fetch("/save/Settings", {
     method: "POST",
-    body: JSON.stringify(settings),
+    body: JSON.stringify(settingsToJSON(settings)),
     headers: {
       "Content-Type": "application/json",
     },
