@@ -774,9 +774,6 @@
   max-height: 15vh;
 }
 
-/* Medication tracking in Journal tab
- * Applied in: src/render/ui/pills.ts (renderPill function)
- */
 .journal-pill {
   margin-bottom: 30px;
 }
@@ -827,7 +824,6 @@
   color: var(--text-color);
 }
 
-/* Medication ordering in Settings tab */
 .pill-order-container {
   margin: 20px 0;
   padding: 20px;
