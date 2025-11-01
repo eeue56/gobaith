@@ -70,6 +70,18 @@ function eventLogEntryToDescription(entry: EventLogEntry): string {
       return "Deleted query";
     case "ToggleFilterLineGraphView":
       return "Toggled graph filter";
+    case "SelectPromptPack":
+      return "Selected prompt pack";
+    case "TogglePrompt":
+      return "Toggled prompt";
+    case "DeletePromptData":
+      return "Deleted prompt data";
+    case "CompleteSetup":
+      return "Completed setup";
+    case "AddCustomPrompt":
+      return "Added custom prompt";
+    case "RemoveCustomPrompt":
+      return "Removed custom prompt";
   }
 }
 

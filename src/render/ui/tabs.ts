@@ -22,6 +22,10 @@ import {
   renderExportedState,
 } from "./importer";
 import { renderAddPill, renderPillOrder } from "./pills";
+import {
+  renderDeletePromptData,
+  renderPromptConfiguration,
+} from "./prompt_setup";
 import { renderRemoveAppState, renderRemoveSettings } from "./settings";
 
 function renderTabTitle(title: string): HtmlNode<never> {
@@ -101,6 +105,8 @@ export function renderSettings(
     [class_("tab-content"), class_("settings-tab-content")],
     [
       renderTabTitle("Settings"),
+      renderPromptConfiguration(model.settings),
+      renderDeletePromptData(model.settings),
       renderRemoveSettings(),
       renderRemoveAppState(),
       renderPillOrder(model.settings),

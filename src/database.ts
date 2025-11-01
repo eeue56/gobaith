@@ -248,6 +248,10 @@ async function runMigration(
       console.info("IndexedDB: Migrating currentPills to Pill objects");
       return db;
     }
+    case 8: {
+      console.info("IndexedDB: Adding prompt configuration support");
+      return db;
+    }
   }
 }
 
@@ -420,11 +424,21 @@ async function syncToDatabase<
 export async function syncSettingsToDatabase(
   settings: Settings
 ): Promise<void> {
-  return syncToDatabase(SETTINGS_OBJECT_STORE_NAME, settings);
+  // Convert Set to Array for IndexedDB storage
+  const serializedSettings = {
+    ...settings,
+    enabledPrompts: Array.from(settings.enabledPrompts),
+  };
+  return syncToDatabase(SETTINGS_OBJECT_STORE_NAME, serializedSettings as any);
 }
 
 export async function loadSettingsFromDatabase(): Promise<Settings> {
-  return loadFromDatabase(SETTINGS_OBJECT_STORE_NAME);
+  const settings = await loadFromDatabase(SETTINGS_OBJECT_STORE_NAME);
+  // Convert Array back to Set after loading
+  return {
+    ...settings,
+    enabledPrompts: new Set((settings as any).enabledPrompts || []),
+  };
 }
 
 export async function syncStateToDatabase(state: AppState): Promise<void> {
