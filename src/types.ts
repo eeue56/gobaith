@@ -71,36 +71,36 @@ export function isPrompt(str: string): str is Prompt {
   return PROMPTS.includes(str as Prompt);
 }
 
+export const PROMPT_PACK_NAMES = ["Bipolar", "Schizophrenia", "ADHD"] as const;
+
+export type PromptPackName = (typeof PROMPT_PACK_NAMES)[number];
+
 /**
  * Prompt packs based on different conditions
  */
-export const PROMPT_PACKS = {
+export const PROMPT_PACKS: Record<PromptPackName, readonly Prompt[]> = {
   Bipolar: [
     "Sleep quality",
     "Today's feelings of depression",
     "Today's feelings of anxiety",
     "Today's feelings of elevation",
     "Today's feelings of irritableness",
-  ] as const,
+    "Today's psychotic symptoms",
+  ],
   Schizophrenia: [
     "Sleep quality",
     "Today's feelings of anxiety",
+    "Today's feelings of depression",
     "Today's psychotic symptoms",
-  ] as const,
+  ],
   ADHD: [
     "Sleep quality",
     "Today's focus and concentration",
     "Today's hyperactivity or impulsivity",
-  ] as const,
-} as const;
-
-export type PromptPackName = keyof typeof PROMPT_PACKS;
-
-export const PROMPT_PACK_NAMES: PromptPackName[] = [
-  "Bipolar",
-  "Schizophrenia",
-  "ADHD",
-];
+    "Today's feelings of anxiety",
+    "Today's feelings of irritableness",
+  ],
+};
 
 export type PromptResponses = {
   [prompt in Prompt]: MoodValue;
@@ -541,6 +541,7 @@ export function NoSuchStore(): NoSuchStore {
     kind: "NoSuchStore",
   };
 }
+
 export type IncorrectPayload = {
   kind: "IncorrectPayload";
 };
@@ -550,6 +551,7 @@ export function IncorrectPayload(): IncorrectPayload {
     kind: "IncorrectPayload",
   };
 }
+
 export type PromptRenderData = {
   prompt: Prompt;
   data: { x: Date; y: number }[];

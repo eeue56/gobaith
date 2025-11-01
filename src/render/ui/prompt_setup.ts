@@ -6,16 +6,18 @@ import {
   h2,
   h3,
   HtmlNode,
+  i,
   on,
   p,
   text,
 } from "@eeue56/coed";
 import {
   Prompt,
+  PROMPT_PACK_NAMES,
   PROMPT_PACKS,
   PromptPackName,
-  PROMPT_PACK_NAMES,
   Settings,
+  SHORT_PROMPTS,
   Update,
 } from "../../types";
 
@@ -31,19 +33,25 @@ export function renderFirstTimeSetup(): HtmlNode<Update> {
         [],
         [class_("setup-container")],
         [
-          h2([], [], [text("Welcome to Gobaith")]),
+          h2(
+            [],
+            [],
+            [
+              text("Welcome to Gobaith, "),
+              i([], [], [text("your")]),
+              text(" mental health tracker"),
+            ]
+          ),
           p(
             [],
             [],
             [
               text(
-                "To get started, please choose a set of prompts that best matches your tracking needs. You can customize these later in Settings."
+                "Choose a set of prompts that best matches your current struggles. You can customize these later in Settings."
               ),
             ]
           ),
-          ...PROMPT_PACK_NAMES.map((packName) =>
-            renderPromptPackOption(packName)
-          ),
+          ...PROMPT_PACK_NAMES.map(renderPromptPackOption),
         ]
       ),
     ]
@@ -68,13 +76,20 @@ function renderPromptPackOption(packName: PromptPackName): HtmlNode<Update> {
         [class_("pack-prompts")],
         [
           text("Includes: "),
-          text(prompts.join(", ")),
+          text(prompts.map((prompt) => SHORT_PROMPTS[prompt]).join(", ")),
         ]
       ),
       button(
-        [on("click", () => selectPromptPack(packName))],
-        [class_("select-pack-button"), attribute("id", `select-pack-${packName}`)],
-        [text(`Use ${packName} prompts`)]
+        [
+          on("click", () => {
+            return { kind: "SelectPromptPack", packName };
+          }),
+        ],
+        [
+          class_("select-pack-button"),
+          attribute("id", `select-pack-${packName}`),
+        ],
+        [text(`Use the ${packName} prompts`)]
       ),
     ]
   );
@@ -95,16 +110,11 @@ function getPackDescription(packName: PromptPackName): string {
 }
 
 /**
- * Update function to select a prompt pack
- */
-function selectPromptPack(packName: PromptPackName): Update {
-  return { kind: "SelectPromptPack", packName };
-}
-
-/**
  * Render prompt configuration in settings
  */
-export function renderPromptConfiguration(settings: Settings): HtmlNode<Update> {
+export function renderPromptConfiguration(
+  settings: Settings
+): HtmlNode<Update> {
   return div(
     [],
     [class_("prompt-configuration")],
@@ -138,7 +148,7 @@ function renderPromptPackToggle(
   settings: Settings
 ): HtmlNode<Update> {
   const prompts = PROMPT_PACKS[packName];
-  
+
   return div(
     [],
     [class_("prompt-pack-toggle")],
@@ -163,7 +173,11 @@ function renderPromptToggle(
     [class_("prompt-toggle-item")],
     [
       button(
-        [on("click", () => togglePrompt(prompt))],
+        [
+          on("click", () => {
+            return { kind: "TogglePrompt", prompt };
+          }),
+        ],
         [
           class_("prompt-toggle-button"),
           class_(isEnabled ? "enabled" : "disabled"),
@@ -173,13 +187,6 @@ function renderPromptToggle(
       ),
     ]
   );
-}
-
-/**
- * Update function to toggle a prompt
- */
-function togglePrompt(prompt: Prompt): Update {
-  return { kind: "TogglePrompt", prompt };
 }
 
 /**
@@ -229,17 +236,17 @@ function renderDeletePromptButton(prompt: Prompt): HtmlNode<Update> {
     [
       text(prompt),
       button(
-        [on("click", () => deletePromptData(prompt))],
-        [class_("delete-prompt-button"), attribute("data-delete-prompt", prompt)],
+        [
+          on("click", () => {
+            return { kind: "DeletePromptData", prompt };
+          }),
+        ],
+        [
+          class_("delete-prompt-button"),
+          attribute("data-delete-prompt", prompt),
+        ],
         [text("Delete data")]
       ),
     ]
   );
-}
-
-/**
- * Update function to delete prompt data
- */
-function deletePromptData(prompt: Prompt): Update {
-  return { kind: "DeletePromptData", prompt };
 }

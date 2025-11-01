@@ -1,7 +1,7 @@
 import { cleanData } from "./cleaners";
 import { initIndexedDB, syncStateAndSettingsToDatabase } from "./database";
 import * as defaultObjects from "./defaultObjects";
-import { importDataFromJson, initializeEntryForDay } from "./logic/journal";
+import { initializeEntryForDay } from "./logic/journal";
 import { EqualTo } from "./logic/query/types";
 import {
   loadAppStateFromServer,
@@ -15,14 +15,18 @@ import {
   LocalState,
   Model,
   pillKey,
+  PROMPT_PACKS,
   Settings,
   Update,
 } from "./types";
 import {
   addJournalEntry,
   addPill,
+  deletePromptData,
+  togglePromptEnabled,
   updateCurrentGraph,
   updateCurrentTab,
+  updateImportFile,
   updatePillOrder,
   updatePillValue,
   updatePromptValue,
@@ -319,9 +323,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
       for (const pill of message.settings.currentPills) {
         const pillKeyValue = pillKey(pill);
         if (
-          model.settings.currentPills.some(
-            (p) => pillKey(p) === pillKeyValue
-          )
+          model.settings.currentPills.some((p) => pillKey(p) === pillKeyValue)
         ) {
           console.log(
             "Skipping import of pill",
@@ -599,8 +601,13 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
     }
     case "SelectPromptPack": {
-      const { selectPromptPack } = await import("./updaters.js");
-      const settings = selectPromptPack(message.packName, model.settings);
+      const prompts = PROMPT_PACKS[message.packName];
+
+      const settings = {
+        ...model.settings,
+        enabledPrompts: new Set(prompts),
+        hasCompletedSetup: true,
+      };
       await syncStateAndSettings(hasBackend, model.appState, settings);
       return {
         appState: model.appState,
@@ -609,8 +616,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
     }
     case "TogglePrompt": {
-      const { togglePrompt } = await import("./updaters.js");
-      const settings = togglePrompt(message.prompt, model.settings);
+      const settings = togglePromptEnabled(message.prompt, model.settings);
       await syncStateAndSettings(hasBackend, model.appState, settings);
       return {
         appState: model.appState,
@@ -619,7 +625,6 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
     }
     case "DeletePromptData": {
-      const { deletePromptData } = await import("./updaters.js");
       const appState = deletePromptData(message.prompt, model.appState);
       await syncStateAndSettings(hasBackend, appState, model.settings);
       return {
@@ -629,8 +634,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
     }
     case "CompleteSetup": {
-      const { completeSetup } = await import("./updaters.js");
-      const settings = completeSetup(model.settings);
+      const settings = { ...model.settings, hasCompletedSetup: true };
       await syncStateAndSettings(hasBackend, model.appState, settings);
       return {
         appState: model.appState,
@@ -639,23 +643,6 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
     }
   }
-}
-
-async function updateImportFile(
-  target: HTMLInputElement
-): Promise<AppState | Settings | string | null> {
-  if (!target) {
-    return null;
-  }
-
-  if (target.files === null || target.files.length === 0) return null;
-
-  if (target.files[0].name.endsWith(".json")) {
-    const fileContents = await target.files[0].text();
-    return importDataFromJson(fileContents);
-  }
-
-  return null;
 }
 
 export async function fetchModelFromStores(): Promise<Model> {

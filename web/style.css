@@ -1413,9 +1413,9 @@
 }
 
 .prompt-pack-toggle {
-  margin: 1.5rem 0;
-  padding: 1rem;
-  border-left: 3px solid var(--pico-primary);
+  margin: 24px 0;
+  padding: 5px 10px;
+  border-left: 3px solid var(--pico-primary-focus);
 }
 
 .prompt-toggle-item {

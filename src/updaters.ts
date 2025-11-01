@@ -1,3 +1,4 @@
+import { importDataFromJson } from "./logic/journal";
 import { Queryable, QueryPath, QueryUpdate } from "./logic/query/types";
 import {
   AppState,
@@ -505,61 +506,48 @@ export function updateQuery(
 }
 
 /**
- * Select a prompt pack and enable those prompts
- */
-export function selectPromptPack(
-  packName: import("./types").PromptPackName,
-  settings: Settings
-): Settings {
-  const { PROMPT_PACKS } = require("./types");
-  const prompts = PROMPT_PACKS[packName];
-  
-  return {
-    ...settings,
-    enabledPrompts: new Set(prompts),
-    hasCompletedSetup: true,
-  };
-}
-
-/**
  * Toggle a prompt on or off
  */
-export function togglePrompt(prompt: Prompt, settings: Settings): Settings {
-  const newEnabledPrompts = new Set(settings.enabledPrompts);
-  
-  if (newEnabledPrompts.has(prompt)) {
-    newEnabledPrompts.delete(prompt);
+export function togglePromptEnabled(
+  prompt: Prompt,
+  settings: Settings
+): Settings {
+  if (settings.enabledPrompts.has(prompt)) {
+    settings.enabledPrompts.delete(prompt);
   } else {
-    newEnabledPrompts.add(prompt);
+    settings.enabledPrompts.add(prompt);
   }
-  
+
   return {
     ...settings,
-    enabledPrompts: newEnabledPrompts,
+    enabledPrompts: settings.enabledPrompts,
   };
 }
 
 /**
  * Delete all data for a specific prompt from all journal entries
  */
-export function deletePromptData(
-  prompt: Prompt,
-  state: AppState
-): AppState {
-  // Remove the prompt data from all journal entries
+export function deletePromptData(prompt: Prompt, state: AppState): AppState {
   for (const entry of state.journalEntries) {
     delete entry.promptResponses[prompt];
   }
-  
+
   return { ...state, journalEntries: state.journalEntries };
 }
 
-/**
- * Mark setup as completed
- */
-export function completeSetup(settings: Settings): Settings {
-  return {
-    ...settings,
-    hasCompletedSetup: true,
-  };
+export async function updateImportFile(
+  target: HTMLInputElement
+): Promise<AppState | Settings | string | null> {
+  if (!target) {
+    return null;
+  }
+
+  if (target.files === null || target.files.length === 0) return null;
+
+  if (target.files[0].name.endsWith(".json")) {
+    const fileContents = await target.files[0].text();
+    return importDataFromJson(fileContents);
+  }
+
+  return null;
 }
