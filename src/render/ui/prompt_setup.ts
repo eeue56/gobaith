@@ -136,6 +136,100 @@ export function renderPromptConfiguration(
           renderPromptPackToggle(packName, settings)
         )
       ),
+      renderCustomPromptsSection(settings),
+    ]
+  );
+}
+
+/**
+ * Render custom prompts section
+ */
+function renderCustomPromptsSection(settings: Settings): HtmlNode<Update> {
+  const { attribute, input, class_, div, h3, p, button, on, text } =
+    require("@eeue56/coed");
+
+  return div(
+    [],
+    [class_("custom-prompts-section")],
+    [
+      h3([], [], [text("Custom Prompts")]),
+      p(
+        [],
+        [],
+        [
+          text(
+            "Add your own custom prompts to track. Note: Custom prompts will appear with a default neutral color scheme."
+          ),
+        ]
+      ),
+      div(
+        [],
+        [class_("add-custom-prompt")],
+        [
+          input(
+            [],
+            [
+              attribute("type", "text"),
+              attribute("id", "new-custom-prompt"),
+              attribute("placeholder", "e.g., Today's stress level"),
+              class_("custom-prompt-input"),
+            ],
+            []
+          ),
+          button(
+            [
+              on("click", () => {
+                const input = document.getElementById(
+                  "new-custom-prompt"
+                ) as HTMLInputElement;
+                if (input && input.value.trim()) {
+                  const promptText = input.value.trim();
+                  input.value = "";
+                  return { kind: "AddCustomPrompt", promptText };
+                }
+                return { kind: "Noop" };
+              }),
+            ],
+            [class_("add-custom-prompt-button"), attribute("id", "add-custom-prompt")],
+            [text("Add Custom Prompt")]
+          ),
+        ]
+      ),
+      ...(settings.customPrompts.length > 0
+        ? [
+            div(
+              [],
+              [class_("custom-prompts-list")],
+              settings.customPrompts.map((prompt) =>
+                renderCustomPromptItem(prompt)
+              )
+            ),
+          ]
+        : []),
+    ]
+  );
+}
+
+/**
+ * Render a single custom prompt item
+ */
+function renderCustomPromptItem(prompt: string): HtmlNode<Update> {
+  const { attribute, button, class_, div, on, text } = require("@eeue56/coed");
+
+  return div(
+    [],
+    [class_("custom-prompt-item")],
+    [
+      div([], [class_("custom-prompt-text")], [text(prompt)]),
+      button(
+        [
+          on("click", () => {
+            return { kind: "RemoveCustomPrompt", promptText: prompt };
+          }),
+        ],
+        [class_("remove-custom-prompt-button")],
+        [text("Remove")]
+      ),
     ]
   );
 }

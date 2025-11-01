@@ -26,6 +26,11 @@ export function updateSettingsToDatabaseVersion8(data: unknown): unknown {
     if (typeof dataObj.hasCompletedSetup !== "boolean") {
       dataObj.hasCompletedSetup = true;
     }
+
+    // Initialize customPrompts if it doesn't exist
+    if (!Array.isArray(dataObj.customPrompts)) {
+      dataObj.customPrompts = [];
+    }
   }
 
   markDatabaseVersion(data, 8);

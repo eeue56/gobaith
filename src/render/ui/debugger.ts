@@ -78,6 +78,10 @@ function eventLogEntryToDescription(entry: EventLogEntry): string {
       return "Deleted prompt data";
     case "CompleteSetup":
       return "Completed setup";
+    case "AddCustomPrompt":
+      return "Added custom prompt";
+    case "RemoveCustomPrompt":
+      return "Removed custom prompt";
   }
 }
 

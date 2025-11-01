@@ -26,6 +26,7 @@ export const settings: Settings = {
   databaseVersion: LATEST_DATABASE_VERSION,
   enabledPrompts: new Set(),
   hasCompletedSetup: false,
+  customPrompts: [],
 };
 
 export const localState: LocalState = {

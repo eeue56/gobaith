@@ -98,6 +98,7 @@ test("the importer can import settings", async ({ context, page }) => {
     databaseVersion: LATEST_DATABASE_VERSION,
     enabledPrompts: new Set(PROMPTS),
     hasCompletedSetup: true,
+    customPrompts: [],
   };
 
   const stringSettings = JSON.stringify(settings);

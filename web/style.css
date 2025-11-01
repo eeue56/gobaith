@@ -66,6 +66,18 @@
   --psychotic-3: #d89cac;
   --psychotic-4: #cc8498;
 
+  /* Focus - soft sky blue (clarity, concentration) */
+  --focus-1: #b8d8e8;
+  --focus-2: #98c4dc;
+  --focus-3: #78b0d0;
+  --focus-4: #5898c0;
+
+  /* Hyperactivity - soft peach (energy, movement) */
+  --hyperactivity-1: #f0d4b8;
+  --hyperactivity-2: #e8c098;
+  --hyperactivity-3: #e0ac78;
+  --hyperactivity-4: #d89458;
+
   --pico-color-sand-50: #f2f0ec;
   --pico-color-zinc-150: #d1d5db;
   --pico-color-zinc-300: #a4acba;
@@ -1441,7 +1453,8 @@
 
 .prompt-toggle-button.disabled {
   border-color: var(--pico-muted-border-color);
-  opacity: 0.6;
+  opacity: 0.85;
+  background-color: var(--pico-background-color);
 }
 
 .prompt-toggle-button:hover {
@@ -1493,6 +1506,78 @@
   }
 
   .delete-prompt-button {
+    width: 100%;
+  }
+}
+
+/* Custom prompts styles */
+.custom-prompts-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+}
+
+.add-custom-prompt {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.custom-prompt-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.add-custom-prompt-button {
+  white-space: nowrap;
+}
+
+.custom-prompts-list {
+  margin-top: 1.5rem;
+}
+
+.custom-prompt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-form-element-background-color);
+}
+
+.custom-prompt-text {
+  flex: 1;
+}
+
+.remove-custom-prompt-button {
+  background-color: var(--pico-del-color);
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.remove-custom-prompt-button:hover {
+  background-color: var(--pico-del-hover-color);
+}
+
+@media (max-width: 768px) {
+  .add-custom-prompt {
+    flex-direction: column;
+  }
+
+  .add-custom-prompt-button {
+    width: 100%;
+  }
+
+  .custom-prompt-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .remove-custom-prompt-button {
     width: 100%;
   }
 }

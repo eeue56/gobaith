@@ -292,6 +292,7 @@ export type Settings = {
   databaseVersion: DatabaseVersion;
   enabledPrompts: Set<Prompt>;
   hasCompletedSetup: boolean;
+  customPrompts: string[];
 };
 
 export function isSettings(object: unknown): object is Settings {
@@ -466,7 +467,9 @@ export type Update =
   | { kind: "SelectPromptPack"; packName: PromptPackName }
   | { kind: "TogglePrompt"; prompt: Prompt }
   | { kind: "DeletePromptData"; prompt: Prompt }
-  | { kind: "CompleteSetup" };
+  | { kind: "CompleteSetup" }
+  | { kind: "AddCustomPrompt"; promptText: string }
+  | { kind: "RemoveCustomPrompt"; promptText: string };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel

@@ -184,6 +184,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         databaseVersion: LATEST_DATABASE_VERSION,
         enabledPrompts: new Set(),
         hasCompletedSetup: false,
+        customPrompts: [],
       };
       console.log("UpdateHandler: Removed settings");
       await syncStateAndSettings(hasBackend, model.appState, settings);
@@ -635,6 +636,28 @@ export async function update(message: Update, model: Model): Promise<Model> {
     }
     case "CompleteSetup": {
       const settings = { ...model.settings, hasCompletedSetup: true };
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "AddCustomPrompt": {
+      const customPrompts = [...model.settings.customPrompts, message.promptText];
+      const settings = { ...model.settings, customPrompts };
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "RemoveCustomPrompt": {
+      const customPrompts = model.settings.customPrompts.filter(
+        (p) => p !== message.promptText
+      );
+      const settings = { ...model.settings, customPrompts };
       await syncStateAndSettings(hasBackend, model.appState, settings);
       return {
         appState: model.appState,
