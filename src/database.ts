@@ -421,23 +421,26 @@ async function syncToDatabase<
   });
 }
 
+type SerializedSettings = Omit<Settings, "enabledPrompts"> & {
+  enabledPrompts: string[];
+};
+
 export async function syncSettingsToDatabase(
   settings: Settings
 ): Promise<void> {
-  // Convert Set to Array for IndexedDB storage
-  const serializedSettings = {
+  const serializedSettings: SerializedSettings = {
     ...settings,
     enabledPrompts: Array.from(settings.enabledPrompts),
   };
-  return syncToDatabase(SETTINGS_OBJECT_STORE_NAME, serializedSettings as any);
+  return syncToDatabase(SETTINGS_OBJECT_STORE_NAME, serializedSettings as unknown as Settings);
 }
 
 export async function loadSettingsFromDatabase(): Promise<Settings> {
   const settings = await loadFromDatabase(SETTINGS_OBJECT_STORE_NAME);
-  // Convert Array back to Set after loading
+  const serialized = settings as unknown as SerializedSettings;
   return {
     ...settings,
-    enabledPrompts: new Set((settings as any).enabledPrompts || []),
+    enabledPrompts: new Set(serialized.enabledPrompts || []) as Settings["enabledPrompts"],
   };
 }
 

@@ -7,6 +7,7 @@ import {
   h3,
   HtmlNode,
   i,
+  input,
   on,
   p,
   text,
@@ -21,9 +22,6 @@ import {
   Update,
 } from "../../types";
 
-/**
- * Render the first-time setup screen with prompt pack selection
- */
 export function renderFirstTimeSetup(): HtmlNode<Update> {
   return div(
     [],
@@ -58,9 +56,6 @@ export function renderFirstTimeSetup(): HtmlNode<Update> {
   );
 }
 
-/**
- * Render a single prompt pack option
- */
 function renderPromptPackOption(packName: PromptPackName): HtmlNode<Update> {
   const prompts = PROMPT_PACKS[packName];
   const description = getPackDescription(packName);
@@ -95,9 +90,6 @@ function renderPromptPackOption(packName: PromptPackName): HtmlNode<Update> {
   );
 }
 
-/**
- * Get a description for each prompt pack
- */
 function getPackDescription(packName: PromptPackName): string {
   switch (packName) {
     case "Bipolar":
@@ -109,9 +101,6 @@ function getPackDescription(packName: PromptPackName): string {
   }
 }
 
-/**
- * Render prompt configuration in settings
- */
 export function renderPromptConfiguration(
   settings: Settings
 ): HtmlNode<Update> {
@@ -141,13 +130,7 @@ export function renderPromptConfiguration(
   );
 }
 
-/**
- * Render custom prompts section
- */
 function renderCustomPromptsSection(settings: Settings): HtmlNode<Update> {
-  const { attribute, input, class_, div, h3, p, button, on, text } =
-    require("@eeue56/coed");
-
   return div(
     [],
     [class_("custom-prompts-section")],
@@ -173,8 +156,7 @@ function renderCustomPromptsSection(settings: Settings): HtmlNode<Update> {
               attribute("id", "new-custom-prompt"),
               attribute("placeholder", "e.g., Today's stress level"),
               class_("custom-prompt-input"),
-            ],
-            []
+            ]
           ),
           button(
             [
@@ -210,12 +192,7 @@ function renderCustomPromptsSection(settings: Settings): HtmlNode<Update> {
   );
 }
 
-/**
- * Render a single custom prompt item
- */
 function renderCustomPromptItem(prompt: string): HtmlNode<Update> {
-  const { attribute, button, class_, div, on, text } = require("@eeue56/coed");
-
   return div(
     [],
     [class_("custom-prompt-item")],
@@ -234,9 +211,6 @@ function renderCustomPromptItem(prompt: string): HtmlNode<Update> {
   );
 }
 
-/**
- * Render a prompt pack with toggles for individual prompts
- */
 function renderPromptPackToggle(
   packName: PromptPackName,
   settings: Settings
@@ -255,9 +229,6 @@ function renderPromptPackToggle(
   );
 }
 
-/**
- * Render a toggle for a single prompt
- */
 function renderPromptToggle(
   prompt: Prompt,
   isEnabled: boolean
@@ -283,9 +254,6 @@ function renderPromptToggle(
   );
 }
 
-/**
- * Render option to delete data for disabled prompts
- */
 export function renderDeletePromptData(settings: Settings): HtmlNode<Update> {
   const disabledPrompts = Array.from(
     new Set(
@@ -320,9 +288,6 @@ export function renderDeletePromptData(settings: Settings): HtmlNode<Update> {
   );
 }
 
-/**
- * Render a button to delete data for a specific prompt
- */
 function renderDeletePromptButton(prompt: Prompt): HtmlNode<Update> {
   return div(
     [],
