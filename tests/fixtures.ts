@@ -73,6 +73,11 @@ export const testPeristentElectron = base.extend<Page, BrowserContext>({
     { page, context }: { page: Page; context: BrowserContext },
     use: (r: Page) => Promise<void>
   ): Promise<void> => {
+    if (!process.env.IS_ELECTRON) {
+      await use(page);
+      return;
+    }
+    
     const electronApp = await electron.launch({
       args: ["./electron/main.js", `--user-data-dir=${tempUserDir}`],
     });
