@@ -65,6 +65,7 @@ export function renderDailyBar(
   const promptBodies: HtmlNode<Update>[] = [];
 
   for (const prompt of PROMPTS) {
+    if (!settings.enabledPrompts.has(prompt)) continue;
     const renderedShortName = renderPromptShortName(prompt);
     const rowBars = renderRowBars(prompt, entries);
     const row = div(
@@ -75,11 +76,7 @@ export function renderDailyBar(
     promptBodies.push(row);
   }
 
-  return div(
-    [],
-    [class_("daily-bar-graph-container")],
-    promptBodies
-  );
+  return div([], [class_("daily-bar-graph-container")], promptBodies);
 }
 
 export function renderTotaledDailyBar(

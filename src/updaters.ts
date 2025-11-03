@@ -529,7 +529,7 @@ export function togglePromptEnabled(
  */
 export function deletePromptData(prompt: Prompt, state: AppState): AppState {
   for (const entry of state.journalEntries) {
-    delete entry.promptResponses[prompt];
+    entry.promptResponses[prompt] = 1;
   }
 
   return { ...state, journalEntries: state.journalEntries };

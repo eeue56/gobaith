@@ -53,3 +53,6 @@ export async function expectActiveTab(
     new RegExp(tabText)
   );
 }
+export async function chooseBipolarPack(page: Page): Promise<void> {
+  await page.locator(`#select-pack-Bipolar`).click();
+}
