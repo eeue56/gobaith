@@ -55,4 +55,5 @@ export async function expectActiveTab(
 }
 export async function chooseBipolarPack(page: Page): Promise<void> {
   await page.locator(`#select-pack-Bipolar`).click();
+  await expect(page.locator(".tabs")).toBeVisible({ timeout: 10000 });
 }
