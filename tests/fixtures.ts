@@ -9,6 +9,10 @@ import { mkdtempSync } from "fs";
 import { mkdtemp, rm } from "fs/promises";
 import { awaitForTitleToChange } from "./helpers";
 
+async function sendSkipOnboarding(page: Page): Promise<void> {
+  await page.evaluate(() => (window as any).skipOnboarding());
+}
+
 export const test = base.extend<Page, BrowserContext>({
   page: async (
     {
@@ -29,6 +33,7 @@ export const test = base.extend<Page, BrowserContext>({
       });
 
       const window = await electronApp.firstWindow();
+      await sendSkipOnboarding(page);
       await use(window);
 
       await electronApp.close();
@@ -49,6 +54,7 @@ export const test = base.extend<Page, BrowserContext>({
       });
       const page = await webview.page();
       await awaitForTitleToChange(page);
+      await sendSkipOnboarding(page);
       await use(page);
 
       return;
@@ -61,6 +67,7 @@ export const test = base.extend<Page, BrowserContext>({
     }
     await page.goto(baseURL || "");
     await awaitForTitleToChange(page);
+    await sendSkipOnboarding(page);
     await use(page);
   },
 });
@@ -77,7 +84,7 @@ export const testPeristentElectron = base.extend<Page, BrowserContext>({
       await use(page);
       return;
     }
-    
+
     const electronApp = await electron.launch({
       args: ["./electron/main.js", `--user-data-dir=${tempUserDir}`],
     });

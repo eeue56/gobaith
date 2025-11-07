@@ -12,15 +12,9 @@ import {
 } from "../src/types";
 import { dateToDay } from "../src/utils/dates";
 import { test } from "./fixtures";
-import {
-  awaitForTitleToChange,
-  changeTab,
-  chooseBipolarPack,
-  expectActiveTab,
-} from "./helpers";
+import { awaitForTitleToChange, changeTab, expectActiveTab } from "./helpers";
 
 test("the importer can import state", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "IMPORT");
 
   const responses = PromptResponses(3, 1, 2, 3, 4, 1);
@@ -94,7 +88,6 @@ test("the importer can import state", async ({ context, page }) => {
 });
 
 test("the importer can import settings", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "IMPORT");
 
   const settings: Settings = {

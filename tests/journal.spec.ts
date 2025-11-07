@@ -1,17 +1,14 @@
 import { expect } from "@playwright/test";
 import { PROMPT_PACKS } from "../src/types";
 import { test } from "./fixtures";
-import { chooseBipolarPack, expectActiveTab } from "./helpers";
+import { expectActiveTab } from "./helpers";
 
 test("renders", async ({ context, page }) => {
   await expect(page).toHaveTitle("Mood tracker");
 });
 
 test("it starts on daily page", async ({ context, page }) => {
-  await chooseBipolarPack(page);
-  await expect(
-    await page.locator(".current-day").first().innerHTML()
-  ).toContain("Today");
+  await expect(page.locator(".current-day")).toHaveText(/Today/);
 
   await expectActiveTab(page, "JOURNAL");
 });
@@ -21,7 +18,6 @@ test("the user can choose answers to prompts", async ({
   page,
   baseURL,
 }) => {
-  await chooseBipolarPack(page);
   const numberOfPrompts = PROMPT_PACKS["Bipolar"].length;
   await expect(await page.locator(".prompt-group")).toHaveCount(
     numberOfPrompts
@@ -79,7 +75,6 @@ test("the user can choose answers to prompts", async ({
 });
 
 test("the user can move between dates", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await expect(
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");
@@ -109,7 +104,6 @@ test("the user can move between dates", async ({ context, page }) => {
 });
 
 test("the user can enter log entries", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await expect(
     await page.locator(".current-day").first().innerHTML()
   ).toContain("Today");

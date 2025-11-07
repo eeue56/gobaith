@@ -1,12 +1,13 @@
 import { expect } from "@playwright/test";
 import { PROMPT_PACKS } from "../src/types";
 import { test } from "./fixtures";
-import { changeTab, chooseBipolarPack, expectActiveTab } from "./helpers";
+import { chooseBipolarPack, expectActiveTab, resetPrompts } from "./helpers";
 
 test("the user gets redirected to the JOURNAL tab after chosing a pack", async ({
   context,
   page,
 }) => {
+  await resetPrompts(page);
   await chooseBipolarPack(page);
   await expectActiveTab(page, "JOURNAL");
 });
@@ -15,12 +16,7 @@ test("first-time setup shows prompt pack selection", async ({
   context,
   page,
 }) => {
-  // Clear settings to simulate first-time user
-  if ((await page.locator(".active-tab").all()).length === 0) {
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-  }
+  await resetPrompts(page);
 
   // Should show the first-time setup screen
   await expect(page.locator(".first-time-setup")).toBeVisible();
@@ -39,12 +35,7 @@ test("first-time setup shows prompt pack selection", async ({
 });
 
 test("user can select Bipolar prompt pack", async ({ context, page }) => {
-  // Clear settings to simulate first-time user
-  if ((await page.locator(".active-tab").all()).length === 0) {
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-  }
+  await resetPrompts(page);
 
   // Select Bipolar pack
   await page.locator("#select-pack-Bipolar").click();
@@ -67,12 +58,7 @@ test("user can select Bipolar prompt pack", async ({ context, page }) => {
 });
 
 test("user can select Schizophrenia prompt pack", async ({ context, page }) => {
-  // Clear settings to simulate first-time user
-  if ((await page.locator(".active-tab").all()).length === 0) {
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-  }
+  await resetPrompts(page);
 
   // Select Schizophrenia pack
   await page.locator("#select-pack-Schizophrenia").click();
@@ -95,12 +81,7 @@ test("user can select Schizophrenia prompt pack", async ({ context, page }) => {
 });
 
 test("user can select ADHD prompt pack", async ({ context, page }) => {
-  // Clear settings to simulate first-time user
-  if ((await page.locator(".active-tab").all()).length === 0) {
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-  }
+  await resetPrompts(page);
 
   // Select ADHD pack
   await page.locator("#select-pack-ADHD").click();

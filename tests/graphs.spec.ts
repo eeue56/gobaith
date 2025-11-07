@@ -1,9 +1,8 @@
 import { expect } from "@playwright/test";
 import { test } from "./fixtures";
-import { changeTab, chooseBipolarPack, expectActiveTab } from "./helpers";
+import { changeTab, expectActiveTab } from "./helpers";
 
 test("the default graph is daily bar", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
 
   await expect(await page.locator("#graph-selection")).toHaveValue("DAILY_BAR");
@@ -19,7 +18,6 @@ test("the user can click a daily bar to go to that day", async ({
   context,
   page,
 }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
 
   await expect(await page.locator("#graph-selection")).toHaveValue("DAILY_BAR");
@@ -40,7 +38,6 @@ test("the user can click a daily bar to go to that day", async ({
 });
 
 test("the user sees some filter information", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -56,7 +53,6 @@ test("the user sees some filter information", async ({ context, page }) => {
 });
 
 test("the user sees some duration information", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -77,7 +73,6 @@ test("DAILY_BAR row labels are visible on desktop", async ({
 }) => {
   // Set desktop viewport size
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -103,7 +98,6 @@ test("DAILY_BAR row labels are visible on desktop", async ({
 });
 
 test("SPIDERWEB graph displays SVG content", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -120,7 +114,6 @@ test("SPIDERWEB graph displays SVG content", async ({ context, page }) => {
 });
 
 test("SPIDERWEB graph is responsive on mobile", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await page.setViewportSize({ width: 375, height: 667 });
 
   await changeTab(page, "GRAPH");
@@ -136,7 +129,6 @@ test("SPIDERWEB graph is responsive on mobile", async ({ context, page }) => {
 });
 
 test("LINE_OVERVIEW graph displays SVG content", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -156,7 +148,6 @@ test("LINE_OVERVIEW graph is responsive on mobile", async ({
   context,
   page,
 }) => {
-  await chooseBipolarPack(page);
   await page.setViewportSize({ width: 375, height: 667 });
 
   await changeTab(page, "GRAPH");
@@ -175,7 +166,6 @@ test("LINE_OVERVIEW graph renders data points when no prompts are filtered", asy
   context,
   page,
 }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -199,7 +189,6 @@ test("LINE_OVERVIEW graph renders data points when no prompts are filtered", asy
 });
 
 test("SPIDERWEB graph renders data points", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -226,7 +215,6 @@ test("LINE_OVERVIEW filtering via clicking legend items", async ({
   context,
   page,
 }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 

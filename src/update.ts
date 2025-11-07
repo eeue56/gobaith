@@ -609,6 +609,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         enabledPrompts: new Set(prompts),
         hasCompletedSetup: true,
       };
+
       await syncStateAndSettings(hasBackend, model.appState, settings);
       return {
         appState: model.appState,
@@ -644,7 +645,10 @@ export async function update(message: Update, model: Model): Promise<Model> {
       };
     }
     case "AddCustomPrompt": {
-      const customPrompts = [...model.settings.customPrompts, message.promptText];
+      const customPrompts = [
+        ...model.settings.customPrompts,
+        message.promptText,
+      ];
       const settings = { ...model.settings, customPrompts };
       await syncStateAndSettings(hasBackend, model.appState, settings);
       return {
@@ -668,7 +672,9 @@ export async function update(message: Update, model: Model): Promise<Model> {
   }
 }
 
-export async function fetchModelFromStores(): Promise<Model> {
+export async function fetchModelFromStores(
+  params: URLSearchParams | null
+): Promise<Model> {
   let appState: AppState = defaultObjects.appState;
   let settings: Settings = defaultObjects.settings;
   const localState: LocalState = defaultObjects.localState;
@@ -706,6 +712,13 @@ export async function fetchModelFromStores(): Promise<Model> {
       appState = maybeDatabaseRecords.appState;
       settings = maybeDatabaseRecords.settings;
     }
+  }
+
+  if (params && params.get("skipOnboarding") === "true") {
+    const prompts = PROMPT_PACKS["Bipolar"];
+
+    settings.enabledPrompts = new Set(prompts);
+    settings.hasCompletedSetup = true;
   }
 
   const initResult = initializeEntryForDay(

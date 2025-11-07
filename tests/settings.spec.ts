@@ -3,7 +3,6 @@ import { test } from "./fixtures";
 import { changeTab, chooseBipolarPack, expectActiveTab } from "./helpers";
 
 test("the user adds a pill", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "SETTINGS");
 
   await page.locator("#new-pill-name").fill("Paracetamol");
@@ -21,7 +20,6 @@ test("the user removes settings (including pills)", async ({
   context,
   page,
 }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "SETTINGS");
 
   await page.locator("#new-pill-name").fill("Paracetamol");
@@ -45,7 +43,6 @@ test("the user removes app state (including journals)", async ({
   context,
   page,
 }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "SETTINGS");
 
   await page.locator("#remove-app-state").click();
@@ -61,7 +58,6 @@ test("the user removes app state (including journals)", async ({
 });
 
 test("the debug log contains events triggered", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "SETTINGS");
 
   await expect(page.locator(".event-description").first()).toContainText(

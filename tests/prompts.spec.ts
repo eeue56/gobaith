@@ -1,19 +1,9 @@
 import { expect } from "@playwright/test";
 import { PROMPT_PACKS } from "../src/types";
 import { test } from "./fixtures";
-import { changeTab, chooseBipolarPack, expectActiveTab } from "./helpers";
+import { changeTab, expectActiveTab } from "./helpers";
 
 test("user can toggle prompts in settings", async ({ context, page }) => {
-  if ((await page.locator(".active-tab").all()).length === 0) {
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-  }
-
-  await page.locator("#select-pack-Bipolar").click();
-
-  await expect(page.locator(".tabs")).toBeVisible({ timeout: 10000 });
-
   await changeTab(page, "SETTINGS");
   await expect(page.locator(".prompt-configuration h3").first()).toContainText(
     "Configure Prompts"
@@ -54,22 +44,6 @@ test("user can toggle prompts in settings", async ({ context, page }) => {
 });
 
 test("disabled prompt data is retained", async ({ context, page }) => {
-  // Clear settings and select a pack
-  if ((await page.locator(".active-tab").all()).length === 0) {
-    await chooseBipolarPack(page);
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-    await chooseBipolarPack(page);
-  }
-
-  await changeTab(page, "SETTINGS");
-  await page.locator("#remove-all-settings").click();
-  await chooseBipolarPack(page);
-
-  // Wait for tabs to appear
-  await expect(page.locator(".tabs")).toBeVisible({ timeout: 10000 });
-
   await changeTab(page, "JOURNAL");
 
   // Fill in a response for the first prompt
@@ -115,13 +89,6 @@ test("disabled prompt data is retained", async ({ context, page }) => {
 });
 
 test("user can delete data for disabled prompts", async ({ context, page }) => {
-  if ((await page.locator(".active-tab").all()).length === 0) {
-  } else {
-    await changeTab(page, "SETTINGS");
-    await page.locator("#remove-all-settings").click();
-  }
-  await chooseBipolarPack(page);
-
   await expectActiveTab(page, "JOURNAL");
 
   // Fill in a response for the first prompt
@@ -169,7 +136,6 @@ test("user can delete data for disabled prompts", async ({ context, page }) => {
 });
 
 test("settings shows all three prompt packs", async ({ context, page }) => {
-  await chooseBipolarPack(page);
   await changeTab(page, "SETTINGS");
 
   // Should show prompt configuration
