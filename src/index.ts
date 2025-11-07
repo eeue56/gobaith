@@ -85,6 +85,10 @@ async function resetPrompts() {
   }
 }
 
+// Attach functions to window immediately so tests can wait for them
+(window as any).skipOnboarding = skipOnboarding;
+(window as any).resetPrompts = resetPrompts;
+
 async function main() {
   console.log("Main: Starting script...");
 
@@ -115,8 +119,6 @@ async function main() {
 
   const runningProgram = program(programConfig);
   SENDER = runningProgram.send;
-  (window as any).skipOnboarding = skipOnboarding;
-  (window as any).resetPrompts = resetPrompts;
 
   runningProgram.send({ kind: "SetDebuggingInfo", info });
 
