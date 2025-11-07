@@ -10,6 +10,7 @@ import { mkdtemp, rm } from "fs/promises";
 import { awaitForTitleToChange } from "./helpers";
 
 async function sendSkipOnboarding(page: Page): Promise<void> {
+  await page.waitForFunction(() => typeof (window as any).skipOnboarding === 'function', {}, { timeout: 10000 });
   await page.evaluate(() => (window as any).skipOnboarding());
 }
 
