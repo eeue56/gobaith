@@ -41,7 +41,7 @@ function getPoints(
 }
 
 function viewRadarChartSvg(
-  prompts: Prompt[],
+  prompts: (Prompt | string)[],
   data: number[],
   title: string
 ): HtmlNode<Update> {
@@ -122,7 +122,9 @@ function viewRadarChartSvg(
     const textAnchor =
       labelX > center + 5 ? "start" : labelX < center - 5 ? "end" : "middle";
 
-    const shortLabel = SHORT_PROMPTS[prompts[i]];
+    const shortLabel = (prompts[i] in SHORT_PROMPTS) 
+      ? SHORT_PROMPTS[prompts[i] as Prompt]
+      : prompts[i];
 
     labelTexts.push(
       svgText(

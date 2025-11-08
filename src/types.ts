@@ -222,7 +222,7 @@ export type Result<value> =
  */
 export type LocalState = {
   kind: "LocalState";
-  Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt> } };
+  Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt | string> } };
   Importer: { status: Result<string> };
 };
 
@@ -464,7 +464,7 @@ export type Update =
   | { kind: "DeleteQuery"; index: number; path: QueryPath[] }
   | {
       kind: "ToggleFilterLineGraphView";
-      prompt: Prompt;
+      prompt: Prompt | string;
     }
   | { kind: "SelectPromptPack"; packName: PromptPackName }
   | { kind: "TogglePrompt"; prompt: Prompt }
@@ -558,7 +558,7 @@ export function IncorrectPayload(): IncorrectPayload {
 }
 
 export type PromptRenderData = {
-  prompt: Prompt;
+  prompt: Prompt | string;
   data: { x: Date; y: number }[];
   borderColor: string;
   borderWidth: number;

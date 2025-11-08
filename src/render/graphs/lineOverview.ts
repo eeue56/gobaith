@@ -68,7 +68,7 @@ function viewGridlines(): HtmlNode<never>[] {
 
 function viewLegends(
   datasets: PromptRenderData[],
-  nonFilteredPrompts: Set<Prompt>,
+  nonFilteredPrompts: Set<Prompt | string>,
   width: number
 ): HtmlNode<Update>[] {
   const legends: HtmlNode<Update>[] = [];
@@ -111,7 +111,7 @@ function viewLegends(
           isNotFiltered ? none() : attribute("text-decoration", "line-through"),
           class_("legend-text"),
         ],
-        [text(SHORT_PROMPTS[dataset.prompt])]
+        [text((dataset.prompt in SHORT_PROMPTS) ? SHORT_PROMPTS[dataset.prompt as Prompt] : dataset.prompt)]
       )
     );
   }
@@ -121,7 +121,7 @@ function viewLegends(
 
 function viewPaths(
   datasets: PromptRenderData[],
-  nonFilteredPrompts: Set<Prompt>,
+  nonFilteredPrompts: Set<Prompt | string>,
   xStep: number
 ): HtmlNode<never>[] {
   const paths: HtmlNode<never>[] = [];
@@ -206,7 +206,7 @@ function viewXLabels(labels: string[], xStep: number): HtmlNode<never>[] {
 function viewLineChartSvg(
   datasets: PromptRenderData[],
   labels: string[],
-  nonFilteredPrompts: Set<Prompt>
+  nonFilteredPrompts: Set<Prompt | string>
 ): HtmlNode<Update> {
   const xStep = chartWidth / Math.max(labels.length - 1, 1);
 

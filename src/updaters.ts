@@ -34,7 +34,7 @@ export function addJournalEntry(
 
 export function updatePromptValue(
   entry: JournalEntry,
-  prompt: Prompt,
+  prompt: Prompt | string,
   value: MoodValue,
   state: AppState
 ): AppState {
