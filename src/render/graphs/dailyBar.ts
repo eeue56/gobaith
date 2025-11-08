@@ -13,11 +13,14 @@ import {
 import { dayToString, sortEntriesByDate } from "../../utils/dates";
 
 function renderRowBars(
-  prompt: Prompt,
+  prompt: Prompt | string,
   entries: JournalEntry[]
 ): HtmlNode<Update> {
   const bodies: HtmlNode<Update>[] = [];
-  const promptShort = SHORT_PROMPTS[prompt].toLowerCase();
+  // For custom prompts, use the prompt itself as the short name
+  const promptShort = (prompt in SHORT_PROMPTS) 
+    ? SHORT_PROMPTS[prompt as Prompt].toLowerCase()
+    : prompt.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   for (const entry of entries) {
     const dayValue = entry.promptResponses[prompt];
