@@ -201,7 +201,12 @@ export function renderSpiderweb(
   settings: Settings,
   localState: LocalState
 ): HtmlNode<Update> {
-  const prompts = PROMPTS.slice(0);
+  // Include both standard enabled prompts and custom prompts
+  const enabledPrompts = PROMPTS.filter((prompt) =>
+    settings.enabledPrompts.has(prompt)
+  );
+  const prompts = [...enabledPrompts, ...settings.customPrompts];
+  
   const todaysData = getDataOnlyForToday(state.day, state.journalEntries);
   const title = `Mood breakdown on ${dayToString(state.day)}`;
   const chart = viewRadarChartSvg(prompts, todaysData, title);

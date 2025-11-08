@@ -36,7 +36,7 @@ function renderMoodState(
   moodValue: MoodValue,
   activeNumber: MoodValue,
   entry: JournalEntry,
-  prompt: Prompt
+  prompt: Prompt | string
 ): HtmlNode<Update> {
   const moodText = moodStateFromValue(moodValue);
   const isActive = activeNumber === moodValue;
@@ -78,7 +78,7 @@ function renderMoodState(
 
 export function renderButtonSet(
   entry: JournalEntry,
-  prompt: Prompt
+  prompt: Prompt | string
 ): HtmlNode<Update> {
   const activeNumber = entry.promptResponses[prompt];
 
@@ -98,7 +98,7 @@ export function renderButtonSet(
 
 function updateMoodState(
   entry: JournalEntry,
-  prompt: Prompt,
+  prompt: Prompt | string,
   value: MoodValue
 ): Update {
   return {

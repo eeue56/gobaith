@@ -1455,6 +1455,7 @@
   border-color: var(--pico-muted-border-color);
   opacity: 0.85;
   background-color: var(--pico-background-color);
+  color: white;
 }
 
 .prompt-toggle-button:hover {
@@ -1478,6 +1479,7 @@
   margin: 0.5rem 0;
   border: 1px solid var(--pico-border-color);
   border-radius: var(--pico-border-radius);
+  color: white;
 }
 
 .delete-prompt-button {

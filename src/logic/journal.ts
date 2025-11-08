@@ -91,7 +91,7 @@ export function getDataOnlyForToday(
 }
 
 export function getDataForPrompt(
-  prompt: Prompt,
+  prompt: Prompt | string,
   entries: JournalEntry[]
 ): DayState[] {
   const data: DayState[] = [];

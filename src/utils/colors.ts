@@ -85,6 +85,10 @@ export function getPromptColorHex(
  * @param prompt The prompt name
  * @returns The hex color string
  */
-export function getPromptColor(prompt: Prompt): string {
-  return getPromptColorHex(prompt, 3);
+export function getPromptColor(prompt: Prompt | string): string {
+  if (typeof prompt === "string" && !(prompt in colorMap)) {
+    // Return a default neutral color for custom prompts
+    return "#888888";
+  }
+  return getPromptColorHex(prompt as Prompt, 3);
 }

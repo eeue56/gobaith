@@ -274,7 +274,7 @@ export function renderLineOverview(
   settings: Settings,
   localState: LocalState
 ): HtmlNode<Update> {
-  const datasets = getDataPerPrompt(state.journalEntries);
+  const datasets = getDataPerPrompt(state.journalEntries, settings);
   const days = state.journalEntries
     .sort(sortEntriesByDate)
     .map((entry) => dayToString(entry.day));

@@ -76,9 +76,17 @@ function circleMoodIcon(
   );
 }
 
-export function getCircleMoodIcon(mood: MoodValue, prompt: Prompt): HtmlNode<never> {
-  const promptShort = SHORT_PROMPTS[prompt].toLowerCase();
-  const colorVar = `var(--${promptShort}-${mood})`;
+export function getCircleMoodIcon(mood: MoodValue, prompt: Prompt | string): HtmlNode<never> {
+  let colorVar: string;
+  
+  if (typeof prompt === "string" && !(prompt in SHORT_PROMPTS)) {
+    // Custom prompt - use a neutral gray color
+    const grayShades = ["#cccccc", "#aaaaaa", "#888888", "#666666"];
+    colorVar = grayShades[mood - 1];
+  } else {
+    const promptShort = SHORT_PROMPTS[prompt as Prompt].toLowerCase();
+    colorVar = `var(--${promptShort}-${mood})`;
+  }
   
   const radiusSize = mood === 1 ? 4 : mood === 2 ? 6 : mood === 3 ? 8 : 10;
   

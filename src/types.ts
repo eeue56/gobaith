@@ -104,6 +104,8 @@ export const PROMPT_PACKS: Record<PromptPackName, readonly Prompt[]> = {
 
 export type PromptResponses = {
   [prompt in Prompt]: MoodValue;
+} & {
+  [customPrompt: string]: MoodValue;
 };
 
 export function PromptResponses(
@@ -399,7 +401,7 @@ export type Update =
       kind: "UpdatePromptValue";
       entry: JournalEntry;
       newValue: MoodValue;
-      prompt: Prompt;
+      prompt: Prompt | string;
     }
   | { kind: "RemoveSettings" }
   | { kind: "RemoveAppState" }

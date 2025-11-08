@@ -48,8 +48,9 @@ function renderRowBars(
   return div([], [class_("daily-bar-colors")], bodies);
 }
 
-function renderPromptShortName(prompt: Prompt): HtmlNode<never> {
-  return span([], [class_("daily-bar-prompt")], [text(SHORT_PROMPTS[prompt])]);
+function renderPromptShortName(prompt: Prompt | string): HtmlNode<never> {
+  const shortName = (prompt in SHORT_PROMPTS) ? SHORT_PROMPTS[prompt as Prompt] : prompt;
+  return span([], [class_("daily-bar-prompt")], [text(shortName)]);
 }
 
 export function renderDailyBar(
@@ -64,8 +65,13 @@ export function renderDailyBar(
 
   const promptBodies: HtmlNode<Update>[] = [];
 
-  for (const prompt of PROMPTS) {
-    if (!settings.enabledPrompts.has(prompt)) continue;
+  // Include both standard enabled prompts and custom prompts
+  const enabledPrompts = PROMPTS.filter((prompt) =>
+    settings.enabledPrompts.has(prompt)
+  );
+  const allPrompts = [...enabledPrompts, ...settings.customPrompts];
+
+  for (const prompt of allPrompts) {
     const renderedShortName = renderPromptShortName(prompt);
     const rowBars = renderRowBars(prompt, entries);
     const row = div(

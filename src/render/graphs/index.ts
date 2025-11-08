@@ -41,10 +41,16 @@ export function renderGraph(model: Model): HtmlNode<Update> {
   );
 }
 
-export function getDataPerPrompt(entries: JournalEntry[]): PromptRenderData[] {
+export function getDataPerPrompt(entries: JournalEntry[], settings: Settings): PromptRenderData[] {
   const data: PromptRenderData[] = [];
 
-  for (const prompt of PROMPTS) {
+  // Include both standard enabled prompts and custom prompts
+  const enabledPrompts = PROMPTS.filter((prompt) =>
+    settings.enabledPrompts.has(prompt)
+  );
+  const allPrompts = [...enabledPrompts, ...settings.customPrompts];
+
+  for (const prompt of allPrompts) {
     const promptData = getDataForPrompt(prompt, entries).map((row) => {
       return {
         x: dayToDate(row.day),
