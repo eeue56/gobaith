@@ -60,5 +60,11 @@ export async function chooseBipolarPack(page: Page): Promise<void> {
 }
 
 export async function resetPrompts(page: Page): Promise<void> {
+  if (process.env.IS_ELECTRON) {
+    await changeTab(page, "SETTINGS");
+    await page.locator("#remove-all-settings").click();
+    await expect(page.locator(".first-time-setup")).toBeVisible();
+    return;
+  }
   await page.evaluate(() => (window as any).resetPrompts());
 }

@@ -85,7 +85,6 @@ async function resetPrompts() {
   }
 }
 
-// Attach functions to window immediately so tests can wait for them
 (window as any).skipOnboarding = skipOnboarding;
 (window as any).resetPrompts = resetPrompts;
 

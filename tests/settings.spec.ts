@@ -60,8 +60,8 @@ test("the user removes app state (including journals)", async ({
 test("the debug log contains events triggered", async ({ context, page }) => {
   await changeTab(page, "SETTINGS");
 
-  await expect(page.locator(".event-description").first()).toContainText(
-    "Selected prompt pack"
+  await expect(page.locator(".event-description").last()).toContainText(
+    "Changed tab"
   );
 
   await changeTab(page, "JOURNAL");

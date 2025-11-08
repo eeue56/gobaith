@@ -692,33 +692,40 @@ export async function fetchModelFromStores(
       console.error(maybeAppState);
 
       if (maybeDatabaseRecords) {
-        appState = maybeDatabaseRecords.appState;
+        appState = { ...appState, ...maybeDatabaseRecords.appState };
       }
     } else {
-      appState = maybeAppState;
+      appState = { ...appState, ...maybeAppState };
     }
 
     if (typeof maybeSettings === "string") {
       console.error(maybeSettings);
 
       if (maybeDatabaseRecords) {
-        settings = maybeDatabaseRecords.settings;
+        settings = { ...settings, ...maybeDatabaseRecords.settings };
       }
     } else {
-      settings = maybeSettings;
+      settings = { ...settings, ...maybeSettings };
     }
   } else {
     if (maybeDatabaseRecords !== null) {
-      appState = maybeDatabaseRecords.appState;
-      settings = maybeDatabaseRecords.settings;
+      appState = { ...appState, ...maybeDatabaseRecords.appState };
+      settings = { ...settings, ...maybeDatabaseRecords.settings };
     }
   }
 
-  if (params && params.get("skipOnboarding") === "true") {
-    const prompts = PROMPT_PACKS["Bipolar"];
+  if (params) {
+    if (params.get("skipOnboarding") === "true") {
+      const prompts = PROMPT_PACKS["Bipolar"];
 
-    settings.enabledPrompts = new Set(prompts);
-    settings.hasCompletedSetup = true;
+      settings.enabledPrompts = new Set(prompts);
+      settings.hasCompletedSetup = true;
+    }
+
+    if (params.get("resetPrompts") === "true") {
+      settings.enabledPrompts = new Set();
+      settings.hasCompletedSetup = false;
+    }
   }
 
   const initResult = initializeEntryForDay(
