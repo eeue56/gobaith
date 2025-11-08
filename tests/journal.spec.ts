@@ -40,7 +40,7 @@ test("the user can choose answers to prompts", async ({
     for (const responseButton of await group
       .locator(".circle-container")
       .all()) {
-      responseButton.click();
+      await responseButton.click();
       await expect(responseButton).toHaveClass(/active/);
     }
   }
