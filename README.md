@@ -6,7 +6,7 @@ Many other trackers exist. This is mine. I have used it for a long time (multipl
 
 _Non-developers probably should look at other existing tracker apps, rather than using this one. There's lots on the app stores._ This tracker comes with flexiblity at a cost in terms of how easy it is to use.
 
-You are expected to modify the tracking to adapt to your needs. The default tracking is suitable for those with mood disorders, or psychotic disorders.
+You are expected to modify the tracking to adapt to your needs. By default, there are several prompt packs for different mental disorders. You are able to create custom prompts without writing code.
 
 ## Screenshots
 
@@ -16,6 +16,7 @@ Some screenshots based on generated data (no real human's tracking, see the [gen
 
 | Page                                                   | Screenshot                                              |
 | ------------------------------------------------------ | ------------------------------------------------------- |
+| Choosing a set of prompts                              | ![](./screenshots/images/prompt_pack.png)               |
 | The daily tracker                                      | ![](./screenshots/images/daily_tracker.png)             |
 | A summary of mood periods                              | ![](./screenshots/images/graph_bipolar_periods.png)     |
 | Daily bar overview, with clickable indicators          | ![](./screenshots/images/graph_daily_bar.png)           |
@@ -30,10 +31,11 @@ Some screenshots based on generated data (no real human's tracking, see the [gen
 
 ## Changelog
 
-| Version | Changes                                                                                                      |
-| ------- | ------------------------------------------------------------------------------------------------------------ |
-| 1.0.0   | Initial public release                                                                                       |
-| 2.0.0   | Rewrite html to use [coed](https://github.com/eeue56/coed) rather than innerHTML magic. Adds Android support |
+| Version       | Changes                                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| 1.0.0         | Initial public release                                                                                       |
+| 2.0.0         | Rewrite html to use [coed](https://github.com/eeue56/coed) rather than innerHTML magic. Adds Android support |
+| 3.0.0-alpha.0 | Use unique colours per prompt. Add custom prompts. Add prompt packs for different disorders.                 |
 
 ## Design principles
 

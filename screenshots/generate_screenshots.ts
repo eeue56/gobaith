@@ -12,7 +12,11 @@ import { mkdtemp } from "fs/promises";
 import { generateRandomMoodValue, isPrompt, Prompt } from "../src/types";
 import { generateData } from "../src/utils/data";
 import { dateToDay } from "../src/utils/dates";
-import { awaitForTitleToChange, changeTab } from "../tests/helpers";
+import {
+  awaitForTitleToChange,
+  changeTab,
+  chooseBipolarPack,
+} from "../tests/helpers";
 
 type PageRunner =
   | { kind: "Electron"; electronApp: ElectronApplication }
@@ -42,6 +46,12 @@ export async function addLogEntryForScreenshot(
   const logEntryToFill = logEntries[prompName];
   await page.locator("#new-journal-entry").fill(logEntryToFill);
   await page.locator(".save-log-entry-button").first().click();
+}
+
+async function screenshotPromptPackSelector(page: Page, basePath: string) {
+  await page.screenshot({
+    path: `${basePath}/prompt_pack.png`,
+  });
 }
 
 async function screenshotDailyTracker(page: Page, basePath: string) {
@@ -154,7 +164,9 @@ async function screenshotSettings(page: Page, basePath: string) {
   });
 }
 
-async function setupPage(page: Page): Promise<void> {
+async function setupPostOnboardingPage(page: Page): Promise<void> {
+  await chooseBipolarPack(page);
+
   await page.locator(".current-day").first().innerHTML();
 
   await page.locator('button:text("Importer")').click();
@@ -223,10 +235,12 @@ async function makePage(): Promise<{ page: Page; runner: PageRunner }> {
 
 async function main() {
   const { runner, page } = await makePage();
-  await setupPage(page);
 
   const basePath = getBasePath(runner);
 
+  await screenshotPromptPackSelector(page, basePath);
+
+  await setupPostOnboardingPage(page);
   await screenshotDailyTracker(page, basePath);
   await screenshotSettings(page, basePath);
   await screenshotGraphDailyBar(page, basePath);
