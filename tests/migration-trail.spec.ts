@@ -4,12 +4,15 @@ import { test as appTest } from "./fixtures";
 /**
  * Tests for the migration trail functionality
  * These tests verify that data is backed up to a trail table before migrations
+ * 
+ * Note: These tests are skipped in electron mode as they use page.evaluate with 
+ * async IndexedDB operations that can be disrupted by navigation events in electron.
  */
 
-appTest("migration trail stores backup data", async ({ page }) => {
-  // Skip in electron mode as these tests use page.evaluate with async operations
-  // that can be disrupted by navigation events
-  if (process.env.IS_ELECTRON) return;
+// Skip all tests in this file when running in electron mode
+const shouldSkip = !!process.env.IS_ELECTRON;
+
+(shouldSkip ? appTest.skip : appTest)("migration trail stores backup data", async ({ page }) => {
   
   // This test verifies that the trail store is created and accessible
   const trailExists = await page.evaluate(async () => {
@@ -32,10 +35,7 @@ appTest("migration trail stores backup data", async ({ page }) => {
   expect(trailExists).toBe(true);
 });
 
-appTest("migration trail can be read", async ({ page }) => {
-  // Skip in electron mode as these tests use page.evaluate with async operations
-  // that can be disrupted by navigation events
-  if (process.env.IS_ELECTRON) return;
+(shouldSkip ? appTest.skip : appTest)("migration trail can be read", async ({ page }) => {
   
   // This test verifies that we can read from the trail store
   // Even if there are no entries (for new databases), the store should be accessible
@@ -76,10 +76,7 @@ appTest("migration trail can be read", async ({ page }) => {
   expect(canRead).toBe(true);
 });
 
-appTest("migration trail is read-only during normal operations", async ({ page }) => {
-  // Skip in electron mode as these tests use page.evaluate with async operations
-  // that can be disrupted by navigation events
-  if (process.env.IS_ELECTRON) return;
+(shouldSkip ? appTest.skip : appTest)("migration trail is read-only during normal operations", async ({ page }) => {
   
   // This test verifies that the trail store cannot be written to during normal operations
   // (only during migrations)
@@ -134,10 +131,7 @@ appTest("migration trail is read-only during normal operations", async ({ page }
   expect(canWrite).toBe(true);
 });
 
-appTest("migration trail entries have correct structure", async ({ page }) => {
-  // Skip in electron mode as these tests use page.evaluate with async operations
-  // that can be disrupted by navigation events
-  if (process.env.IS_ELECTRON) return;
+(shouldSkip ? appTest.skip : appTest)("migration trail entries have correct structure", async ({ page }) => {
   
   // This test verifies that any entries in the trail have the expected structure
   const entryStructureValid = await page.evaluate(async () => {
