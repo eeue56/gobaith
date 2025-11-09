@@ -36,6 +36,10 @@ export const iconArrowDownward: HtmlNode<never> = icon("arrow_downward");
 
 export const iconVerticalAlignTop: HtmlNode<never> = icon("vertical_align_top");
 
+export const iconCheck: HtmlNode<never> = icon("check");
+
+export const iconBlock: HtmlNode<never> = icon("block");
+
 function circleMoodIcon(
   innerRadiusSize: number,
   innerCircleColour: string
@@ -76,9 +80,12 @@ function circleMoodIcon(
   );
 }
 
-export function getCircleMoodIcon(mood: MoodValue, prompt: Prompt | string): HtmlNode<never> {
+export function getCircleMoodIcon(
+  mood: MoodValue,
+  prompt: Prompt | string
+): HtmlNode<never> {
   let colorVar: string;
-  
+
   if (typeof prompt === "string" && !(prompt in SHORT_PROMPTS)) {
     // Custom prompt - use a neutral gray color
     const grayShades = ["#cccccc", "#aaaaaa", "#888888", "#666666"];
@@ -87,8 +94,8 @@ export function getCircleMoodIcon(mood: MoodValue, prompt: Prompt | string): Htm
     const promptShort = SHORT_PROMPTS[prompt as Prompt].toLowerCase();
     colorVar = `var(--${promptShort}-${mood})`;
   }
-  
+
   const radiusSize = mood === 1 ? 4 : mood === 2 ? 6 : mood === 3 ? 8 : 10;
-  
+
   return circleMoodIcon(radiusSize, colorVar);
 }

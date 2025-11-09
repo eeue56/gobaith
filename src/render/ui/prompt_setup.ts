@@ -21,6 +21,7 @@ import {
   SHORT_PROMPTS,
   Update,
 } from "../../types";
+import { iconBlock, iconCheck, iconDelete } from "./icons";
 
 export function renderFirstTimeSetup(): HtmlNode<Update> {
   return div(
@@ -172,7 +173,10 @@ function renderCustomPromptsSection(settings: Settings): HtmlNode<Update> {
                 return { kind: "Noop" };
               }),
             ],
-            [class_("add-custom-prompt-button"), attribute("id", "add-custom-prompt")],
+            [
+              class_("add-custom-prompt-button"),
+              attribute("id", "add-custom-prompt"),
+            ],
             [text("Add Custom Prompt")]
           ),
         ]
@@ -205,7 +209,7 @@ function renderCustomPromptItem(prompt: string): HtmlNode<Update> {
           }),
         ],
         [class_("remove-custom-prompt-button")],
-        [text("Remove")]
+        [text("Remove"), iconDelete]
       ),
     ]
   );
@@ -248,7 +252,7 @@ function renderPromptToggle(
           class_(isEnabled ? "enabled" : "disabled"),
           attribute("data-prompt", prompt),
         ],
-        [text(isEnabled ? "✓" : "○"), text(" "), text(prompt)]
+        [isEnabled ? iconCheck : iconBlock, text(" "), text(prompt)]
       ),
     ]
   );
@@ -306,7 +310,7 @@ function renderDeletePromptButton(prompt: Prompt | string): HtmlNode<Update> {
           class_("delete-prompt-button"),
           attribute("data-delete-prompt", prompt),
         ],
-        [text("Delete data")]
+        [text("Delete data"), iconDelete]
       ),
     ]
   );

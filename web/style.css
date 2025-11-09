@@ -1061,6 +1061,11 @@
   text-align: center;
 }
 
+.new-journal-entry-form {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
 .new-journal-entry-containter {
   display: grid;
   grid-template-rows: 1fr;
@@ -1435,15 +1440,14 @@
 }
 
 .prompt-toggle-button {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
   width: 100%;
   justify-content: flex-start;
-  text-align: left;
-  border-radius: var(--pico-border-radius);
   background-color: var(--pico-form-element-background-color);
+  font-size: 20px;
 }
 
 .prompt-toggle-button.enabled {
@@ -1452,10 +1456,8 @@
 }
 
 .prompt-toggle-button.disabled {
-  border-color: var(--pico-muted-border-color);
   opacity: 0.85;
-  background-color: var(--pico-background-color);
-  color: white;
+  color: white !important;
 }
 
 .prompt-toggle-button:hover {
@@ -1483,33 +1485,8 @@
 }
 
 .delete-prompt-button {
-  background-color: var(--pico-del-color);
-  color: white;
   padding: 0.5rem 1rem;
   min-width: 120px;
-}
-
-.delete-prompt-button:hover {
-  background-color: var(--pico-del-hover-color);
-}
-
-@media (max-width: 768px) {
-  .first-time-setup {
-    padding: 1rem;
-  }
-
-  .prompt-pack-option {
-    padding: 1rem;
-  }
-
-  .delete-prompt-item {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .delete-prompt-button {
-    width: 100%;
-  }
 }
 
 /* Custom prompts styles */
@@ -1548,7 +1525,8 @@
   margin: 0.5rem 0;
   border: 1px solid var(--pico-border-color);
   border-radius: var(--pico-border-radius);
-  background-color: var(--pico-form-element-background-color);
+  border-color: var(--pico-primary);
+  background-color: var(--pico-primary-background);
 }
 
 .custom-prompt-text {
@@ -1556,13 +1534,7 @@
 }
 
 .remove-custom-prompt-button {
-  background-color: var(--pico-del-color);
-  color: white;
   padding: 0.5rem 1rem;
-}
-
-.remove-custom-prompt-button:hover {
-  background-color: var(--pico-del-hover-color);
 }
 
 @media (max-width: 768px) {
@@ -1570,16 +1542,21 @@
     flex-direction: column;
   }
 
-  .add-custom-prompt-button {
-    width: 100%;
-  }
-
   .custom-prompt-item {
     flex-direction: column;
     gap: 0.5rem;
   }
 
-  .remove-custom-prompt-button {
-    width: 100%;
+  .first-time-setup {
+    padding: 1rem;
+  }
+
+  .prompt-pack-option {
+    padding: 1rem;
+  }
+
+  .delete-prompt-item {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
