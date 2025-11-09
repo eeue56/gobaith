@@ -35,43 +35,37 @@ export function renderLogs(journalEntry: JournalEntry): HtmlNode<never> {
 }
 
 export function renderEnterTimestampMessage(today: Day): HtmlNode<Update> {
-  return div(
-    [],
-    [],
+  return form(
     [
-      form(
-        [
-          on("submit", (event) => {
-            event.preventDefault();
-            return dontSend();
-          }),
-        ],
+      on("submit", (event) => {
+        event.preventDefault();
+        return dontSend();
+      }),
+    ],
+    [attribute("class", "new-journal-entry-form")],
+    [
+      fieldset(
         [],
+        [class_("new-journal-entry-containter")],
         [
-          fieldset(
+          textarea(
             [],
-            [class_("new-journal-entry-containter")],
             [
-              textarea(
-                [],
-                [
-                  attribute("id", "new-journal-entry"),
-                  attribute(
-                    "placeholder",
-                    "Enter a timestamped journal log entry..."
-                  ),
-                ],
-                []
+              attribute("id", "new-journal-entry"),
+              attribute(
+                "placeholder",
+                "Enter a timestamped journal log entry..."
               ),
-              button(
-                [on("click", () => updateLogEntries(today))],
-                [
-                  attribute("title", "Save the entry"),
-                  class_("save-log-entry-button"),
-                ],
-                [text("Save"), iconSave]
-              ),
-            ]
+            ],
+            []
+          ),
+          button(
+            [on("click", () => updateLogEntries(today))],
+            [
+              attribute("title", "Save the entry"),
+              class_("save-log-entry-button"),
+            ],
+            [text("Save"), iconSave]
           ),
         ]
       ),

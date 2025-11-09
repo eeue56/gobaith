@@ -1,9 +1,11 @@
+import { importDataFromJson } from "./logic/journal";
 import { Queryable, QueryPath, QueryUpdate } from "./logic/query/types";
 import {
   AppState,
   Day,
   Direction,
   GraphName,
+  isPrompt,
   JournalEntry,
   MoodValue,
   Pill,
@@ -33,13 +35,17 @@ export function addJournalEntry(
 
 export function updatePromptValue(
   entry: JournalEntry,
-  prompt: Prompt,
+  prompt: Prompt | string,
   value: MoodValue,
   state: AppState
 ): AppState {
   for (const journalEntry of state.journalEntries) {
     if (isSameDay(journalEntry.day, entry.day)) {
-      journalEntry.promptResponses[prompt] = value;
+      if (isPrompt(prompt)) {
+        journalEntry.promptResponses[prompt] = value;
+      } else {
+        journalEntry.customPromptResponses[prompt] = value;
+      }
       break;
     }
   }
@@ -502,4 +508,58 @@ export function updateQuery(
   newQueries[index] = updateOneQuery(path, update, queries[index]);
 
   return newQueries;
+}
+
+/**
+ * Toggle a prompt on or off
+ */
+export function togglePromptEnabled(
+  prompt: Prompt,
+  settings: Settings
+): Settings {
+  if (settings.enabledPrompts.has(prompt)) {
+    settings.enabledPrompts.delete(prompt);
+  } else {
+    settings.enabledPrompts.add(prompt);
+  }
+
+  return {
+    ...settings,
+    enabledPrompts: settings.enabledPrompts,
+  };
+}
+
+/**
+ * Delete all data for a specific prompt from all journal entries
+ */
+export function deletePromptData(
+  prompt: Prompt | string,
+  state: AppState
+): AppState {
+  for (const entry of state.journalEntries) {
+    if (isPrompt(prompt)) {
+      entry.promptResponses[prompt] = 1;
+    } else {
+      delete entry.customPromptResponses[prompt];
+    }
+  }
+
+  return { ...state, journalEntries: state.journalEntries };
+}
+
+export async function updateImportFile(
+  target: HTMLInputElement
+): Promise<AppState | Settings | string | null> {
+  if (!target) {
+    return null;
+  }
+
+  if (target.files === null || target.files.length === 0) return null;
+
+  if (target.files[0].name.endsWith(".json")) {
+    const fileContents = await target.files[0].text();
+    return importDataFromJson(fileContents);
+  }
+
+  return null;
 }

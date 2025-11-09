@@ -53,3 +53,18 @@ export async function expectActiveTab(
     new RegExp(tabText)
   );
 }
+
+export async function chooseBipolarPack(page: Page): Promise<void> {
+  await page.locator(`#select-pack-Bipolar`).click();
+  await expect(page.locator(".tabs")).toBeVisible({ timeout: 10000 });
+}
+
+export async function resetPrompts(page: Page): Promise<void> {
+  if (process.env.IS_ELECTRON) {
+    await changeTab(page, "SETTINGS");
+    await page.locator("#remove-all-settings").click();
+    await expect(page.locator(".first-time-setup")).toBeVisible();
+    return;
+  }
+  await page.evaluate(() => (window as any).resetPrompts());
+}

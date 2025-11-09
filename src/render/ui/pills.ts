@@ -32,7 +32,7 @@ import {
 
 export function renderPill(entry: JournalEntry, pill: Pill): HtmlNode<Update> {
   const key = pillKey(pill);
-  const amountTaken = entry.pills[key];
+  const amountTaken = entry.pills[key] || 0;
 
   function makeCallback(direction: Direction): () => Update {
     return (): Update => {

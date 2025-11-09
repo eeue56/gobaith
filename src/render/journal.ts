@@ -28,6 +28,14 @@ export function renderJournal(model: Model): HtmlNode<Update> {
     ).entry;
   }
 
+  // Filter prompts to only show enabled ones
+  const enabledPrompts = PROMPTS.filter((prompt) =>
+    model.settings.enabledPrompts.has(prompt)
+  );
+
+  // Add custom prompts to the list
+  const allEnabledPrompts = [...enabledPrompts, ...model.settings.customPrompts];
+
   return div(
     [],
     [class_("tab-content"), class_("journal-tab-content")],
@@ -37,7 +45,7 @@ export function renderJournal(model: Model): HtmlNode<Update> {
         [class_("selections")],
         [
           renderDate(model.appState.day),
-          ...PROMPTS.map((prompt) => renderButtonSet(todaysEntry, prompt)),
+          ...allEnabledPrompts.map((prompt) => renderButtonSet(todaysEntry, prompt)),
           ...model.settings.currentPills.map((pill) =>
             renderPill(todaysEntry, pill)
           ),

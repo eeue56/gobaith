@@ -1,7 +1,8 @@
 import { renderJournal } from "./render/journal";
-import { DebuggingInfo, Model, Update } from "./types";
+import { Model, Update } from "./types";
 
 import { renderGraph } from "./render/graphs/index";
+import { renderFirstTimeSetup } from "./render/ui/prompt_setup";
 import {
   renderImport,
   renderSettings,
@@ -17,6 +18,11 @@ import { pushHistoryState } from "./updaters";
  * Call the individual render functions
  */
 function renderBody(model: Model): HtmlNode<Update> {
+  // Show first-time setup if user hasn't completed it
+  if (!model.settings.hasCompletedSetup) {
+    return renderFirstTimeSetup();
+  }
+
   switch (model.appState.currentTab) {
     case "JOURNAL": {
       return renderJournal(model);
@@ -35,6 +41,11 @@ function renderBody(model: Model): HtmlNode<Update> {
 }
 
 function render(model: Model): HtmlNode<Update> {
+  // Don't show tab navigation during first-time setup
+  if (!model.settings.hasCompletedSetup) {
+    return div([], [], [renderBody(model)]);
+  }
+
   return div(
     [],
     [],
@@ -54,11 +65,31 @@ async function tryToPersistStorage(): Promise<void> {
   });
 }
 
+let SENDER: ((msg: Update) => void) | null = null;
+
+async function skipOnboarding() {
+  if (SENDER) {
+    SENDER({ kind: "SelectPromptPack", packName: "Bipolar" });
+    console.log("Prompt selected");
+  } else {
+    console.log("No sender!");
+  }
+}
+
+async function resetPrompts() {
+  if (SENDER) {
+    SENDER({ kind: "RemoveSettings" });
+    console.log("Reset settings");
+  } else {
+    console.log("No sender!");
+  }
+}
+
+(window as any).skipOnboarding = skipOnboarding;
+(window as any).resetPrompts = resetPrompts;
+
 async function main() {
   console.log("Main: Starting script...");
-
-  console.log("Main: changing document title...");
-  document.title = "Mood tracker";
 
   let info = getDebuggingInfo();
   if (!info) {
@@ -74,7 +105,9 @@ async function main() {
   mainElement.innerHTML = "";
 
   console.log("Main: registering update handle");
-  const model = await fetchModelFromStores();
+
+  const params = new URLSearchParams(window.location.search);
+  const model = await fetchModelFromStores(params);
 
   const programConfig: Program<Model, Update> = {
     initialModel: model,
@@ -84,6 +117,7 @@ async function main() {
   };
 
   const runningProgram = program(programConfig);
+  SENDER = runningProgram.send;
 
   runningProgram.send({ kind: "SetDebuggingInfo", info });
 
@@ -98,6 +132,9 @@ async function main() {
 
     runningProgram.send({ kind: "UpdateCurrentTab", tab: event.state.tab });
   });
+
+  console.log("Main: changing document title...");
+  document.title = "Mood tracker";
 }
 
 main();

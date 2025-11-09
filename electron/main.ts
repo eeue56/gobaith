@@ -5,8 +5,8 @@ function createWindow() {
     darkTheme: true,
     frame: false,
   });
-  window.loadFile("../web/index.html");
 
+  window.loadFile("../web/index.html");
   window.maximize();
 }
 

@@ -22,6 +22,8 @@ function generateDataForADay(day: Day): JournalEntry {
     generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
+    generateRandomMoodValue(),
+    generateRandomMoodValue(),
     generateRandomMoodValue()
   );
 
@@ -30,6 +32,7 @@ function generateDataForADay(day: Day): JournalEntry {
     pills: pills,
     promptResponses: promptResponses,
     logs: logs,
+    customPromptResponses: {},
   };
 }
 
@@ -48,6 +51,8 @@ function generatePromptResponsesBasedOnMoodState(
   newLength: CurrentMoodLength;
 } {
   const promptResponses: PromptResponses = PromptResponses(
+    generateRandomMoodValue(),
+    generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
     generateRandomMoodValue(),
@@ -164,7 +169,13 @@ export function generateDataBasedOnCurrentMood(startDay: Day): AppState {
 
     currentMoodState = newState;
     currentMoodLength = newLength;
-    entries.push({ day: day, pills, logs, promptResponses });
+    entries.push({
+      day: day,
+      pills,
+      logs,
+      promptResponses,
+      customPromptResponses: {},
+    });
     day = previousDay(day);
   }
 

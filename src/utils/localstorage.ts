@@ -9,13 +9,10 @@ export function storeDebuggingInfo(info: DebuggingInfo): void {
 export function getDebuggingInfo(): DebuggingInfo | null {
   const infoAsString = localStorage.getItem(DEBUGGING_INFO_KEY);
 
-  console.log("debug info:", infoAsString);
-
   if (infoAsString === null) return null;
 
   try {
     const parsed = JSON.parse(infoAsString) as DebuggingInfo;
-    console.log("debug info parsed:", parsed);
 
     for (const entry of parsed.eventLog) {
       if (!entry.timestamp) entry.timestamp = new Date();

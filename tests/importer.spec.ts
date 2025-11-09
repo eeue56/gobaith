@@ -7,6 +7,7 @@ import {
   LATEST_DATABASE_VERSION,
   LogEntry,
   PromptResponses,
+  PROMPTS,
   Settings,
 } from "../src/types";
 import { dateToDay } from "../src/utils/dates";
@@ -16,14 +17,11 @@ import { awaitForTitleToChange, changeTab, expectActiveTab } from "./helpers";
 test("the importer can import state", async ({ context, page }) => {
   await changeTab(page, "IMPORT");
 
-  const responses = PromptResponses(3, 1, 2, 3, 4, 1);
+  const responses = PromptResponses(3, 1, 2, 3, 4, 1, 1, 1);
   const logEntry: LogEntry = { time: new Date(), text: "Imported stuff" };
-  const journalEntry = JournalEntry(
-    dateToDay(new Date()),
-    {},
-    responses,
-    [logEntry]
-  );
+  const journalEntry = JournalEntry(dateToDay(new Date()), {}, responses, {}, [
+    logEntry,
+  ]);
 
   const state: AppState = {
     kind: "AppState",
@@ -52,17 +50,20 @@ test("the importer can import state", async ({ context, page }) => {
 
   // Find the sleep quality prompt group specifically
   const sleepPromptGroup = page.locator(".prompt-group").filter({
-    has: page.locator('.prompt h4:text("Sleep quality")')
+    has: page.locator('.prompt h4:text("Sleep quality")'),
   });
-  
+
   // Verify the sleep quality prompt exists
   await expect(sleepPromptGroup).toHaveCount(1);
-  
+
   // Check the active mood value for sleep quality
   const sleepMoodValue = await sleepPromptGroup
     .locator(".prompt-answer.active")
     .getAttribute("data-mood-value");
-  expect(sleepMoodValue).toEqual(`${journalEntry.promptResponses["Sleep quality"]}`);
+
+  expect(sleepMoodValue).toEqual(
+    `${journalEntry.promptResponses["Sleep quality"]}`
+  );
 
   const promptGroups = await page.locator(".prompt-group").all();
 
@@ -95,6 +96,9 @@ test("the importer can import settings", async ({ context, page }) => {
     currentPills: [{ kind: "Pill", name: "Ibux", dosage: "200mg" }],
     queries: [...BUILT_IN_QUERIES],
     databaseVersion: LATEST_DATABASE_VERSION,
+    enabledPrompts: new Set(PROMPTS),
+    hasCompletedSetup: true,
+    customPrompts: [],
   };
 
   const stringSettings = JSON.stringify(settings);

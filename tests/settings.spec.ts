@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 import { test } from "./fixtures";
-import { changeTab, expectActiveTab } from "./helpers";
+import { changeTab, chooseBipolarPack, expectActiveTab } from "./helpers";
 
 test("the user adds a pill", async ({ context, page }) => {
   await changeTab(page, "SETTINGS");
@@ -32,6 +32,9 @@ test("the user removes settings (including pills)", async ({
   await changeTab(page, "SETTINGS");
   await page.locator("#remove-all-settings").click();
 
+  await expect(page.locator(".first-time-setup")).toBeVisible();
+  await chooseBipolarPack(page);
+
   await changeTab(page, "JOURNAL");
   await expect(await page.locator(".journal-pill")).toHaveCount(0);
 });
@@ -57,8 +60,7 @@ test("the user removes app state (including journals)", async ({
 test("the debug log contains events triggered", async ({ context, page }) => {
   await changeTab(page, "SETTINGS");
 
-  // Check that the event log contains the "Changed tab" description
-  await expect(page.locator(".event-description").first()).toContainText(
+  await expect(page.locator(".event-description").last()).toContainText(
     "Changed tab"
   );
 
@@ -93,7 +95,9 @@ test("the debug log contains events triggered", async ({ context, page }) => {
   expect(timestamps.length).toEqual(eventEntries.length);
 
   // Check that specific events are logged with their descriptions
-  const descriptions = await page.locator(".event-description").allTextContents();
+  const descriptions = await page
+    .locator(".event-description")
+    .allTextContents();
   expect(descriptions).toContain("Changed tab");
   expect(descriptions).toContain("Changed day");
   expect(descriptions).toContain("Updated mood/prompt value");

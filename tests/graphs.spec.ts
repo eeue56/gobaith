@@ -67,10 +67,12 @@ test("the user sees some duration information", async ({ context, page }) => {
   await expect(page.locator(".duration-query-result")).toHaveCount(6);
 });
 
-test("DAILY_BAR row labels are visible on desktop", async ({ context, page }) => {
+test("DAILY_BAR row labels are visible on desktop", async ({
+  context,
+  page,
+}) => {
   // Set desktop viewport size
   await page.setViewportSize({ width: 1920, height: 1080 });
-  
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -78,10 +80,19 @@ test("DAILY_BAR row labels are visible on desktop", async ({ context, page }) =>
   await expect(await page.locator("#graph-selection")).toHaveValue("DAILY_BAR");
 
   // Check that all expected row labels are visible
-  const expectedLabels = ["Sleep", "Depression", "Anxiety", "Elevation", "Irrability", "Psychotic"];
-  
+  const expectedLabels = [
+    "Sleep",
+    "Depression",
+    "Anxiety",
+    "Elevation",
+    "Irrability",
+    "Psychotic",
+  ];
+
   for (const label of expectedLabels) {
-    const labelElement = page.locator(".daily-bar-prompt").filter({ hasText: label });
+    const labelElement = page
+      .locator(".daily-bar-prompt")
+      .filter({ hasText: label });
     await expect(labelElement).toBeVisible();
   }
 });
@@ -104,7 +115,7 @@ test("SPIDERWEB graph displays SVG content", async ({ context, page }) => {
 
 test("SPIDERWEB graph is responsive on mobile", async ({ context, page }) => {
   await page.setViewportSize({ width: 375, height: 667 });
-  
+
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -133,9 +144,12 @@ test("LINE_OVERVIEW graph displays SVG content", async ({ context, page }) => {
   expect(svgText).toContain("Mood Overview Over Time");
 });
 
-test("LINE_OVERVIEW graph is responsive on mobile", async ({ context, page }) => {
+test("LINE_OVERVIEW graph is responsive on mobile", async ({
+  context,
+  page,
+}) => {
   await page.setViewportSize({ width: 375, height: 667 });
-  
+
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -148,7 +162,10 @@ test("LINE_OVERVIEW graph is responsive on mobile", async ({ context, page }) =>
   await expect(svgElement).toBeVisible();
 });
 
-test("LINE_OVERVIEW graph renders data points when no prompts are filtered", async ({ context, page }) => {
+test("LINE_OVERVIEW graph renders data points when no prompts are filtered", async ({
+  context,
+  page,
+}) => {
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -194,7 +211,10 @@ test("SPIDERWEB graph renders data points", async ({ context, page }) => {
   expect(circleCount).toBeGreaterThan(0);
 });
 
-test("LINE_OVERVIEW filtering via clicking legend items", async ({ context, page }) => {
+test("LINE_OVERVIEW filtering via clicking legend items", async ({
+  context,
+  page,
+}) => {
   await changeTab(page, "GRAPH");
   await expectActiveTab(page, "GRAPH");
 
@@ -226,7 +246,7 @@ test("LINE_OVERVIEW filtering via clicking legend items", async ({ context, page
   // Check that the legend icon's stroke changed (indicating it's now filtered)
   const firstLegendIcon = legendIcons.first();
   const strokeWidth = await firstLegendIcon.getAttribute("stroke-width");
-  
+
   // When filtered, stroke-width should be "3px" (as per the code)
   expect(strokeWidth).toBe("3px");
 
@@ -241,4 +261,3 @@ test("LINE_OVERVIEW filtering via clicking legend items", async ({ context, page
   const newStrokeWidth = await firstLegendIcon.getAttribute("stroke-width");
   expect(newStrokeWidth).toBe("1px");
 });
-

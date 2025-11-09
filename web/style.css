@@ -66,6 +66,18 @@
   --psychotic-3: #d89cac;
   --psychotic-4: #cc8498;
 
+  /* Focus - soft sky blue (clarity, concentration) */
+  --focus-1: #b8d8e8;
+  --focus-2: #98c4dc;
+  --focus-3: #78b0d0;
+  --focus-4: #5898c0;
+
+  /* Hyperactivity - soft peach (energy, movement) */
+  --hyperactivity-1: #f0d4b8;
+  --hyperactivity-2: #e8c098;
+  --hyperactivity-3: #e0ac78;
+  --hyperactivity-4: #d89458;
+
   --pico-color-sand-50: #f2f0ec;
   --pico-color-zinc-150: #d1d5db;
   --pico-color-zinc-300: #a4acba;
@@ -1049,6 +1061,11 @@
   text-align: center;
 }
 
+.new-journal-entry-form {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
 .new-journal-entry-containter {
   display: grid;
   grid-template-rows: 1fr;
@@ -1358,5 +1375,188 @@
 
   .prompt-group {
     margin-bottom: 30px;
+  }
+}
+
+/* First-time setup styles */
+.first-time-setup {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.setup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.prompt-pack-option {
+  border: 2px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background-color: var(--pico-card-background-color);
+}
+
+.prompt-pack-option h3 {
+  margin-top: 0;
+  color: var(--pico-h3-color);
+}
+
+.pack-description {
+  color: var(--pico-color);
+  margin: 0.5rem 0;
+}
+
+.pack-prompts {
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+  margin: 1rem 0;
+}
+
+.select-pack-button {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* Prompt configuration styles */
+.prompt-configuration {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+}
+
+.prompt-pack-toggle {
+  margin: 24px 0;
+  padding: 5px 10px;
+  border-left: 3px solid var(--pico-primary-focus);
+}
+
+.prompt-toggle-item {
+  margin: 0.5rem 0;
+}
+
+.prompt-toggle-button {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: flex-start;
+  background-color: var(--pico-form-element-background-color);
+  font-size: 20px;
+}
+
+.prompt-toggle-button.enabled {
+  border-color: var(--pico-primary);
+  background-color: var(--pico-primary-background);
+}
+
+.prompt-toggle-button.disabled {
+  opacity: 0.85;
+  color: white !important;
+}
+
+.prompt-toggle-button:hover {
+  opacity: 0.9;
+}
+
+/* Delete prompt data styles */
+.delete-prompt-data {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--pico-del-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+}
+
+.delete-prompt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  color: white;
+}
+
+.delete-prompt-button {
+  padding: 0.5rem 1rem;
+  min-width: 120px;
+}
+
+/* Custom prompts styles */
+.custom-prompts-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  background-color: var(--pico-card-background-color);
+}
+
+.add-custom-prompt {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.custom-prompt-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.add-custom-prompt-button {
+  white-space: nowrap;
+}
+
+.custom-prompts-list {
+  margin-top: 1.5rem;
+}
+
+.custom-prompt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--pico-border-color);
+  border-radius: var(--pico-border-radius);
+  border-color: var(--pico-primary);
+  background-color: var(--pico-primary-background);
+}
+
+.custom-prompt-text {
+  flex: 1;
+}
+
+.remove-custom-prompt-button {
+  padding: 0.5rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .add-custom-prompt {
+    flex-direction: column;
+  }
+
+  .custom-prompt-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .first-time-setup {
+    padding: 1rem;
+  }
+
+  .prompt-pack-option {
+    padding: 1rem;
+  }
+
+  .delete-prompt-item {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

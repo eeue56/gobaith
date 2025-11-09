@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { PROMPTS } from "../src/types";
+import { PROMPT_PACKS } from "../src/types";
 import { test } from "./fixtures";
 import { expectActiveTab } from "./helpers";
 
@@ -8,9 +8,7 @@ test("renders", async ({ context, page }) => {
 });
 
 test("it starts on daily page", async ({ context, page }) => {
-  await expect(
-    await page.locator(".current-day").first().innerHTML()
-  ).toContain("Today");
+  await expect(page.locator(".current-day")).toHaveText(/Today/);
 
   await expectActiveTab(page, "JOURNAL");
 });
@@ -20,7 +18,7 @@ test("the user can choose answers to prompts", async ({
   page,
   baseURL,
 }) => {
-  const numberOfPrompts = PROMPTS.length;
+  const numberOfPrompts = PROMPT_PACKS["Bipolar"].length;
   await expect(await page.locator(".prompt-group")).toHaveCount(
     numberOfPrompts
   );
@@ -42,7 +40,7 @@ test("the user can choose answers to prompts", async ({
     for (const responseButton of await group
       .locator(".circle-container")
       .all()) {
-      responseButton.click();
+      await responseButton.click();
       await expect(responseButton).toHaveClass(/active/);
     }
   }

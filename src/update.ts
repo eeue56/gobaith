@@ -1,7 +1,7 @@
 import { cleanData } from "./cleaners";
 import { initIndexedDB, syncStateAndSettingsToDatabase } from "./database";
 import * as defaultObjects from "./defaultObjects";
-import { importDataFromJson, initializeEntryForDay } from "./logic/journal";
+import { initializeEntryForDay } from "./logic/journal";
 import { EqualTo } from "./logic/query/types";
 import {
   loadAppStateFromServer,
@@ -15,14 +15,18 @@ import {
   LocalState,
   Model,
   pillKey,
+  PROMPT_PACKS,
   Settings,
   Update,
 } from "./types";
 import {
   addJournalEntry,
   addPill,
+  deletePromptData,
+  togglePromptEnabled,
   updateCurrentGraph,
   updateCurrentTab,
+  updateImportFile,
   updatePillOrder,
   updatePillValue,
   updatePromptValue,
@@ -178,6 +182,9 @@ export async function update(message: Update, model: Model): Promise<Model> {
         currentPills: [],
         queries: [...defaultObjects.DEFAULT_QUERIES],
         databaseVersion: LATEST_DATABASE_VERSION,
+        enabledPrompts: new Set(),
+        hasCompletedSetup: false,
+        customPrompts: [],
       };
       console.log("UpdateHandler: Removed settings");
       await syncStateAndSettings(hasBackend, model.appState, settings);
@@ -317,9 +324,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
       for (const pill of message.settings.currentPills) {
         const pillKeyValue = pillKey(pill);
         if (
-          model.settings.currentPills.some(
-            (p) => pillKey(p) === pillKeyValue
-          )
+          model.settings.currentPills.some((p) => pillKey(p) === pillKeyValue)
         ) {
           console.log(
             "Skipping import of pill",
@@ -596,27 +601,80 @@ export async function update(message: Update, model: Model): Promise<Model> {
         localState: model.localState,
       };
     }
+    case "SelectPromptPack": {
+      const prompts = PROMPT_PACKS[message.packName];
+
+      const settings = {
+        ...model.settings,
+        enabledPrompts: new Set(prompts),
+        hasCompletedSetup: true,
+      };
+
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "TogglePrompt": {
+      const settings = togglePromptEnabled(message.prompt, model.settings);
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "DeletePromptData": {
+      const appState = deletePromptData(message.prompt, model.appState);
+      await syncStateAndSettings(hasBackend, appState, model.settings);
+      return {
+        appState,
+        settings: model.settings,
+        localState: model.localState,
+      };
+    }
+    case "CompleteSetup": {
+      const settings = { ...model.settings, hasCompletedSetup: true };
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "AddCustomPrompt": {
+      const customPrompts = [
+        ...model.settings.customPrompts,
+        message.promptText,
+      ];
+      const settings = { ...model.settings, customPrompts };
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
+    case "RemoveCustomPrompt": {
+      const customPrompts = model.settings.customPrompts.filter(
+        (p) => p !== message.promptText
+      );
+      const settings = { ...model.settings, customPrompts };
+      await syncStateAndSettings(hasBackend, model.appState, settings);
+      return {
+        appState: model.appState,
+        settings,
+        localState: model.localState,
+      };
+    }
   }
 }
 
-async function updateImportFile(
-  target: HTMLInputElement
-): Promise<AppState | Settings | string | null> {
-  if (!target) {
-    return null;
-  }
-
-  if (target.files === null || target.files.length === 0) return null;
-
-  if (target.files[0].name.endsWith(".json")) {
-    const fileContents = await target.files[0].text();
-    return importDataFromJson(fileContents);
-  }
-
-  return null;
-}
-
-export async function fetchModelFromStores(): Promise<Model> {
+export async function fetchModelFromStores(
+  params: URLSearchParams | null
+): Promise<Model> {
   let appState: AppState = defaultObjects.appState;
   let settings: Settings = defaultObjects.settings;
   const localState: LocalState = defaultObjects.localState;
@@ -634,25 +692,39 @@ export async function fetchModelFromStores(): Promise<Model> {
       console.error(maybeAppState);
 
       if (maybeDatabaseRecords) {
-        appState = maybeDatabaseRecords.appState;
+        appState = { ...appState, ...maybeDatabaseRecords.appState };
       }
     } else {
-      appState = maybeAppState;
+      appState = { ...appState, ...maybeAppState };
     }
 
     if (typeof maybeSettings === "string") {
       console.error(maybeSettings);
 
       if (maybeDatabaseRecords) {
-        settings = maybeDatabaseRecords.settings;
+        settings = { ...settings, ...maybeDatabaseRecords.settings };
       }
     } else {
-      settings = maybeSettings;
+      settings = { ...settings, ...maybeSettings };
     }
   } else {
     if (maybeDatabaseRecords !== null) {
-      appState = maybeDatabaseRecords.appState;
-      settings = maybeDatabaseRecords.settings;
+      appState = { ...appState, ...maybeDatabaseRecords.appState };
+      settings = { ...settings, ...maybeDatabaseRecords.settings };
+    }
+  }
+
+  if (params) {
+    if (params.get("skipOnboarding") === "true") {
+      const prompts = PROMPT_PACKS["Bipolar"];
+
+      settings.enabledPrompts = new Set(prompts);
+      settings.hasCompletedSetup = true;
+    }
+
+    if (params.get("resetPrompts") === "true") {
+      settings.enabledPrompts = new Set();
+      settings.hasCompletedSetup = false;
     }
   }
 

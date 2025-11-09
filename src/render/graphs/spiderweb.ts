@@ -41,7 +41,7 @@ function getPoints(
 }
 
 function viewRadarChartSvg(
-  prompts: Prompt[],
+  prompts: (Prompt | string)[],
   data: number[],
   title: string
 ): HtmlNode<Update> {
@@ -122,7 +122,9 @@ function viewRadarChartSvg(
     const textAnchor =
       labelX > center + 5 ? "start" : labelX < center - 5 ? "end" : "middle";
 
-    const shortLabel = SHORT_PROMPTS[prompts[i]];
+    const shortLabel = (prompts[i] in SHORT_PROMPTS) 
+      ? SHORT_PROMPTS[prompts[i] as Prompt]
+      : prompts[i];
 
     labelTexts.push(
       svgText(
@@ -201,7 +203,12 @@ export function renderSpiderweb(
   settings: Settings,
   localState: LocalState
 ): HtmlNode<Update> {
-  const prompts = PROMPTS.slice(0);
+  // Include both standard enabled prompts and custom prompts
+  const enabledPrompts = PROMPTS.filter((prompt) =>
+    settings.enabledPrompts.has(prompt)
+  );
+  const prompts = [...enabledPrompts, ...settings.customPrompts];
+  
   const todaysData = getDataOnlyForToday(state.day, state.journalEntries);
   const title = `Mood breakdown on ${dayToString(state.day)}`;
   const chart = viewRadarChartSvg(prompts, todaysData, title);

@@ -1,11 +1,20 @@
 import { expect } from "@playwright/test";
 import { testPeristentElectron } from "./fixtures";
-import { changeTab } from "./helpers";
+import { changeTab, chooseBipolarPack, expectActiveTab } from "./helpers";
 
 testPeristentElectron.describe.configure({ mode: "serial" });
 
+testPeristentElectron("the user chooses a pack", async ({ context, page }) => {
+  if (!process.env.IS_ELECTRON) return;
+
+  await chooseBipolarPack(page);
+
+  await expectActiveTab(page, "JOURNAL");
+});
+
 testPeristentElectron("the user adds a pill", async ({ context, page }) => {
   if (!process.env.IS_ELECTRON) return;
+
   await changeTab(page, "SETTINGS");
 
   await page.locator("#new-pill-name").fill("Paracetamol");

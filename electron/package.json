@@ -5,16 +5,16 @@
   "main": "main.js",
   "devDependencies": {
     "@types/node": "^22.10.1",
-    "electron": "^33.2.1",
-    "esbuild": "^0.24.0"
+    "electron": "^39.1.1",
+    "esbuild": "^0.25.12"
   },
   "scripts": {
     "build": "esbuild main.ts --outfile=main.js --format=cjs && cd ../ && npm run build",
-    "start": "npm run build && electron ./",
+    "start": "npm run build && electron ./ --enable-logging",
     "test": "cd ../ && npx playwright test-electron"
   },
   "engines": {
-    "node": "21.x"
+    "node": "24.x"
   },
   "author": "",
   "license": "AGPL-3.0-only"
