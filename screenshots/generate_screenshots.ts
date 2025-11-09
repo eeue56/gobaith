@@ -164,6 +164,17 @@ async function screenshotSettings(page: Page, basePath: string) {
   });
 }
 
+async function screenshotCustomPromptSettings(page: Page, basePath: string) {
+  await changeTab(page, "SETTINGS");
+
+  await page.locator(".custom-prompts-section").scrollIntoViewIfNeeded();
+
+  await page.screenshot({
+    path: `${basePath}/custom_prompt_settings.png`,
+    scale: "device",
+  });
+}
+
 async function setupPostOnboardingPage(page: Page): Promise<void> {
   await chooseBipolarPack(page);
 
@@ -243,6 +254,7 @@ async function main() {
   await setupPostOnboardingPage(page);
   await screenshotDailyTracker(page, basePath);
   await screenshotSettings(page, basePath);
+  await screenshotCustomPromptSettings(page, basePath);
   await screenshotGraphDailyBar(page, basePath);
   await screenshotImporter(page, basePath);
   await screenshotGraphSpiderweb(page, basePath);

@@ -26,6 +26,7 @@ Some screenshots based on generated data (no real human's tracking, see the [gen
 | Interactive query builder for personalised data        | ![](./screenshots/images/graph_interactive_queries.png) |
 | Importer                                               | ![](./screenshots/images/importer.png)                  |
 | Settings                                               | ![](./screenshots/images/settings.png)                  |
+| Custom prompt settings                                 | ![](./screenshots/images/custom_prompt_settings.png)    |
 
 </details>
 
