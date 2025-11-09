@@ -2,6 +2,7 @@ import { attribute, class_, div, HtmlNode, on, span, text } from "@eeue56/coed";
 import { daysBeforeToday as entriesBeforeToday } from "../../logic/journal";
 import {
   AppState,
+  getPromptValue,
   JournalEntry,
   LocalState,
   Prompt,
@@ -18,12 +19,13 @@ function renderRowBars(
 ): HtmlNode<Update> {
   const bodies: HtmlNode<Update>[] = [];
   // For custom prompts, use the prompt itself as the short name
-  const promptShort = (prompt in SHORT_PROMPTS) 
-    ? SHORT_PROMPTS[prompt as Prompt].toLowerCase()
-    : prompt.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const promptShort =
+    prompt in SHORT_PROMPTS
+      ? SHORT_PROMPTS[prompt as Prompt].toLowerCase()
+      : prompt.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
   for (const entry of entries) {
-    const dayValue = entry.promptResponses[prompt];
+    const dayValue = getPromptValue(prompt, entry);
     const title = dayToString(entry.day);
 
     bodies.push(
@@ -52,7 +54,8 @@ function renderRowBars(
 }
 
 function renderPromptShortName(prompt: Prompt | string): HtmlNode<never> {
-  const shortName = (prompt in SHORT_PROMPTS) ? SHORT_PROMPTS[prompt as Prompt] : prompt;
+  const shortName =
+    prompt in SHORT_PROMPTS ? SHORT_PROMPTS[prompt as Prompt] : prompt;
   return span([], [class_("daily-bar-prompt")], [text(shortName)]);
 }
 

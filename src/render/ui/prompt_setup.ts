@@ -283,12 +283,14 @@ export function renderDeletePromptData(settings: Settings): HtmlNode<Update> {
           ),
         ]
       ),
-      ...disabledPrompts.map((prompt) => renderDeletePromptButton(prompt)),
+      ...[...disabledPrompts, ...settings.customPrompts].map((prompt) =>
+        renderDeletePromptButton(prompt)
+      ),
     ]
   );
 }
 
-function renderDeletePromptButton(prompt: Prompt): HtmlNode<Update> {
+function renderDeletePromptButton(prompt: Prompt | string): HtmlNode<Update> {
   return div(
     [],
     [class_("delete-prompt-item")],

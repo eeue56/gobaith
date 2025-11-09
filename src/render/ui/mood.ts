@@ -9,6 +9,7 @@ import {
   text,
 } from "@eeue56/coed";
 import {
+  getPromptValue,
   JournalEntry,
   MOOD_VALUES,
   moodStateFromValue,
@@ -80,8 +81,7 @@ export function renderButtonSet(
   entry: JournalEntry,
   prompt: Prompt | string
 ): HtmlNode<Update> {
-  const activeNumber = entry.promptResponses[prompt];
-
+  const activeNumber = getPromptValue(prompt, entry);
   const moodStates = MOOD_VALUES.map((x) =>
     renderMoodState(x, activeNumber, entry, prompt)
   );

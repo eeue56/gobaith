@@ -71,6 +71,21 @@ export function isPrompt(str: string): str is Prompt {
   return PROMPTS.includes(str as Prompt);
 }
 
+export function getPromptValue(
+  prompt: Prompt | string,
+  entry: JournalEntry
+): MoodValue {
+  const moodValue = isPrompt(prompt)
+    ? entry.promptResponses[prompt]
+    : entry.customPromptResponses[prompt];
+
+  if (!moodValue) {
+    return 1;
+  }
+
+  return moodValue;
+}
+
 export const PROMPT_PACK_NAMES = ["Bipolar", "Schizophrenia", "ADHD"] as const;
 
 export type PromptPackName = (typeof PROMPT_PACK_NAMES)[number];
@@ -104,7 +119,9 @@ export const PROMPT_PACKS: Record<PromptPackName, readonly Prompt[]> = {
 
 export type PromptResponses = {
   [prompt in Prompt]: MoodValue;
-} & {
+};
+
+export type CustomPromptResponses = {
   [customPrompt: string]: MoodValue;
 };
 
@@ -115,8 +132,8 @@ export function PromptResponses(
   elevation: MoodValue,
   irritableness: MoodValue,
   psychotic: MoodValue,
-  focus: MoodValue = 1,
-  hyperactivity: MoodValue = 1
+  focus: MoodValue,
+  hyperactivity: MoodValue
 ): PromptResponses {
   return {
     "Sleep quality": sleepQuality,
@@ -319,6 +336,7 @@ export type JournalEntry = {
   day: Day;
   pills: Record<string, number>;
   promptResponses: PromptResponses;
+  customPromptResponses: CustomPromptResponses;
   logs: LogEntry[];
 };
 
@@ -326,12 +344,14 @@ export function JournalEntry(
   day: Day,
   pills: Record<string, number>,
   promptResponses: PromptResponses,
+  customPromptResponses: CustomPromptResponses,
   logs: LogEntry[]
 ): JournalEntry {
   return {
     day,
     pills,
     promptResponses,
+    customPromptResponses,
     logs,
   };
 }
@@ -468,7 +488,7 @@ export type Update =
     }
   | { kind: "SelectPromptPack"; packName: PromptPackName }
   | { kind: "TogglePrompt"; prompt: Prompt }
-  | { kind: "DeletePromptData"; prompt: Prompt }
+  | { kind: "DeletePromptData"; prompt: Prompt | string }
   | { kind: "CompleteSetup" }
   | { kind: "AddCustomPrompt"; promptText: string }
   | { kind: "RemoveCustomPrompt"; promptText: string };

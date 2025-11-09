@@ -1,12 +1,14 @@
 import {
   AppState,
+  CustomPromptResponses,
   Day,
   DayState,
+  getPromptValue,
   JournalEntry,
   pillKey,
-  PROMPTS,
   Prompt,
   PromptResponses,
+  PROMPTS,
   Settings,
 } from "../types";
 import { dayToDate, isSameDay } from "../utils/dates";
@@ -38,7 +40,19 @@ export function initializeEntryForDay(
     pills[pillKey(pill)] = 0;
   }
 
-  entry = JournalEntry(day, pills, PromptResponses(1, 1, 1, 1, 1, 1), []);
+  const customPromptResponses: CustomPromptResponses = {};
+
+  for (const customPrompt of settings.customPrompts) {
+    customPromptResponses[customPrompt] = 1;
+  }
+
+  entry = JournalEntry(
+    day,
+    pills,
+    PromptResponses(1, 1, 1, 1, 1, 1, 1, 1),
+    customPromptResponses,
+    []
+  );
 
   return { kind: "CreatedNewEntry", entry };
 }
@@ -97,9 +111,11 @@ export function getDataForPrompt(
   const data: DayState[] = [];
 
   for (const entry of entries) {
+    const moodValue = getPromptValue(prompt, entry);
+
     data.push({
       day: entry.day,
-      moodValue: entry.promptResponses[prompt],
+      moodValue,
     });
   }
 

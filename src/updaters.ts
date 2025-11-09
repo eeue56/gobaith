@@ -5,6 +5,7 @@ import {
   Day,
   Direction,
   GraphName,
+  isPrompt,
   JournalEntry,
   MoodValue,
   Pill,
@@ -40,7 +41,11 @@ export function updatePromptValue(
 ): AppState {
   for (const journalEntry of state.journalEntries) {
     if (isSameDay(journalEntry.day, entry.day)) {
-      journalEntry.promptResponses[prompt] = value;
+      if (isPrompt(prompt)) {
+        journalEntry.promptResponses[prompt] = value;
+      } else {
+        journalEntry.customPromptResponses[prompt] = value;
+      }
       break;
     }
   }
@@ -527,9 +532,16 @@ export function togglePromptEnabled(
 /**
  * Delete all data for a specific prompt from all journal entries
  */
-export function deletePromptData(prompt: Prompt, state: AppState): AppState {
+export function deletePromptData(
+  prompt: Prompt | string,
+  state: AppState
+): AppState {
   for (const entry of state.journalEntries) {
-    entry.promptResponses[prompt] = 1;
+    if (isPrompt(prompt)) {
+      entry.promptResponses[prompt] = 1;
+    } else {
+      delete entry.customPromptResponses[prompt];
+    }
   }
 
   return { ...state, journalEntries: state.journalEntries };
