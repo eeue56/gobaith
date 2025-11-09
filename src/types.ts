@@ -216,6 +216,17 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
 export const LATEST_DATABASE_VERSION: DatabaseVersion = 8;
 
 /**
+ * A trail entry stores a backup of data before a migration is run
+ */
+export type MigrationTrailEntry = {
+  storeName: StoreName;
+  data: unknown;
+  timestamp: number;
+  fromVersion: DatabaseVersion;
+  toVersion: DatabaseVersion;
+};
+
+/**
  * AppState includes UI state and data (journal entries)
  */
 export type AppState = {
@@ -539,6 +550,7 @@ export type RenderError = "NeedsToInitialize";
 
 export const SETTINGS_OBJECT_STORE_NAME = "Settings";
 export const APP_STATE_OBJECT_STORE_NAME = "AppState";
+export const TRAIL_OBJECT_STORE_NAME = "MigrationTrail";
 
 export type StoreName =
   | typeof SETTINGS_OBJECT_STORE_NAME
