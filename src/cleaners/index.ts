@@ -1,13 +1,19 @@
 import { DatabaseVersion, LATEST_DATABASE_VERSION } from "../types";
 import { renameStateFields } from "./database_3";
 import { addDatabaseVersion } from "./database_4";
+import { addQueriesToSettings } from "./database_5";
 import {
-  addDatabaseVersionToAppState,
-  addQueriesToSettings,
-} from "./database_5";
-import { migrateHoursSleptToSleepQuality, updateSettingsToDatabaseVersion6 } from "./database_6";
-import { migrateCurrentPillsToPillObjects, updateAppStateToDatabaseVersion7 } from "./database_7";
-import { updateAppStateToDatabaseVersion8, updateSettingsToDatabaseVersion8 } from "./database_8";
+  migrateHoursSleptToSleepQuality,
+  updateSettingsToDatabaseVersion6,
+} from "./database_6";
+import {
+  migrateCurrentPillsToPillObjects,
+  updateAppStateToDatabaseVersion7,
+} from "./database_7";
+import {
+  updateAppStateToDatabaseVersion8,
+  updateSettingsToDatabaseVersion8,
+} from "./database_8";
 import { renameField } from "./rename_fields";
 
 /**
@@ -95,7 +101,7 @@ function cleanSettings(data: unknown): unknown {
 
   const dataVersion5 = addQueriesToSettings(dataWithDatabaseVersion);
   const dataVersion6 = updateSettingsToDatabaseVersion6(dataVersion5);
-  
+
   if (dataWithDatabaseVersion.databaseVersion < 7) {
     data = migrateCurrentPillsToPillObjects(dataVersion6);
     console.log("Cleaner: migrated currentPills to Pill objects");

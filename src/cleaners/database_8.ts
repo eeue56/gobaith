@@ -27,9 +27,20 @@ export function updateSettingsToDatabaseVersion8(data: unknown): unknown {
 }
 
 export function updateAppStateToDatabaseVersion8(data: unknown): unknown {
-  if (typeof data === "object") {
-    markDatabaseVersion(data, 8);
+  if (typeof data !== "object" || data === null) {
     return data;
   }
+
+  const dataObj = data as any;
+
+  if (dataObj.kind === "AppState" && Array.isArray(dataObj.journalEntries)) {
+    for (const entry of dataObj.journalEntries) {
+      if (!("customPromptResponses" in entry)) {
+        entry["customPromptResponses"] = {};
+      }
+    }
+  }
+
+  markDatabaseVersion(data, 8);
   return data;
 }

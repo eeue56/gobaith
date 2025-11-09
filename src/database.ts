@@ -14,6 +14,12 @@ import { addDatabaseVersion } from "./cleaners/database_4";
 import { addQueriesToSettings } from "./cleaners/database_5";
 import { renameField } from "./cleaners/rename_fields";
 
+import { migrateHoursSleptToSleepQuality } from "./cleaners/database_6";
+import { migrateCurrentPillsToPillObjects } from "./cleaners/database_7";
+import {
+  updateAppStateToDatabaseVersion8,
+  updateSettingsToDatabaseVersion8,
+} from "./cleaners/database_8";
 import * as defaultObjects from "./defaultObjects";
 
 async function getObject(
@@ -196,6 +202,70 @@ function upgradeDatabaseToVersion5(
   });
 }
 
+function upgradeDatabaseToVersionN(
+  db: IDBDatabase,
+  transaction: IDBTransaction,
+  upgradeAppState: ((appState: unknown) => unknown) | null,
+  upgradeSettings: ((settings: unknown) => unknown) | null
+): IDBDatabase | Promise<IDBDatabase> {
+  return new Promise(async (resolve, reject) => {
+    // load from the database
+    console.log("IndexedDB: creating transaction");
+
+    if (upgradeAppState) {
+      const storeName = APP_STATE_OBJECT_STORE_NAME;
+      const currentData = await getObject(storeName, transaction);
+
+      if (typeof currentData === "undefined") {
+        console.log("IndexedDB: no entry yet, no need to migrate");
+      } else {
+        const newData = upgradeAppState(currentData);
+
+        // store in the database
+        console.info(
+          "IndexedDB: writing to the store",
+          APP_STATE_OBJECT_STORE_NAME,
+          newData
+        );
+
+        try {
+          await putObject(storeName, newData, transaction, db);
+        } catch (error) {
+          reject(error);
+          return;
+        }
+      }
+    }
+
+    if (upgradeSettings) {
+      const storeName = SETTINGS_OBJECT_STORE_NAME;
+      const currentData = await getObject(storeName, transaction);
+
+      if (typeof currentData === "undefined") {
+        console.log("IndexedDB: no entry yet, no need to migrate");
+      } else {
+        const newData = upgradeSettings(currentData);
+
+        // store in the database
+        console.info(
+          "IndexedDB: writing to the store",
+          SETTINGS_OBJECT_STORE_NAME,
+          newData
+        );
+
+        try {
+          await putObject(storeName, newData, transaction, db);
+        } catch (error) {
+          reject(error);
+          return;
+        }
+      }
+    }
+
+    resolve(db);
+  });
+}
+
 /**
  * Run a migration for a specific version of the database
  * These should be written by hand, most of the time.
@@ -242,15 +312,30 @@ async function runMigration(
     }
     case 6: {
       console.info("IndexedDB: Migrating hoursSlept to sleepQuality");
-      return db;
+      return upgradeDatabaseToVersionN(
+        db,
+        transaction,
+        migrateHoursSleptToSleepQuality,
+        null
+      );
     }
     case 7: {
       console.info("IndexedDB: Migrating currentPills to Pill objects");
-      return db;
+      return upgradeDatabaseToVersionN(
+        db,
+        transaction,
+        null,
+        migrateCurrentPillsToPillObjects
+      );
     }
     case 8: {
       console.info("IndexedDB: Adding prompt configuration support");
-      return db;
+      return upgradeDatabaseToVersionN(
+        db,
+        transaction,
+        updateAppStateToDatabaseVersion8,
+        updateSettingsToDatabaseVersion8
+      );
     }
   }
 }
@@ -432,7 +517,10 @@ export async function syncSettingsToDatabase(
     ...settings,
     enabledPrompts: Array.from(settings.enabledPrompts),
   };
-  return syncToDatabase(SETTINGS_OBJECT_STORE_NAME, serializedSettings as unknown as Settings);
+  return syncToDatabase(
+    SETTINGS_OBJECT_STORE_NAME,
+    serializedSettings as unknown as Settings
+  );
 }
 
 export async function loadSettingsFromDatabase(): Promise<Settings> {
@@ -440,7 +528,9 @@ export async function loadSettingsFromDatabase(): Promise<Settings> {
   const serialized = settings as unknown as SerializedSettings;
   return {
     ...settings,
-    enabledPrompts: new Set(serialized.enabledPrompts || []) as Settings["enabledPrompts"],
+    enabledPrompts: new Set(
+      serialized.enabledPrompts || []
+    ) as Settings["enabledPrompts"],
   };
 }
 
