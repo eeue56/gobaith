@@ -26,7 +26,7 @@ import {
   renderDeletePromptData,
   renderPromptConfiguration,
 } from "./prompt_setup";
-import { renderRemoveAppState, renderRemoveSettings } from "./settings";
+import { renderMigrationTrail, renderRemoveAppState, renderRemoveSettings } from "./settings";
 
 function renderTabTitle(title: string): HtmlNode<never> {
   return div([], [], [h2([], [class_("tab-title")], [text(title)])]);
@@ -111,6 +111,7 @@ export function renderSettings(
       renderRemoveAppState(),
       renderPillOrder(model.settings),
       renderAddPill(),
+      renderMigrationTrail(model.migrationTrail),
       renderDebuggingInfo(info),
     ]
   );

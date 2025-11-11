@@ -341,6 +341,7 @@ export type Model = {
   settings: Settings;
   appState: AppState;
   localState: LocalState;
+  migrationTrail: MigrationTrailEntry[];
 };
 
 export type JournalEntry = {
@@ -502,7 +503,9 @@ export type Update =
   | { kind: "DeletePromptData"; prompt: Prompt | string }
   | { kind: "CompleteSetup" }
   | { kind: "AddCustomPrompt"; promptText: string }
-  | { kind: "RemoveCustomPrompt"; promptText: string };
+  | { kind: "RemoveCustomPrompt"; promptText: string }
+  | { kind: "DownloadTrailEntry"; entry: MigrationTrailEntry; index: number }
+  | { kind: "LoadMigrationTrail" };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel

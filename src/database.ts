@@ -652,3 +652,31 @@ export async function initIndexedDB(): Promise<{
     return null;
   }
 }
+
+/**
+ * Load all migration trail entries from the database
+ */
+export async function loadMigrationTrail(): Promise<MigrationTrailEntry[]> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await openDatabase();
+
+      const transaction = db.transaction(TRAIL_OBJECT_STORE_NAME, "readonly");
+      const store = transaction.objectStore(TRAIL_OBJECT_STORE_NAME);
+
+      const getAllRequest = store.getAll();
+
+      getAllRequest.onsuccess = () => {
+        resolve(getAllRequest.result as MigrationTrailEntry[]);
+      };
+
+      getAllRequest.onerror = (event) => {
+        console.error("IndexedDB: Failed to load migration trail", event);
+        reject();
+      };
+    } catch (error) {
+      console.error("IndexedDB: Failed to open database:", error);
+      reject();
+    }
+  });
+}
