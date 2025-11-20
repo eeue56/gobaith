@@ -9,6 +9,10 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     
+    # Minimal permissions for this workflow
+    permissions:
+      contents: read
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
