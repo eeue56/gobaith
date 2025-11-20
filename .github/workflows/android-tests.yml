@@ -39,6 +39,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
       
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      
       - name: Prepare Android build
         run: npm run prepare-android
       

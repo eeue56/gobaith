@@ -126,6 +126,8 @@ npm run run-android
 
 The test suite also supports Android via Playwright (`npm run test-android`).
 
+The Android tests can also be run via GitHub Actions using the workflow in `.github/workflows/android-tests.yml`. This workflow runs on demand (manual trigger) from the Actions tab, as the Android emulator is resource-intensive.
+
 ## Tests
 
 There are some Playwright tests, which will be added to over time.
@@ -134,6 +136,27 @@ There are some Playwright tests, which will be added to over time.
 npm run build
 npm run test
 ```
+
+### Android Tests
+
+To run Android tests locally:
+
+```bash
+npm run prepare-android
+npm run run-android
+npm run test-android
+```
+
+To run Android tests via GitHub Actions:
+1. Go to the repository's "Actions" tab
+2. Select "Android Tests" workflow
+3. Click "Run workflow"
+
+The GitHub Actions workflow will:
+- Build the Android APK
+- Start an Android emulator
+- Run the Playwright tests against the app in the emulator
+- Upload test results as artifacts
 
 ## Generate fake data
 
