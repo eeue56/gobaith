@@ -7,6 +7,7 @@ import {
 } from "@playwright/test";
 import { mkdtempSync } from "fs";
 import { mkdtemp, rm } from "fs/promises";
+import { join } from "path";
 import { awaitForTitleToChange } from "./helpers";
 
 async function sendSkipOnboarding(page: Page): Promise<void> {
@@ -48,9 +49,8 @@ export const test = base.extend<Page, BrowserContext>({
       const devices = await android.devices();
 
       const [device] = devices;
-      await device.installApk(
-        "/home/noah/dev/mental-health-tracker/android/app/build/outputs/apk/debug/app-debug.apk"
-      );
+      const apkPath = join(__dirname, "..", "android", "app", "build", "outputs", "apk", "debug", "app-debug.apk");
+      await device.installApk(apkPath);
       console.log("clearing...");
       await device.shell("pm clear com.gobaith.eeue56");
       await device.shell("am start com.gobaith.eeue56/.MainActivity");
@@ -131,9 +131,8 @@ export const testOnboarding = base.extend<Page, BrowserContext>({
       const devices = await android.devices();
 
       const [device] = devices;
-      await device.installApk(
-        "/home/noah/dev/mental-health-tracker/android/app/build/outputs/apk/debug/app-debug.apk"
-      );
+      const apkPath = join(__dirname, "..", "android", "app", "build", "outputs", "apk", "debug", "app-debug.apk");
+      await device.installApk(apkPath);
       console.log("clearing...");
       await device.shell("pm clear com.gobaith.eeue56");
       await device.shell("am start com.gobaith.eeue56/.MainActivity");
