@@ -1,6 +1,9 @@
 name: Android Tests
 
 on:
+  # Run on pull requests
+  pull_request:
+    branches: [main, master]
   # Allow manual trigger from the Actions tab
   workflow_dispatch:
 
