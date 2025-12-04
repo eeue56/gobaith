@@ -39,4 +39,8 @@ export const localState: LocalState = {
   Importer: {
     status: { kind: "Ok", value: "" },
   },
+  MigrationTrail: {
+    entries: [],
+    loaded: false,
+  },
 };

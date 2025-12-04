@@ -111,7 +111,10 @@ export function renderSettings(
       renderRemoveAppState(),
       renderPillOrder(model.settings),
       renderAddPill(),
-      renderMigrationTrail(model.migrationTrail),
+      renderMigrationTrail(
+        model.localState.MigrationTrail.entries,
+        model.localState.MigrationTrail.loaded
+      ),
       renderDebuggingInfo(info),
     ]
   );

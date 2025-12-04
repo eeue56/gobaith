@@ -103,6 +103,23 @@ async function syncStateAndSettings(
   }
 }
 
+/**
+ * Download a migration trail entry as a JSON file
+ */
+function downloadMigrationTrailEntry(entry: MigrationTrailEntry): void {
+  const fileName = `migration-backup-${entry.storeName}-v${entry.fromVersion}-to-v${entry.toVersion}-${entry.timestamp}.json`;
+  const blob = new Blob([JSON.stringify(entry.data, null, 2)], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export async function update(message: Update, model: Model): Promise<Model> {
   console.info("UpdateHandler: received event", message.kind);
 
@@ -147,7 +164,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: message.model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "AddJournalEntry": {
@@ -162,7 +179,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdatePromptValue": {
@@ -177,7 +194,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "RemoveSettings": {
@@ -196,7 +213,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "RemoveAppState": {
@@ -216,7 +233,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdateCurrentTab": {
@@ -226,7 +243,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdateCurrentGraph": {
@@ -236,7 +253,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "AddPill": {
@@ -253,7 +270,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "ResetCurrentDay": {
@@ -263,7 +280,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdateCurrentDay": {
@@ -297,7 +314,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "GoToSpecificDay": {
@@ -308,7 +325,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdateImportAppState": {
@@ -330,7 +347,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
             },
           },
         },
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdateImportSettings": {
@@ -374,7 +391,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
             },
           },
         },
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetImportStatus": {
@@ -385,7 +402,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
           ...model.localState,
           Importer: { status: message.status },
         },
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdatePillValue": {
@@ -400,7 +417,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "UpdatePillOrder": {
@@ -414,7 +431,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "ReadyToRender": {
@@ -440,7 +457,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetDebuggingInfo": {
@@ -450,7 +467,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetQueryDuration": {
@@ -466,7 +483,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetPromptChoice": {
@@ -482,7 +499,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetComparisonChoice": {
@@ -499,7 +516,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetMoodValueChoice": {
@@ -516,7 +533,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SetCombineQuery": {
@@ -533,7 +550,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "AddNewDurationQuery": {
@@ -553,7 +570,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "AddNewFilterQuery": {
@@ -568,7 +585,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "DeleteQuery": {
@@ -578,7 +595,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "Noop": {
@@ -597,7 +614,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
             appState: imported,
             settings: model.settings,
             localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
           };
         }
         case "Settings": {
@@ -605,7 +622,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
             appState: model.appState,
             settings: imported,
             localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
           };
         }
       }
@@ -628,7 +645,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "SelectPromptPack": {
@@ -645,7 +662,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "TogglePrompt": {
@@ -655,7 +672,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "DeletePromptData": {
@@ -665,7 +682,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState,
         settings: model.settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "CompleteSetup": {
@@ -675,7 +692,7 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
+
       };
     }
     case "AddCustomPrompt": {
@@ -689,7 +706,6 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
       };
     }
     case "RemoveCustomPrompt": {
@@ -702,34 +718,25 @@ export async function update(message: Update, model: Model): Promise<Model> {
         appState: model.appState,
         settings,
         localState: model.localState,
-        migrationTrail: model.migrationTrail,
       };
     }
-    case "DownloadTrailEntry": {
-      const fileName = `migration-backup-${message.entry.storeName}-v${message.entry.fromVersion}-to-v${message.entry.toVersion}-${message.entry.timestamp}.json`;
-      const blob = new Blob([JSON.stringify(message.entry.data, null, 2)], {
-        type: "application/json",
-      });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-
+    case "DownloadMigrationTrailEntry": {
+      downloadMigrationTrailEntry(message.entry);
       return model;
     }
     case "LoadMigrationTrail": {
-      let migrationTrail: MigrationTrailEntry[] = [];
+      let entries: MigrationTrailEntry[] = [];
       try {
-        migrationTrail = await loadMigrationTrail();
+        entries = await loadMigrationTrail();
       } catch (error) {
         console.error("Failed to load migration trail:", error);
       }
       return {
         ...model,
-        migrationTrail,
+        localState: {
+          ...model.localState,
+          MigrationTrail: { entries, loaded: true },
+        },
       };
     }
   }
@@ -807,13 +814,5 @@ export async function fetchModelFromStores(
     }
   }
 
-  // Load migration trail entries
-  let migrationTrail: MigrationTrailEntry[] = [];
-  try {
-    migrationTrail = await loadMigrationTrail();
-  } catch (error) {
-    console.error("Failed to load migration trail:", error);
-  }
-
-  return { appState, settings, localState, migrationTrail };
+  return { appState, settings, localState };
 }

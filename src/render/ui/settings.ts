@@ -31,8 +31,28 @@ function updateRemoveAppState(): Update {
 }
 
 export function renderMigrationTrail(
-  trailEntries: MigrationTrailEntry[]
+  trailEntries: MigrationTrailEntry[],
+  loaded: boolean
 ): HtmlNode<Update> {
+  if (!loaded) {
+    return div(
+      [],
+      [attribute("id", "migration-trail-section")],
+      [
+        h3([], [], [text("Migration Trail (Backup History)")]),
+        button<Update>(
+          [
+            on("click", (): Update => ({
+              kind: "LoadMigrationTrail",
+            })),
+          ],
+          [attribute("class", "load-trail-button")],
+          [text("Load migration backups")]
+        ),
+      ]
+    );
+  }
+
   if (trailEntries.length === 0) {
     return div(
       [],
@@ -56,44 +76,47 @@ export function renderMigrationTrail(
     (a, b) => b.timestamp - a.timestamp
   );
 
-  const entryElements = sortedEntries.map((entry, index) => {
+  const entryElements: HtmlNode<Update>[] = [];
+  for (const [index, entry] of sortedEntries.entries()) {
     const date = new Date(entry.timestamp);
     const dateStr = date.toLocaleString();
     const entrySize = JSON.stringify(entry.data).length;
     const sizeKB = (entrySize / 1024).toFixed(2);
 
-    return div<Update>(
-      [],
-      [attribute("class", "migration-trail-entry")],
-      [
-        p(
-          [],
-          [attribute("class", "trail-entry-header")],
-          [
-            text(
-              `Backup ${sortedEntries.length - index}: ${entry.storeName} (v${entry.fromVersion} → v${entry.toVersion})`
-            ),
-          ]
-        ),
-        p(
-          [],
-          [attribute("class", "trail-entry-meta")],
-          [text(`Date: ${dateStr} | Size: ${sizeKB} KB`)],
-        ),
-        button<Update>(
-          [
-            on("click", (): Update => ({
-              kind: "DownloadTrailEntry",
-              entry,
-              index,
-            })),
-          ],
-          [attribute("class", "download-trail-button")],
-          [text("Download backup")]
-        ),
-      ]
+    entryElements.push(
+      div<Update>(
+        [],
+        [attribute("class", "migration-trail-entry")],
+        [
+          p(
+            [],
+            [attribute("class", "trail-entry-header")],
+            [
+              text(
+                `Backup ${sortedEntries.length - index}: ${entry.storeName} (v${entry.fromVersion} → v${entry.toVersion})`
+              ),
+            ]
+          ),
+          p(
+            [],
+            [attribute("class", "trail-entry-meta")],
+            [text(`Date: ${dateStr} | Size: ${sizeKB} KB`)],
+          ),
+          button<Update>(
+            [
+              on("click", (): Update => ({
+                kind: "DownloadMigrationTrailEntry",
+                entry,
+                index,
+              })),
+            ],
+            [attribute("class", "download-trail-button")],
+            [text("Download backup")]
+          ),
+        ]
+      )
     );
-  });
+  }
 
   return div(
     [],

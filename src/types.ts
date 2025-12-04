@@ -252,6 +252,7 @@ export type LocalState = {
   kind: "LocalState";
   Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt | string> } };
   Importer: { status: Result<string> };
+  MigrationTrail: { entries: MigrationTrailEntry[]; loaded: boolean };
 };
 
 export function isAppState(object: unknown): object is AppState {
@@ -341,7 +342,6 @@ export type Model = {
   settings: Settings;
   appState: AppState;
   localState: LocalState;
-  migrationTrail: MigrationTrailEntry[];
 };
 
 export type JournalEntry = {
@@ -504,7 +504,7 @@ export type Update =
   | { kind: "CompleteSetup" }
   | { kind: "AddCustomPrompt"; promptText: string }
   | { kind: "RemoveCustomPrompt"; promptText: string }
-  | { kind: "DownloadTrailEntry"; entry: MigrationTrailEntry; index: number }
+  | { kind: "DownloadMigrationTrailEntry"; entry: MigrationTrailEntry; index: number }
   | { kind: "LoadMigrationTrail" };
 
 /**
