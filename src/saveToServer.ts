@@ -24,11 +24,16 @@ export async function saveToServer(
   state: AppState,
   settings: Settings
 ): Promise<void> {
-  // we send to the database, but don't block on response
-  try {
-    saveSettingsToServer(settings);
-    saveAppStateToServer(state);
-  } catch (error) {}
+  const results = await Promise.allSettled([
+    saveSettingsToServer(settings),
+    saveAppStateToServer(state),
+  ]);
+
+  for (const result of results) {
+    if (result.status === "rejected") {
+      console.error("Failed to save data to server:", result.reason);
+    }
+  }
 }
 
 export async function loadSettingsFromServer(): Promise<Settings | string> {

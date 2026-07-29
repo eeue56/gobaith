@@ -36,6 +36,7 @@ import { dateToDay, nextDay, previousDay } from "./utils/dates";
 import { getDebuggingInfo, storeDebuggingInfo } from "./utils/localstorage";
 
 export let hasBackend = false;
+const HEARTBEAT_TIMEOUT_MS = 1500;
 
 /**
  * Initialize debuggingInfo from localStorage if available (browser context only)
@@ -61,7 +62,8 @@ export let debuggingInfo: DebuggingInfo = initializeDebuggingInfo();
 /**
  * Checks if the server has a healthcheck enabled
  *
- * Limit healthcheck request to 50ms, so that it doesn't block for too long when the server is down.
+ * Limit healthcheck request timeout so that it fails fast when server is down,
+ * without false negatives on slower mobile networks.
  *
  * Return true if the response is 200 with a text body of `ok`
  *
@@ -71,7 +73,7 @@ export let debuggingInfo: DebuggingInfo = initializeDebuggingInfo();
 async function hasHeartbeat(): Promise<boolean> {
   try {
     const healthcheck = await fetch("/healthcheck", {
-      signal: AbortSignal.timeout(50),
+      signal: AbortSignal.timeout(HEARTBEAT_TIMEOUT_MS),
     });
 
     if (healthcheck.status !== 200) {

@@ -54,7 +54,12 @@ function render(model: Model): HtmlNode<Update> {
 }
 
 async function tryToPersistStorage(): Promise<void> {
-  return navigator.storage.persist().then((persistent) => {
+  if (typeof navigator === "undefined" || !navigator.storage?.persist) {
+    return;
+  }
+
+  try {
+    const persistent = await navigator.storage.persist();
     if (persistent) {
       console.log("Storage will not be cleared except by explicit user action");
     } else {
@@ -62,6 +67,19 @@ async function tryToPersistStorage(): Promise<void> {
         "Client-side storage may be cleared under storage pressure."
       );
     }
+  } catch (error) {
+    console.warn("Unable to request persistent storage:", error);
+  }
+}
+
+function attachGlobalErrorHandlers(): void {
+  window.addEventListener("error", (event) => {
+    console.error("Unhandled window error:", event.error || event.message);
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    console.error("Unhandled promise rejection:", event.reason);
+    event.preventDefault();
   });
 }
 
@@ -90,6 +108,7 @@ async function resetPrompts() {
 
 async function main() {
   console.log("Main: Starting script...");
+  attachGlobalErrorHandlers();
 
   let info = getDebuggingInfo();
   if (!info) {
