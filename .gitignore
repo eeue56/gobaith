@@ -143,3 +143,6 @@ state.json
 backend-state
 electron/main.js
 tmp/
+
+# java junk
+.idea/

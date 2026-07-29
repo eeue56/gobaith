@@ -7,9 +7,9 @@
     "@eeue56/coed": "^0.4.0"
   },
   "devDependencies": {
-    "@capacitor/android": "^7.4.2",
-    "@capacitor/cli": "^7.4.2",
-    "@capacitor/core": "^7.4.2",
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "@eeue56/gweld": "^1.1.2",
     "@playwright/test": "~1.54.1",
     "@types/express": "^5.0.3",

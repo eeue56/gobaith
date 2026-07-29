@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.gobaith.eeue56"
-    compileSdk rootProject.ext.compileSdkVersion
+    namespace = "com.gobaith.eeue56"
+    compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.gobaith.eeue56"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -13,21 +13,15 @@ android {
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
-    }
-    dependenciesInfo {
-        // Disable including dependency metadata when building APKs
-        includeInApk = false
-        // Disable including dependency metadata when building Android App Bundles
-        includeInBundle = false
     }
     buildTypes {
         release {
             shrinkResources true
             zipAlignEnabled true
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
