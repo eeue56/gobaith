@@ -202,12 +202,14 @@ function getBasePath(runner: PageRunner): string {
 
 async function makePage(): Promise<{ page: Page; runner: PageRunner }> {
   if (process.env.IS_ANDROID) {
+    const apkPath =
+      process.env.ANDROID_APK_PATH ||
+      "./android/app/build/outputs/apk/debug/app-debug.apk";
+
     const devices = await android.devices();
 
     const [device] = devices;
-    await device.installApk(
-      "/home/noah/dev/mental-health-tracker/android/app/build/outputs/apk/debug/app-debug.apk"
-    );
+    await device.installApk(apkPath);
     console.log("clearing...");
     await device.shell("pm clear com.gobaith.eeue56");
     await device.shell("am start com.gobaith.eeue56/.MainActivity");
