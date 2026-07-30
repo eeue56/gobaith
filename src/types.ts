@@ -216,6 +216,17 @@ export function isDatabaseVersion(version: number): version is DatabaseVersion {
 export const LATEST_DATABASE_VERSION: DatabaseVersion = 8;
 
 /**
+ * A trail entry stores a backup of data before a migration is run
+ */
+export type MigrationTrailEntry = {
+  storeName: StoreName;
+  data: unknown;
+  timestamp: number;
+  fromVersion: DatabaseVersion;
+  toVersion: DatabaseVersion;
+};
+
+/**
  * AppState includes UI state and data (journal entries)
  */
 export type AppState = {
@@ -241,6 +252,7 @@ export type LocalState = {
   kind: "LocalState";
   Graphs: { LineOverview: { nonFilteredPrompts: Set<Prompt | string> } };
   Importer: { status: Result<string> };
+  MigrationTrail: { entries: MigrationTrailEntry[]; loaded: boolean };
 };
 
 export function isAppState(object: unknown): object is AppState {
@@ -491,7 +503,9 @@ export type Update =
   | { kind: "DeletePromptData"; prompt: Prompt | string }
   | { kind: "CompleteSetup" }
   | { kind: "AddCustomPrompt"; promptText: string }
-  | { kind: "RemoveCustomPrompt"; promptText: string };
+  | { kind: "RemoveCustomPrompt"; promptText: string }
+  | { kind: "DownloadMigrationTrailEntry"; entry: MigrationTrailEntry; index: number }
+  | { kind: "LoadMigrationTrail" };
 
 /**
  * These are used to make sure that events communicate over the broadcast channel
@@ -539,6 +553,7 @@ export type RenderError = "NeedsToInitialize";
 
 export const SETTINGS_OBJECT_STORE_NAME = "Settings";
 export const APP_STATE_OBJECT_STORE_NAME = "AppState";
+export const TRAIL_OBJECT_STORE_NAME = "MigrationTrail";
 
 export type StoreName =
   | typeof SETTINGS_OBJECT_STORE_NAME

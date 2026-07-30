@@ -4,9 +4,11 @@ import {
   DatabaseVersion,
   isDatabaseVersion,
   LATEST_DATABASE_VERSION,
+  MigrationTrailEntry,
   Settings,
   SETTINGS_OBJECT_STORE_NAME,
   StoreName,
+  TRAIL_OBJECT_STORE_NAME,
 } from "./types";
 
 import { renameStateFields } from "./cleaners/database_3";
@@ -61,6 +63,47 @@ async function putObject(
     transaction.oncomplete = () => {
       resolve(db);
     };
+  });
+}
+
+/**
+ * Save data to the migration trail store before running a migration
+ */
+async function saveToTrail(
+  storeName: StoreName,
+  data: unknown,
+  transaction: IDBTransaction,
+  fromVersion: DatabaseVersion,
+  toVersion: DatabaseVersion
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    try {
+      const trailStore = transaction.objectStore(TRAIL_OBJECT_STORE_NAME);
+      
+      const trailEntry: MigrationTrailEntry = {
+        storeName,
+        data,
+        timestamp: Date.now(),
+        fromVersion,
+        toVersion,
+      };
+      
+      const request = trailStore.add(trailEntry);
+      
+      request.onsuccess = () => {
+        console.log(`IndexedDB: Saved ${storeName} to trail (v${fromVersion} -> v${toVersion})`);
+        resolve();
+      };
+      
+      request.onerror = (event) => {
+        const message = `IndexedDB: Failed to save ${storeName} to trail`;
+        console.error(message, event);
+        reject(message);
+      };
+    } catch (error) {
+      console.error(`IndexedDB: Error saving to trail:`, error);
+      reject(error);
+    }
   });
 }
 
@@ -289,6 +332,13 @@ async function runMigration(
           keyPath: "kind",
         });
       }
+      
+      // Create the trail store for migration backups
+      if (!db.objectStoreNames.contains(TRAIL_OBJECT_STORE_NAME)) {
+        db.createObjectStore(TRAIL_OBJECT_STORE_NAME, {
+          autoIncrement: true,
+        });
+      }
       return db;
     }
     case 2: {
@@ -362,6 +412,40 @@ async function runMigrations(
     await syncStateToDatabase(defaultObjects.appState);
 
     return db;
+  }
+
+  // Backup current data to trail before running migrations
+  console.log("IndexedDB: Backing up data to trail before migration...");
+  try {
+    // Check if stores exist before backing them up
+    if (db.objectStoreNames.contains(APP_STATE_OBJECT_STORE_NAME)) {
+      const appStateData = await getObject(APP_STATE_OBJECT_STORE_NAME, transaction);
+      if (typeof appStateData !== "undefined") {
+        await saveToTrail(
+          APP_STATE_OBJECT_STORE_NAME,
+          appStateData,
+          transaction,
+          previousVersion,
+          newVersion
+        );
+      }
+    }
+
+    if (db.objectStoreNames.contains(SETTINGS_OBJECT_STORE_NAME)) {
+      const settingsData = await getObject(SETTINGS_OBJECT_STORE_NAME, transaction);
+      if (typeof settingsData !== "undefined") {
+        await saveToTrail(
+          SETTINGS_OBJECT_STORE_NAME,
+          settingsData,
+          transaction,
+          previousVersion,
+          newVersion
+        );
+      }
+    }
+  } catch (error) {
+    console.error("IndexedDB: Failed to backup data to trail:", error);
+    // Continue with migration even if backup fails, but log it
   }
 
   for (let i = versionToStartPatchAt; i <= newVersion; i++) {
@@ -567,4 +651,32 @@ export async function initIndexedDB(): Promise<{
 
     return null;
   }
+}
+
+/**
+ * Load all migration trail entries from the database
+ */
+export async function loadMigrationTrail(): Promise<MigrationTrailEntry[]> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await openDatabase();
+
+      const transaction = db.transaction(TRAIL_OBJECT_STORE_NAME, "readonly");
+      const store = transaction.objectStore(TRAIL_OBJECT_STORE_NAME);
+
+      const getAllRequest = store.getAll();
+
+      getAllRequest.onsuccess = () => {
+        resolve(getAllRequest.result as MigrationTrailEntry[]);
+      };
+
+      getAllRequest.onerror = (event) => {
+        console.error("IndexedDB: Failed to load migration trail", event);
+        reject();
+      };
+    } catch (error) {
+      console.error("IndexedDB: Failed to open database:", error);
+      reject();
+    }
+  });
 }

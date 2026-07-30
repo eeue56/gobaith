@@ -82,6 +82,10 @@ function eventLogEntryToDescription(entry: EventLogEntry): string {
       return "Added custom prompt";
     case "RemoveCustomPrompt":
       return "Removed custom prompt";
+    case "DownloadMigrationTrailEntry":
+      return "Downloaded migration backup";
+    case "LoadMigrationTrail":
+      return "Loaded migration trail";
   }
 }
 
